@@ -1,6 +1,7 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/view/place_create_page.dart';
+import 'package:gohan_map/view/place_detail_page.dart';
 
 class MapPage extends StatelessWidget {
   // StatelessWidgetは、状態を持たないウィジェット。情報が変わらないウィジェット。
@@ -25,6 +26,19 @@ class MapPage extends StatelessWidget {
               isScrollControlled: true,
               builder: (context) {
                 return const PlaceCreatePage();
+              },
+            );
+          },
+        ),
+        CupertinoButton(
+          child: const Text('Detail'),
+          onPressed: () {
+            showModalBottomSheet(
+              barrierColor: Colors.black.withOpacity(0.05),
+              context: context,
+              isScrollControlled: true,
+              builder: (context) {
+                return const PlaceDetailPage();
               },
             );
           },
