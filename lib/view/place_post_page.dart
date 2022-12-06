@@ -2,8 +2,8 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/component/gohan_app_modal.dart';
 
-class PlaceCreatePage extends StatelessWidget {
-  const PlaceCreatePage({Key? key}) : super(key: key);
+class PlacePostPage extends StatelessWidget {
+  const PlacePostPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class PlaceCreatePage extends StatelessWidget {
           children: [
             const Text('PlaceCreatePage'),
             CupertinoButton(
-              child: const Text('Create'),
+              child: const Text('Post'),
               onPressed: () {
                 Navigator.pop(context);
               },
