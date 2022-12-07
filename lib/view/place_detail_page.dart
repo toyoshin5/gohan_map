@@ -9,7 +9,6 @@ class PlaceDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GohanAppModal(
-      maxChildSize: 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -20,10 +19,10 @@ class PlaceDetailPage extends StatelessWidget {
               child: const Text('Post'),
               onPressed: () {
                 showModalBottomSheet(
-                  barrierColor: Colors.black.withOpacity(0),
+                  barrierColor: Colors.black.withOpacity(0.3),//背景をどれぐらい暗くするか
                   backgroundColor: Colors.transparent,
                   context: context,
-                  isScrollControlled: true,
+                  isScrollControlled: true,//スクロールで閉じたりするか
                   builder: (context) {
                     return const PlacePostPage();
                   },

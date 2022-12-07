@@ -8,6 +8,8 @@ class PlacePostPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GohanAppModal(
+      initialChildSize: 0.9,
+      minChildSize: 0.9,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
