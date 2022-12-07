@@ -1,9 +1,13 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:gohan_map/view/map_page.dart';
 
 /// アプリが起動したときに呼ばれる
 void main() {
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  ));
   runApp(const MyApp());
 }
 
@@ -15,7 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const CupertinoApp(
       title: 'Gohan Map',
-      //ダークモード
+      //ステータスバーの文字を消す
+      debugShowCheckedModeBanner: false,
       home: CupertinoPageScaffold(
         //Scaffoldは画面の枠組みを作るウィジェット。基本的アプリに1つで、画面全体を覆う最上位ウィジェットであることを示す。
         navigationBar: CupertinoNavigationBar(

@@ -8,44 +8,41 @@ class GohanAppModal extends StatelessWidget {
     this.height,
     Key? key,
   }) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: height,
-      child: Container(
-        decoration: BoxDecoration(
-          color: CupertinoColors.white,
-          boxShadow: [
-            BoxShadow(
-              color: CupertinoColors.systemGrey2,
-              spreadRadius: 5,
-              blurRadius: 10,
-              offset: const Offset(0, 0), // changes position of shadow
-            ),
-          ],
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(10.0),
-            topRight: Radius.circular(10.0),
+      decoration: const BoxDecoration(
+        color: CupertinoColors.white,
+        boxShadow: [
+          BoxShadow(
+            color: CupertinoColors.systemGrey4,
+            spreadRadius: 5,
+            blurRadius: 10,
+            offset: Offset(0, 0), // changes position of shadow
           ),
+        ],
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(10.0),
+          topRight: Radius.circular(10.0),
         ),
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.fromLTRB(0, 16, 0, 15),
-              height: 5,
-              width: 26,
-              decoration: BoxDecoration(
-                color: const Color(0x26000000),
-                borderRadius: BorderRadius.circular(2.5),
-              ),
+      ),
+      child: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.fromLTRB(0, 10, 0, 15),
+            height: 5,
+            width: 26,
+            decoration: BoxDecoration(
+              color: const Color(0x16000000),
+              borderRadius: BorderRadius.circular(2.5),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: child,
-            ),
-          ],
-        ),
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: child,
+          ),
+        ],
       ),
     );
   }
