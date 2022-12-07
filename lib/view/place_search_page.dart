@@ -1,3 +1,4 @@
+
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/component/gohan_app_modal.dart';
@@ -14,9 +15,12 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   var isSearch = false;
   @override
   Widget build(BuildContext context) {
+    //modalの高さをNavigationBarに合わせる
+    var displayHeight = MediaQuery.of(context).size.height;
+    var navigationBarHeight = AppBar().preferredSize.height;
+    var ratio = (displayHeight-navigationBarHeight) / displayHeight;
     return GohanAppModal(
       initialChildSize: 0.6,
-      maxChildSize: 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(

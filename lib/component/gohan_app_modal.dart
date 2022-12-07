@@ -5,17 +5,20 @@ import 'package:flutter/material.dart';
 class GohanAppModal extends StatelessWidget {
   final Widget child; //bodyとなるウィジェット
   final double initialChildSize; //初期の大きさが画面の高さの何倍か
-  final double minChildSize; //最小の大きさが親ウェジェットの何倍か
-  final double maxChildSize; //最大の大きさが親ウェジェットの何倍か
+  final double minChildSize; //最小の大きさが画面の高さの何倍か (最大の大きさはNavigationBarの下までで固定)
   const GohanAppModal({
     this.initialChildSize = 0.4,
     this.minChildSize = 0.2,
-    this.maxChildSize = 0.8,
     required this.child,
     Key? key,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    //modalの高さをNavigationBarに合わせる
+
+    var displayHeight = MediaQuery.of(context).size.height;
+    var navigationBarHeight = AppBar().preferredSize.height + 22;//22はstatusBarの高さ
+    var ratio = (displayHeight-navigationBarHeight) / displayHeight;
     return DraggableScrollableSheet(
       builder: (BuildContext context, scrollController) {
         return Container(
@@ -59,7 +62,7 @@ class GohanAppModal extends StatelessWidget {
       },
       initialChildSize: initialChildSize /*最初の大きさが親ウェジェットの何倍か*/,
       minChildSize: minChildSize /*最小の大きさが親ウェジェットの何倍か*/,
-      maxChildSize: maxChildSize /*最大の大きさが親ウェジェットの何倍か*/,
+      maxChildSize: ratio/*最大の大きさが親ウェジェットの何倍か*/,
     );
   }
 }
