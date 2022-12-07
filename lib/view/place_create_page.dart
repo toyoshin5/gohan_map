@@ -8,7 +8,7 @@ class PlaceCreatePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GohanAppModal(
-      height: 500,
+      height: 300,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(

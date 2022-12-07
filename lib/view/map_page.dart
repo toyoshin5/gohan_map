@@ -2,6 +2,7 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
+import 'package:gohan_map/view/place_search_page.dart';
 
 class MapPage extends StatelessWidget {
   // StatelessWidgetは、状態を持たないウィジェット。情報が変わらないウィジェット。
@@ -16,7 +17,7 @@ class MapPage extends StatelessWidget {
       //縦に並べる
       mainAxisAlignment: MainAxisAlignment.start, //上寄せ
       children: [
-        const Text('Gohan Map'),
+        const Text('MapPage'),
         CupertinoButton(
           child: const Text('Create'),
           onPressed: () {
@@ -39,6 +40,33 @@ class MapPage extends StatelessWidget {
               isScrollControlled: true,
               builder: (context) {
                 return const PlaceDetailPage();
+              },
+            );
+          },
+        ),
+        CupertinoButton(
+          child: const Text('Search'),
+          onPressed: () {
+            showModalBottomSheet(
+              barrierColor: Colors.black.withOpacity(0.05),
+              context: context,
+              isScrollControlled: true,
+              builder: (context) {
+                return const PlaceSearchPage();
+              },
+            ).then(
+              (value) {
+                //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
+                if (value != null) {
+                  showModalBottomSheet(
+                    barrierColor: Colors.black.withOpacity(0.05),
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (context) {
+                      return const PlaceDetailPage();
+                    },
+                  );
+                }
               },
             );
           },
