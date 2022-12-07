@@ -42,7 +42,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                           child: ListTile(
                             title: Text('place$i'),
                             onTap: () {
-                              Navigator.pop(context,"searchid");
+                              Navigator.pop(context,"<searchid>");
                             },
                           ),
                         )
