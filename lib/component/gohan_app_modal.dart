@@ -1,5 +1,4 @@
 import 'package:flutter/Cupertino.dart';
-import 'package:flutter/material.dart';
 
 class GohanAppModal extends StatelessWidget {
   final double? height;
@@ -16,10 +15,10 @@ class GohanAppModal extends StatelessWidget {
       height: height,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: CupertinoColors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
+              color: CupertinoColors.systemGrey2,
               spreadRadius: 5,
               blurRadius: 10,
               offset: const Offset(0, 0), // changes position of shadow

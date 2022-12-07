@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const CupertinoApp(
       title: 'Gohan Map',
+      //ダークモード
       home: CupertinoPageScaffold(
         //Scaffoldは画面の枠組みを作るウィジェット。基本的アプリに1つで、画面全体を覆う最上位ウィジェットであることを示す。
         navigationBar: CupertinoNavigationBar(
