@@ -6,7 +6,6 @@ class PlaceCreatePage extends StatelessWidget {
   const PlaceCreatePage({Key? key}) : super(key: key);
   Widget build(BuildContext context) {
     return GohanAppModal(
-      height: 400,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(

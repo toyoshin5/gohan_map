@@ -66,6 +66,7 @@ class MapPage extends StatelessWidget {
                     barrierColor: Colors.black.withOpacity(0),
                     context: context,
                     isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
                     builder: (context) {
                       return const PlaceDetailPage();
                     },
