@@ -15,41 +15,32 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   @override
   Widget build(BuildContext context) {
     return GohanAppModal(
-      height: 600,
+      initialChildSize: 0.6,
+      maxChildSize: 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('PlaceSearchPage'),
-              Container(
-                height: 500,
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      CupertinoButton(
-                        child: const Text('SearchButton'),
-                        onPressed: () {
-                          setState(() {
-                            isSearch = true;
-                          });
-                        },
-                      ),
-                      for (var i = 0; i < 20; i++)
-                        if (isSearch)
-                        Card(
-                          child: ListTile(
-                            title: Text('place$i'),
-                            onTap: () {
-                              Navigator.pop(context,"searchid");
-                            },
-                          ),
-                        )
-                    ],
+            CupertinoButton(
+              child: const Text('SearchButton'),
+              onPressed: () {
+                setState(() {
+                  isSearch = true;
+                });
+              },
+            ),
+            for (var i = 0; i < 20; i++)
+              if (isSearch)
+                Card(
+                  child: ListTile(
+                    title: Text('place$i'),
+                    onTap: () {
+                      Navigator.pop(context, "<searchid>");
+                    },
                   ),
                 ),
-              ),
           ],
         ),
       ),
