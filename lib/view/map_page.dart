@@ -22,9 +22,10 @@ class MapPage extends StatelessWidget {
           child: const Text('Create'),
           onPressed: () {
             showModalBottomSheet(
-              barrierColor: Colors.black.withOpacity(0.05),
+              barrierColor: Colors.black.withOpacity(0),
               context: context,
               isScrollControlled: true,
+              backgroundColor: Colors.transparent,
               builder: (context) {
                 return const PlaceCreatePage();
               },
@@ -35,9 +36,11 @@ class MapPage extends StatelessWidget {
           child: const Text('Detail'),
           onPressed: () {
             showModalBottomSheet(
-              barrierColor: Colors.black.withOpacity(0.05),
-              context: context,
+              barrierColor: Colors.black.withOpacity(0),
               isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              context: context,
+              //isScrollControlled: true,
               builder: (context) {
                 return const PlaceDetailPage();
               },
@@ -48,9 +51,10 @@ class MapPage extends StatelessWidget {
           child: const Text('Search'),
           onPressed: () {
             showModalBottomSheet(
-              barrierColor: Colors.black.withOpacity(0.05),
+              barrierColor: Colors.black.withOpacity(0),
               context: context,
               isScrollControlled: true,
+              backgroundColor: Colors.transparent,
               builder: (context) {
                 return const PlaceSearchPage();
               },
@@ -59,9 +63,10 @@ class MapPage extends StatelessWidget {
                 //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
                 if (value != null) {
                   showModalBottomSheet(
-                    barrierColor: Colors.black.withOpacity(0.05),
+                    barrierColor: Colors.black.withOpacity(0),
                     context: context,
                     isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
                     builder: (context) {
                       return const PlaceDetailPage();
                     },

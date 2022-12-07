@@ -9,7 +9,7 @@ class PlaceDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GohanAppModal(
-      height: 300,
+      maxChildSize: 1,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -21,6 +21,7 @@ class PlaceDetailPage extends StatelessWidget {
               onPressed: () {
                 showModalBottomSheet(
                   barrierColor: Colors.black.withOpacity(0),
+                  backgroundColor: Colors.transparent,
                   context: context,
                   isScrollControlled: true,
                   builder: (context) {
