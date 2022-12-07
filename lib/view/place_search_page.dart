@@ -15,19 +15,15 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   var isSearch = false;
   @override
   Widget build(BuildContext context) {
-    //modalの高さをNavigationBarに合わせる
-    var displayHeight = MediaQuery.of(context).size.height;
-    var navigationBarHeight = AppBar().preferredSize.height;
-    var ratio = (displayHeight-navigationBarHeight) / displayHeight;
     return GohanAppModal(
       initialChildSize: 0.6,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Padding(//余白を作るためのウィジェット
+        padding: const EdgeInsets.symmetric(horizontal: 16),//左右に16pxの余白を作る
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text('PlaceSearchPage'),
-            CupertinoButton(
+            CupertinoButton(//iOS風のボタン
               child: const Text('SearchButton'),
               onPressed: () {
                 setState(() {
@@ -37,7 +33,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
             ),
             for (var i = 0; i < 20; i++)
               if (isSearch)
-                Card(
+                Card(//影付きの角丸四角形
                   child: ListTile(
                     title: Text('place$i'),
                     onTap: () {

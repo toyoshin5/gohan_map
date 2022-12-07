@@ -1,9 +1,9 @@
 import 'package:flutter/Cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:gohan_map/component/gohan_app_modal.dart';
-
+///飲食店の登録画面
 class PlaceCreatePage extends StatelessWidget {
   const PlaceCreatePage({Key? key}) : super(key: key);
+  @override
   Widget build(BuildContext context) {
     return GohanAppModal(
       child: Padding(

@@ -4,6 +4,7 @@ import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
 
+///地図が表示されている画面
 class MapPage extends StatelessWidget {
   // StatelessWidgetは、状態を持たないウィジェット。情報が変わらないウィジェット。
   const MapPage({Key? key})
@@ -18,21 +19,21 @@ class MapPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start, //上寄せ
       children: [
         const Text('MapPage'),
-        CupertinoButton(
+        CupertinoButton(//iOS風のボタン
           child: const Text('Create'),
           onPressed: () {
-            showModalBottomSheet(
+            showModalBottomSheet(//モーダルを表示する関数
               barrierColor: Colors.black.withOpacity(0),
               context: context,
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder: (context) {
-                return const PlaceCreatePage();
+                return const PlaceCreatePage();//飲食店を作成する画面
               },
             );
           },
         ),
-        CupertinoButton(
+        CupertinoButton(//iOS風のボタン
           child: const Text('Detail'),
           onPressed: () {
             showModalBottomSheet(
@@ -42,7 +43,7 @@ class MapPage extends StatelessWidget {
               context: context,
               //isScrollControlled: true,
               builder: (context) {
-                return const PlaceDetailPage();
+                return const PlaceDetailPage();//飲食店の詳細画面
               },
             );
           },
@@ -56,7 +57,7 @@ class MapPage extends StatelessWidget {
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder: (context) {
-                return const PlaceSearchPage();
+                return const PlaceSearchPage();//飲食店を検索する画面
               },
             ).then(
               (value) {
@@ -68,7 +69,7 @@ class MapPage extends StatelessWidget {
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (context) {
-                      return const PlaceDetailPage();
+                      return const PlaceDetailPage();//飲食店の詳細画面
                     },
                   );
                 }
