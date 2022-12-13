@@ -18,12 +18,10 @@ class MapPage extends StatelessWidget {
     // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
     return Stack(
       children: [
-        Container(
-          color: Colors.white,
-          width: double.infinity,
+        Center(
           child: Column(
             //縦に並べる
-            mainAxisAlignment: MainAxisAlignment.start, //上寄せ
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text('MapPage'),
               CupertinoButton(
@@ -68,7 +66,6 @@ class MapPage extends StatelessWidget {
           alignment: Alignment.bottomCenter,
           child: SizedBox(
             width: double.infinity,
-            height: 100,
             child: GestureDetector(
               child: AbsorbPointer(
                 child: Container(            //モーダル風UIの中身  
@@ -80,7 +77,7 @@ class MapPage extends StatelessWidget {
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 28),
+                    padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
                     child: AppSearchBar(onSubmitted: (value) {},),
                   ),
                 ),
