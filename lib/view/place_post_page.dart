@@ -7,14 +7,15 @@ class PlacePostPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GohanAppModal(
-      initialChildSize: 0.9,
-      minChildSize: 0.9,
+      initialChildSize: 0.5,
+      minChildSize: 0.5,
+      maxChildSize: 0.5,
       child: Padding(//余白を作るためのウィジェット
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(//縦に並べるためのウィジェット
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('PlaceCreatePage'),
+            const Text('PlacePostPage'),
             CupertinoButton(
               child: const Text('Post'),
               onPressed: () {

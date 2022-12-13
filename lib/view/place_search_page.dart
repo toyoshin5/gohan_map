@@ -16,6 +16,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   @override
   Widget build(BuildContext context) {
     return GohanAppModal(
+      showKnob: false,
       initialChildSize: 0.6,
       child: Padding(//余白を作るためのウィジェット
         padding: const EdgeInsets.symmetric(horizontal: 16),//左右に16pxの余白を作る
