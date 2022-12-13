@@ -18,46 +18,50 @@ class MapPage extends StatelessWidget {
     // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
     return Stack(
       children: [
-        Column(
-          //縦に並べる
-          mainAxisAlignment: MainAxisAlignment.start, //上寄せ
-          children: [
-            const Text('MapPage'),
-            CupertinoButton(
-              //iOS風のボタン
-              child: const Text('Create'),
-              onPressed: () {
-                showModalBottomSheet(
-                  //モーダルを表示する関数
-                  barrierColor: Colors.black.withOpacity(0),
-                  isDismissible: true,
-                  context: context,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  builder: (context) {
-                    return const PlaceCreatePage(); //飲食店を作成する画面
-                  },
-                );
-              },
-            ),
-            CupertinoButton(
-              //iOS風のボタン
-              child: const Text('Detail'),
-              onPressed: () {
-                showModalBottomSheet(
-                  barrierColor: Colors.black.withOpacity(0),
-                  isDismissible: true,
-                  isScrollControlled: true,
-                  backgroundColor: Colors.transparent,
-                  context: context,
-                  //isScrollControlled: true,
-                  builder: (context) {
-                    return const PlaceDetailPage(); //飲食店の詳細画面
-                  },
-                );
-              },
-            ),
-          ],
+        Container(
+          color: Colors.white,
+          width: double.infinity,
+          child: Column(
+            //縦に並べる
+            mainAxisAlignment: MainAxisAlignment.start, //上寄せ
+            children: [
+              const Text('MapPage'),
+              CupertinoButton(
+                //iOS風のボタン
+                child: const Text('Create'),
+                onPressed: () {
+                  showModalBottomSheet(
+                    //モーダルを表示する関数
+                    barrierColor: Colors.black.withOpacity(0),
+                    isDismissible: true,
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) {
+                      return const PlaceCreatePage(); //飲食店を作成する画面
+                    },
+                  );
+                },
+              ),
+              CupertinoButton(
+                //iOS風のボタン
+                child: const Text('Detail'),
+                onPressed: () {
+                  showModalBottomSheet(
+                    barrierColor: Colors.black.withOpacity(0),
+                    isDismissible: true,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    context: context,
+                    //isScrollControlled: true,
+                    builder: (context) {
+                      return const PlaceDetailPage(); //飲食店の詳細画面
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
         ),
         //下の検索ボタン
         Align(
@@ -70,14 +74,6 @@ class MapPage extends StatelessWidget {
                 child: Container(            //モーダル風UIの中身  
                   decoration: const BoxDecoration(
                     color: AppColors.backgroundGrayColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: CupertinoColors.systemGrey5,
-                        spreadRadius: 5,
-                        blurRadius: 10,
-                        offset: Offset(0, 0), // changes position of shadow
-                      ),
-                    ],
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(20.0),
                       topRight: Radius.circular(20.0),
