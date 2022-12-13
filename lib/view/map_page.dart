@@ -1,5 +1,7 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
@@ -14,68 +16,109 @@ class MapPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
-    return Column(
-      //縦に並べる
-      mainAxisAlignment: MainAxisAlignment.start, //上寄せ
+    return Stack(
       children: [
-        const Text('MapPage'),
-        CupertinoButton(//iOS風のボタン
-          child: const Text('Create'),
-          onPressed: () {
-            showModalBottomSheet(//モーダルを表示する関数
-              barrierColor: Colors.black.withOpacity(0),
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) {
-                return const PlaceCreatePage();//飲食店を作成する画面
+        Column(
+          //縦に並べる
+          mainAxisAlignment: MainAxisAlignment.start, //上寄せ
+          children: [
+            const Text('MapPage'),
+            CupertinoButton(
+              //iOS風のボタン
+              child: const Text('Create'),
+              onPressed: () {
+                showModalBottomSheet(
+                  //モーダルを表示する関数
+                  barrierColor: Colors.black.withOpacity(0),
+                  isDismissible: true,
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) {
+                    return const PlaceCreatePage(); //飲食店を作成する画面
+                  },
+                );
               },
-            );
-          },
+            ),
+            CupertinoButton(
+              //iOS風のボタン
+              child: const Text('Detail'),
+              onPressed: () {
+                showModalBottomSheet(
+                  barrierColor: Colors.black.withOpacity(0),
+                  isDismissible: true,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  context: context,
+                  //isScrollControlled: true,
+                  builder: (context) {
+                    return const PlaceDetailPage(); //飲食店の詳細画面
+                  },
+                );
+              },
+            ),
+          ],
         ),
-        CupertinoButton(//iOS風のボタン
-          child: const Text('Detail'),
-          onPressed: () {
-            showModalBottomSheet(
-              barrierColor: Colors.black.withOpacity(0),
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              context: context,
-              //isScrollControlled: true,
-              builder: (context) {
-                return const PlaceDetailPage();//飲食店の詳細画面
+        //下の検索ボタン
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: SizedBox(
+            width: double.infinity,
+            height: 100,
+            child: GestureDetector(
+              child: AbsorbPointer(
+                child: Container(            //モーダル風UIの中身  
+                  decoration: const BoxDecoration(
+                    color: AppColors.backgroundGrayColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: CupertinoColors.systemGrey5,
+                        spreadRadius: 5,
+                        blurRadius: 10,
+                        offset: Offset(0, 0), // changes position of shadow
+                      ),
+                    ],
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 28),
+                    child: AppSearchBar(onSubmitted: (value) {},),
+                  ),
+                ),
+              ),
+              onTap: () {
+                showModalBottomSheet(
+                  barrierColor: Colors.black.withOpacity(0),
+                  context: context,
+                  isDismissible: true,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) {
+                    return const PlaceSearchPage(); //飲食店を検索する画面
+                  },
+                ).then(
+                  (value) {
+                    //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
+                    if (value != null) {
+                      showModalBottomSheet(
+                        barrierColor: Colors.black.withOpacity(0),
+                        context: context,
+                        isDismissible: true,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) {
+                          return const PlaceDetailPage(); //飲食店の詳細画面
+                        },
+                      );
+                    }
+                  },
+                );
               },
-            );
-          },
-        ),
-        CupertinoButton(
-          child: const Text('Search'),
-          onPressed: () {
-            showModalBottomSheet(
-              barrierColor: Colors.black.withOpacity(0),
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) {
-                return const PlaceSearchPage();//飲食店を検索する画面
-              },
-            ).then(
-              (value) {
-                //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
-                if (value != null) {
-                  showModalBottomSheet(
-                    barrierColor: Colors.black.withOpacity(0),
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) {
-                      return const PlaceDetailPage();//飲食店の詳細画面
-                    },
-                  );
-                }
-              },
-            );
-          },
+            ),
+          ),
         ),
       ],
     );

@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
       //ステータスバーの文字を消す
       debugShowCheckedModeBanner: false,
       home: CupertinoPageScaffold(
+        resizeToAvoidBottomInset: false,//キーボードが出てきたときに画面を上にずらすかどうか
         //Scaffoldは画面の枠組みを作るウィジェット。基本的アプリに1つで、画面全体を覆う最上位ウィジェットであることを示す。
         navigationBar: CupertinoNavigationBar(
           //上のバー
