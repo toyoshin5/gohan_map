@@ -24,6 +24,7 @@ class MapPage extends StatelessWidget {
           onPressed: () {
             showModalBottomSheet(//モーダルを表示する関数
               barrierColor: Colors.black.withOpacity(0),
+              isDismissible: true,
               context: context,
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
@@ -38,6 +39,7 @@ class MapPage extends StatelessWidget {
           onPressed: () {
             showModalBottomSheet(
               barrierColor: Colors.black.withOpacity(0),
+              isDismissible: true,
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               context: context,
@@ -54,6 +56,7 @@ class MapPage extends StatelessWidget {
             showModalBottomSheet(
               barrierColor: Colors.black.withOpacity(0),
               context: context,
+              isDismissible: true,
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder: (context) {
@@ -66,6 +69,7 @@ class MapPage extends StatelessWidget {
                   showModalBottomSheet(
                     barrierColor: Colors.black.withOpacity(0),
                     context: context,
+                    isDismissible: true,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (context) {
