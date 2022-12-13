@@ -1,14 +1,15 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gohan_map/colors/app_colors.dart';
 
 ///下から出てくるモーダルウィジェットの中身の雛形
-class GohanAppModal extends StatelessWidget {
+class AppModal extends StatelessWidget {
   final Widget child; //bodyとなるウィジェット
   final double initialChildSize; //初期の大きさが画面の高さの何倍か
   final double minChildSize; //最小の大きさが画面の高さの何倍か (最大の大きさはNavigationBarの下までで固定)
   final double maxChildSize; //最大の大きさが画面の高さの何倍か
   final bool showKnob; //つまみを表示するか
-  const GohanAppModal({
+  const AppModal({
     this.initialChildSize = 0.4,
     this.minChildSize = 0.2,
     this.maxChildSize = 0,
@@ -35,18 +36,18 @@ class GohanAppModal extends StatelessWidget {
         builder: (BuildContext context, scrollController) {
           return Container(//モーダルの中身
             decoration: const BoxDecoration(
-              color: CupertinoColors.white,
+              color: AppColors.backgroundGrayColor,
               boxShadow: [
                 BoxShadow(
-                  color: CupertinoColors.systemGrey4,
+                  color: CupertinoColors.systemGrey5,
                   spreadRadius: 5,
                   blurRadius: 10,
                   offset: Offset(0, 0), // changes position of shadow
                 ),
               ],
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10.0),
-                topRight: Radius.circular(10.0),
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
               ),
             ),
             child: SingleChildScrollView(
