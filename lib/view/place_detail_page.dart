@@ -1,6 +1,6 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gohan_map/component/gohan_app_modal.dart';
+import 'package:gohan_map/component/app_modal.dart';
 import 'package:gohan_map/view/place_post_page.dart';
 ///飲食店の詳細画面
 class PlaceDetailPage extends StatelessWidget {
@@ -8,7 +8,7 @@ class PlaceDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GohanAppModal(
+    return AppModal(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
