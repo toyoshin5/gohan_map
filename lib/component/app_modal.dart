@@ -1,10 +1,12 @@
+import 'dart:ui';
+
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 
 ///下から出てくるモーダルウィジェットの中身の雛形
 class AppModal extends StatelessWidget {
-  final Widget child; //bodyとなるウィジェット
+  final Widget child; //子要素となるウィジェット
   final double initialChildSize; //初期の大きさが画面の高さの何倍か
   final double minChildSize; //最小の大きさが画面の高さの何倍か (最大の大きさはNavigationBarの下までで固定)
   final double maxChildSize; //最大の大きさが画面の高さの何倍か
@@ -35,41 +37,45 @@ class AppModal extends StatelessWidget {
       child: DraggableScrollableSheet(//スクロール可能なモーダルウィジェット
         builder: (BuildContext context, scrollController) {
           return Container(//モーダルの中身
-            decoration: const BoxDecoration(
-              color: AppColors.backgroundGrayColor,
-              boxShadow: [
-                BoxShadow(
-                  color: CupertinoColors.systemGrey5,
-                  spreadRadius: 5,
-                  blurRadius: 10,
-                  offset: Offset(0, 0), // changes position of shadow
-                ),
-              ],
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: AppColors.backgroundModalColor,
+              border: Border.all(
+                color: AppColors.backgroundGrayColor,
+                width: 1,),
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20.0),
                 topRight: Radius.circular(20.0),
               ),
             ),
-            child: SingleChildScrollView(
-              //DraggableScrollableSheeの子要素は必ずScrollableなウィジェットである必要がある
-              controller: scrollController,
-              child: Column(
-                children: [
-                  if (showKnob)
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(0, 10, 0, 15),
-                      height: 5,
-                      width: 26,
-                      decoration: BoxDecoration(
-                        color: const Color(0x16000000),
-                        borderRadius: BorderRadius.circular(2.5),
+            child: ClipRRect(//ぼかす領域を指定するためのウィジェット
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
+              ),
+              child: BackdropFilter(//ぼかすためのウィジェット
+                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                child: SingleChildScrollView(
+                  //DraggableScrollableSheeの子要素は必ずScrollableなウィジェットである必要がある
+                  controller: scrollController,
+                  child: Column(
+                    children: [
+                      if (showKnob)
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(0, 10, 0, 15),
+                          height: 5,
+                          width: 26,
+                          decoration: BoxDecoration(
+                            color: const Color(0x16000000),
+                            borderRadius: BorderRadius.circular(2.5),
+                          ),
+                        ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: child,
                       ),
-                    ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: child,
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           );

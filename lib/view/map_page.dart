@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/colors/app_colors.dart';
@@ -18,6 +20,13 @@ class MapPage extends StatelessWidget {
     // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
     return Stack(
       children: [
+        //MAPの画像(ダミー)表示
+        Image.asset(
+          'images/dummyMap.png',
+          fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
         Center(
           child: Column(
             //縦に並べる
@@ -68,17 +77,35 @@ class MapPage extends StatelessWidget {
             width: double.infinity,
             child: GestureDetector(
               child: AbsorbPointer(
-                child: Container(            //モーダル風UIの中身  
-                  decoration: const BoxDecoration(
-                    color: AppColors.backgroundGrayColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
-                    ),
+                child: ClipRRect(
+                  //ぼかす領域を指定するためのウィジェット
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
-                    child: AppSearchBar(onSubmitted: (value) {},),
+                  child: BackdropFilter(
+                    //ぼかすためのウィジェット
+                    filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                    child: Container(
+                      //モーダル風UIの中身
+                      decoration: BoxDecoration(
+                        color: AppColors.backgroundModalColor,
+                        border: Border.all(
+                          color: AppColors.backgroundGrayColor,
+                          width: 1,
+                        ),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20.0),
+                          topRight: Radius.circular(20.0),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
+                        child: AppSearchBar(
+                          onSubmitted: (value) {},
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),

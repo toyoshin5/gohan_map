@@ -7,7 +7,7 @@ import 'package:gohan_map/view/map_page.dart';
 /// アプリが起動したときに呼ばれる
 void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-    statusBarColor: Colors.white,
+    statusBarColor: Colors.transparent,
   ));
   runApp(const MyApp());
 }
