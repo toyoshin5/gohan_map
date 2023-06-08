@@ -37,10 +37,10 @@ class _AppMapState extends State<AppMap> {
           case ConnectionState.done:
             return FlutterMap(
               options: MapOptions(
-                center:
-                    LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
-                zoom: 13,
-              ),
+                  center:
+                      LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
+                  zoom: 13,
+                  interactiveFlags: InteractiveFlag.all),
               nonRotatedChildren: [
                 RichAttributionWidget(
                   attributions: [
