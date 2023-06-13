@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
@@ -20,12 +21,8 @@ class MapPage extends StatelessWidget {
     // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
     return Stack(
       children: [
-        //MAPの画像(ダミー)表示
-        Image.asset(
-          'images/dummyMap.png',
-          fit: BoxFit.cover,
-          width: double.infinity,
-          height: double.infinity,
+        Material(
+          child: AppMap(),
         ),
         Center(
           child: Column(
