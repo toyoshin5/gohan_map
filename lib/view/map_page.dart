@@ -12,9 +12,7 @@ import 'package:gohan_map/view/place_search_page.dart';
 ///地図が表示されている画面
 class MapPage extends StatelessWidget {
   // StatelessWidgetは、状態を持たないウィジェット。情報が変わらないウィジェット。
-  const MapPage({Key? key})
-      : super(
-            key: key); // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
+  const MapPage({Key? key}) : super(key: key); // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +20,20 @@ class MapPage extends StatelessWidget {
     return Stack(
       children: [
         Material(
-          child: AppMap(),
+          child: AppMap(
+            onLongPress: (_, latLng) { //画面の座標, 緯度経度
+              showModalBottomSheet(
+                barrierColor: Colors.black.withOpacity(0),
+                isDismissible: true,
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) {
+                  return PlaceCreatePage(latlng: latLng,);
+                },
+              );
+            },
+          ),
         ),
         Center(
           child: Column(
@@ -30,23 +41,6 @@ class MapPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text('MapPage'),
-              CupertinoButton(
-                //iOS風のボタン
-                child: const Text('Create'),
-                onPressed: () {
-                  showModalBottomSheet(
-                    //モーダルを表示する関数
-                    barrierColor: Colors.black.withOpacity(0),
-                    isDismissible: true,
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) {
-                      return const PlaceCreatePage(); //飲食店を作成する画面
-                    },
-                  );
-                },
-              ),
               CupertinoButton(
                 //iOS風のボタン
                 child: const Text('Detail'),
