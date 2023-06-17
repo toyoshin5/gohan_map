@@ -8,13 +8,13 @@ import 'package:gohan_map/colors/app_colors.dart';
 class AppModal extends StatelessWidget {
   final Widget child; //子要素となるウィジェット
   final double initialChildSize; //初期の大きさが画面の高さの何倍か
-  final double minChildSize; //最小の大きさが画面の高さの何倍か (最大の大きさはNavigationBarの下までで固定)
+  final double minChildSize; //最小の大きさが画面の高さの何倍か
   final double maxChildSize; //最大の大きさが画面の高さの何倍か
   final bool showKnob; //つまみを表示するか
   const AppModal({
     this.initialChildSize = 0.4,
     this.minChildSize = 0.2,
-    this.maxChildSize = 0,
+    this.maxChildSize = 0.9,
     this.showKnob = true,
     required this.child,
     Key? key,
@@ -24,35 +24,42 @@ class AppModal extends StatelessWidget {
     //modalの高さをNavigationBarに合わせる
     var ratio = 0.0;
     var displayHeight = MediaQuery.of(context).size.height;
-    var navigationBarHeight =
-        AppBar().preferredSize.height + 22; //22はstatusBarの高さ
-    if (maxChildSize == 0) {
-      ratio = (displayHeight - navigationBarHeight) / displayHeight;
-    }else{
-      ratio = maxChildSize;
-    }
-    return GestureDetector(//モーダルの外側をタップしたらモーダルを閉じる
+    var navigationBarHeight = 22;
+
+    // if (maxChildSize == 1) {
+    //   ratio = (displayHeight - navigationBarHeight) / displayHeight;
+    // } else {
+    //   ratio = maxChildSize;
+    // }
+    ratio = maxChildSize;
+    return GestureDetector(
+      //モーダルの外側をタップしたらモーダルを閉じる
       behavior: HitTestBehavior.opaque,
       onTap: () => Navigator.pop(context),
-      child: DraggableScrollableSheet(//スクロール可能なモーダルウィジェット
+      child: DraggableScrollableSheet(
+        //スクロール可能なモーダルウィジェット
         builder: (BuildContext context, scrollController) {
-          return Container(//モーダルの中身
+          return Container(
+            //モーダルの中身
             decoration: BoxDecoration(
               color: AppColors.backgroundModalColor,
               border: Border.all(
                 color: AppColors.backgroundGrayColor,
-                width: 1,),
+                width: 1,
+              ),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20.0),
                 topRight: Radius.circular(20.0),
               ),
             ),
-            child: ClipRRect(//ぼかす領域を指定するためのウィジェット
+            child: ClipRRect(
+              //ぼかす領域を指定するためのウィジェット
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(20.0),
                 topRight: Radius.circular(20.0),
               ),
-              child: BackdropFilter(//ぼかすためのウィジェット
+              child: BackdropFilter(
+                //ぼかすためのウィジェット
                 filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
                 child: SingleChildScrollView(
                   //DraggableScrollableSheeの子要素は必ずScrollableなウィジェットである必要がある
