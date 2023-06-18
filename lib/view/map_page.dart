@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
@@ -10,10 +11,15 @@ import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
 
 ///地図が表示されている画面
-class MapPage extends StatelessWidget {
-  // StatelessWidgetは、状態を持たないウィジェット。情報が変わらないウィジェット。
-  const MapPage({Key? key}) : super(key: key); // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
+class MapPage extends StatefulWidget {
+  const MapPage({Key? key}) : super(key: key); 
+  @override
+  State<MapPage> createState() => _MapPageState();
+}
 
+class _MapPageState extends State<MapPage> {
+ // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
+ List<Marker> _pins = [];
   @override
   Widget build(BuildContext context) {
     // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
@@ -21,7 +27,26 @@ class MapPage extends StatelessWidget {
       children: [
         Material(
           child: AppMap(
+            pins: _pins,   
             onLongPress: (_, latLng) { //画面の座標, 緯度経度
+              setState(() {
+                //ピンを配置する
+                _pins.add(
+                  Marker(
+                    width: 80,
+                    height: 80,
+                    point: latLng,
+                    builder: (context) {
+                      return const Icon(
+                        Icons.pin_drop,
+                        color: AppColors.pinColor,
+                        size: 80,
+                      );
+                    },
+                  ),
+                );
+              });
+              print(_pins);
               showModalBottomSheet(
                 barrierColor: Colors.black.withOpacity(0),
                 isDismissible: true,
@@ -31,7 +56,14 @@ class MapPage extends StatelessWidget {
                 builder: (context) {
                   return PlaceCreatePage(latlng: latLng,);
                 },
-              );
+              ).then((value) {
+                //0:保存 -1:保存しない
+                if (value != 0) {
+                  setState(() {
+                    _pins.removeLast();
+                  });
+                }
+              });
             },
           ),
         ),

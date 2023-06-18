@@ -8,9 +8,11 @@ import 'package:geolocator/geolocator.dart';
 
 class AppMap extends StatefulWidget {
   final void Function(TapPosition, LatLng)? onLongPress;
+  final List<Marker>? pins;
 
   const AppMap({Key? key,
     required this.onLongPress,
+    this.pins,
   }) : super(key: key);
 
   @override
@@ -62,6 +64,11 @@ class _AppMapState extends State<AppMap> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                ),
+                if (widget.pins != null)
+                MarkerLayer(
+                  markers: widget.pins!,
+                  rotate: true,
                 ),
               ],
             );
