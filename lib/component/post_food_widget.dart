@@ -10,21 +10,16 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
 
 //白い枠で囲まれた、投稿内容を入力する部分
-class PostFoodWidget extends StatefulWidget {
+class PostFoodWidget extends StatelessWidget {
   const PostFoodWidget({
     Key? key,
     required this.onImageChanged,
     required this.onDateChanged,
     required this.onCommentChanged,
   }) : super(key: key);
-  final Function(File) onImageChanged;
+  final Function(File?) onImageChanged;
   final Function(DateTime) onDateChanged;
   final Function(String) onCommentChanged;
-  @override
-  State<PostFoodWidget> createState() => _PostFoodWidgetState();
-}
-
-class _PostFoodWidgetState extends State<PostFoodWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,13 +32,13 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
       child: Column(
         children: [
           _ImgSection(
-            onChanged: widget.onImageChanged,
+            onChanged: onImageChanged,
           ),
           _DateSection(
-            onChanged: widget.onDateChanged,
+            onChanged: onDateChanged,
           ),
           _CommentSection(
-            onChanged: widget.onCommentChanged,
+            onChanged: onCommentChanged,
           ),
         ],
       ),
@@ -52,7 +47,7 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
 }
 
 class _ImgSection extends StatefulWidget {
-  final Function(File) onChanged;
+  final Function(File?) onChanged;
   const _ImgSection({
     super.key,
     required this.onChanged,
@@ -154,6 +149,7 @@ class _ImgSectionState extends State<_ImgSection> {
                 top: 0,
                 child: IconButton(
                   onPressed: () {
+                    widget.onChanged(null);
                     setState(() {
                       image = null;
                     });
@@ -198,7 +194,7 @@ class _ImgSectionState extends State<_ImgSection> {
   }
 }
 
-class _DateSection extends StatefulWidget {
+class _DateSection extends StatelessWidget {
   const _DateSection({
     super.key,
     required this.onChanged,
@@ -206,11 +202,6 @@ class _DateSection extends StatefulWidget {
 
   final Function(DateTime) onChanged;
 
-  @override
-  State<_DateSection> createState() => _DateSectionState();
-}
-
-class _DateSectionState extends State<_DateSection> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -238,25 +229,20 @@ class _DateSectionState extends State<_DateSection> {
           return true;
         },
         onChanged: (value) {
-          widget.onChanged(DateTime.parse(value));
+          onChanged(DateTime.parse(value));
         },
       ),
     );
   }
 }
 
-class _CommentSection extends StatefulWidget {
+class _CommentSection extends StatelessWidget {
   const _CommentSection({
     super.key,
     required this.onChanged,
   });
   final Function(String) onChanged;
 
-  @override
-  State<_CommentSection> createState() => _CommentSectionState();
-}
-
-class _CommentSectionState extends State<_CommentSection> {
   @override
   Widget build(BuildContext context) {
     return TextField(
@@ -281,7 +267,7 @@ class _CommentSectionState extends State<_CommentSection> {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      onChanged: widget.onChanged,
+      onChanged: onChanged,
     );
   }
 }

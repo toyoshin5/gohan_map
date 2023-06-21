@@ -3,9 +3,12 @@ import 'dart:io';
 
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
+import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
@@ -25,7 +28,9 @@ class PlaceCreatePage extends StatefulWidget {
 }
 
 class _PlaceCreatePageState extends State<PlaceCreatePage> {
-  double _rating = 3;
+  String shopName = '';
+  String address = '';
+  double rating = 3;
   File? image;
   DateTime? date;
   String comment = '';
@@ -42,7 +47,13 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const _ShopNameTextField(),
+                _ShopNameTextField(
+                  onChanged: (value) {
+                    setState(() {
+                      shopName = value;
+                    });
+                  },
+                ),
                 const SizedBox(width: 24),
                 SizedBox(
                   height: 30,
@@ -62,20 +73,20 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
             ),
             //住所
             const Padding(
-              padding: 
-              EdgeInsets.fromLTRB(0, 16, 0, 4),
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
               child: Text(
                 '住所',
-                style:TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             FutureBuilder(
-              future: _getAddressFromLatLng(widget.latlng),
+              future: getAddressFromLatLng(widget.latlng),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
+                  address = snapshot.data.toString();
                   return Text(snapshot.data.toString());
                 } else {
                   return const Text('住所を取得中...');
@@ -84,31 +95,29 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
             ),
             //評価
             const Padding(
-              padding: 
-              EdgeInsets.fromLTRB(0, 16, 0, 4),
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
               child: Text(
                 '店の評価',
-                style:TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
             _ShopRatingBar(
-              rating: _rating,
+              rating: rating,
               onRatingUpdate: (rating) {
                 setState(() {
-                  _rating = rating;
+                  rating = rating;
                 });
               },
             ),
             //最初の投稿
             const Padding(
-              padding: 
-              EdgeInsets.fromLTRB(0, 16, 0, 8),
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
               child: Text(
                 '最初の投稿',
-                style:TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -146,11 +155,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
                 onPressed: () {
-                  //image, date, commentを出力
-                  print(image);
-                  print(date);
-                  print(comment);
-        
+                  //iOS風のアラートを表示する
+                  onTapComfirm(context);
+
                   //Navigator.pop(context);
                 },
               ),
@@ -162,8 +169,74 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
     );
   }
 
+  //決定ボタンを押した時の処理
+  void onTapComfirm(BuildContext context) {
+    //バリデーション
+    if (shopName.isEmpty) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('店名を入力してください'),
+            content: const Text('店を登録するためには、店名の入力が必要です。'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    } else if (image == null && date == null && comment.isEmpty) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('最初の投稿がありません'),
+            content: const Text('最初の投稿なしで登録しますか？'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('キャンセル'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              CupertinoDialogAction(
+                child: const Text('店だけ登録'),
+                onPressed: () async {
+                  addToDB(false);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    addToDB(true);
+  }
+
+  void addToDB(bool initialPostFlg) {
+    final shop = Shop()
+      ..shopName = shopName
+      ..shopAddress = address //TODO
+      ..shopLatitude = widget.latlng.latitude
+      ..shopLongitude = widget.latlng.longitude
+      ..shopStar = rating
+      ..createdAt = DateTime.now()
+      ..updatedAt = DateTime.now();
+    createShop(shop);
+    //前の画面に戻る
+    Navigator.pop(context);
+  }
+
   //緯度経度から住所を取得する
-  Future<String> _getAddressFromLatLng(LatLng latLng) async {
+  Future<String> getAddressFromLatLng(LatLng latLng) async {
     const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
     final String apiUrl = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
     final response = await http.get(Uri.parse(apiUrl));
@@ -176,7 +249,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
     }
   }
 }
-
 
 class _ShopRatingBar extends StatelessWidget {
   const _ShopRatingBar({
@@ -196,14 +268,14 @@ class _ShopRatingBar extends StatelessWidget {
         minRating: 0,
         maxRating: 5,
         direction: Axis.horizontal,
-        //allowHalfRating: true,
+        allowHalfRating: true,
         itemCount: 5,
         itemSize: 40.0,
         glowColor: Colors.amber,
         onRatingUpdate: onRatingUpdate,
         ratingWidget: RatingWidget(
           full: const Icon(Icons.star, color: Colors.amber),
-          half: const Icon(Icons.star_half, color: Colors.amber),
+          half: const _HalfStarIcon(),
           empty: const Icon(Icons.star, color: Color(0xffd3d3d3)),
         ),
       ),
@@ -211,9 +283,40 @@ class _ShopRatingBar extends StatelessWidget {
   }
 }
 
+class _HalfStarIcon extends StatelessWidget {
+  const _HalfStarIcon({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        const Icon(Icons.star, color: Color(0xffd3d3d3)),
+        ClipRect(
+          clipper: _HalfClipper(),
+          child: const Icon(Icons.star, color: Colors.amber),
+        ),
+      ],
+    );
+  }
+}
+
+class _HalfClipper extends CustomClipper<Rect> {
+  @override
+  Rect getClip(Size size) {
+    return Rect.fromLTRB(0, 0, size.width / 2, size.height);
+  }
+
+  @override
+  bool shouldReclip(_HalfClipper oldClipper) => false;
+}
+
 //AppTextField
 class _ShopNameTextField extends StatelessWidget {
-  const _ShopNameTextField({Key? key}) : super(key: key);
+  const _ShopNameTextField({
+    Key? key,
+    required this.onChanged,
+  }) : super(key: key);
+  final Function(String) onChanged;
   @override
   Widget build(BuildContext context) {
     //角丸,白いぬりつぶし,枠線なし
@@ -237,6 +340,7 @@ class _ShopNameTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
+        onChanged: onChanged,
       ),
     );
   }
