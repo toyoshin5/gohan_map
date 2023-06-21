@@ -40,7 +40,10 @@ class AppModal extends StatelessWidget {
         //スクロール可能なモーダルウィジェット
         builder: (BuildContext context, scrollController) {
           return InkWell(
-            onTap: () {},//モーダルの内側をタップしてモーダルを閉じないようにタップイベントを無効化
+            onTap: () {
+              //キーボードを閉じる
+              FocusScope.of(context).unfocus();
+            },//モーダルの内側をタップしてモーダルを閉じないようにタップイベントを無効化
             child: Container(
               //モーダルの中身
               decoration: BoxDecoration(

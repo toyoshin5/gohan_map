@@ -155,6 +155,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 },
               ),
             ),
+            const SizedBox(height: 300),
           ],
         ),
       ),
