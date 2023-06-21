@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/Cupertino.dart';
@@ -9,17 +10,20 @@ import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
+import 'package:latlong2/latlong.dart';
 
 ///地図が表示されている画面
-class MapPage extends StatefulWidget {
+class MapPage extends StatefulWidget{
   const MapPage({Key? key}) : super(key: key); 
   @override
   State<MapPage> createState() => _MapPageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _MapPageState extends State<MapPage> with TickerProviderStateMixin{
  // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
- List<Marker> _pins = [];
+ final List<Marker> _pins = [];
+ final MapController mapController = MapController();
+
   @override
   Widget build(BuildContext context) {
     // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
@@ -28,6 +32,7 @@ class _MapPageState extends State<MapPage> {
         Material(
           child: AppMap(
             pins: _pins,   
+            mapController: mapController,
             onLongPress: (_, latLng) { //画面の座標, 緯度経度
               setState(() {
                 //ピンを配置する
@@ -46,7 +51,8 @@ class _MapPageState extends State<MapPage> {
                   ),
                 );
               });
-              print(_pins);
+              //mapをスクロールする
+              _moveToPin(latLng,180);
               showModalBottomSheet(
                 barrierColor: Colors.black.withOpacity(0),
                 isDismissible: true,
@@ -165,5 +171,44 @@ class _MapPageState extends State<MapPage> {
         ),
       ],
     );
+  }
+
+  //ピンの位置に移動する。offsetはピンを画面の中央から何dp上にずらして表示するか
+  void _moveToPin(LatLng pinLocation, double offset){
+    var zoom = mapController.zoom;
+    var rot = mapController.rotation;
+    //1ピクセルあたりの緯度経度
+    var pixelPerLat = pow(2, zoom + 8) / 360;
+    var pixelPerLng = pow(2, zoom + 8) / 360 * cos (pinLocation.latitude * pi / 180);
+    //ピンの位置から下へ移動する
+    var lat = pinLocation.latitude - (offset / pixelPerLat * cos (rot * pi / 180));
+    var lng = pinLocation.longitude+ (offset / pixelPerLng * sin (rot * pi / 180));
+    _animatedMapMove(LatLng(lat, lng), zoom);
+  }
+
+  //flutter_mapにはアニメーションありのmoveメソッドがないため、AnimationControllerで作成
+  void _animatedMapMove(LatLng destLocation, double destZoom) {
+    final latTween = Tween<double>(
+        begin: mapController.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: mapController.center.longitude, end: destLocation.longitude);
+    final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    controller.addListener(() {
+      mapController.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
+    });
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+    controller.forward();
   }
 }

@@ -9,10 +9,12 @@ import 'package:geolocator/geolocator.dart';
 class AppMap extends StatefulWidget {
   final void Function(TapPosition, LatLng)? onLongPress;
   final List<Marker>? pins;
+  final MapController? mapController;
 
   const AppMap({Key? key,
     required this.onLongPress,
     this.pins,
+    this.mapController,
   }) : super(key: key);
 
   @override
@@ -50,6 +52,7 @@ class _AppMapState extends State<AppMap> {
                   zoom: 13,
                   interactiveFlags: InteractiveFlag.all,
                   onLongPress: widget.onLongPress),
+              mapController: widget.mapController,
               nonRotatedChildren: [
                 RichAttributionWidget(
                   attributions: [
