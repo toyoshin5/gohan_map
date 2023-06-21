@@ -113,7 +113,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   void loadAllShop() {
-    getAllShops().then(
+    IsarUtils.getAllShops().then(
       (value) => setState(() {
         shops = value;
         pins = [];

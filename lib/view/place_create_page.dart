@@ -7,6 +7,7 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gohan_map/collections/shop.dart';
+import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:http/http.dart' as http;
@@ -221,7 +222,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
     addToDB(true);
   }
 
-  void addToDB(bool initialPostFlg) {
+  Future<void> addToDB(bool initialPostFlg) async {
     final shop = Shop()
       ..shopName = shopName
       ..shopAddress = address //TODO
@@ -230,9 +231,35 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       ..shopStar = rating
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now();
-    createShop(shop);
-    //前の画面に戻る
-    Navigator.pop(context);
+    final shopId = await IsarUtils.createShop(shop);
+    if (initialPostFlg) {
+      final base64Img = await fileToBase64(image);
+      final timeline = Timeline()
+        ..image = base64Img
+        ..comment = comment
+        ..umai = false
+        ..createdAt = DateTime.now()
+        ..updatedAt = DateTime.now()
+        ..shopId = shopId
+        ..date = date ?? DateTime.now();
+      await IsarUtils.createTimeline(timeline);
+      if (context.mounted) {
+        Navigator.pop(context);
+        return;
+      }
+    }
+    if (context.mounted) {
+      Navigator.pop(context);
+    }
+  }
+
+  Future<String> fileToBase64(File? file) async {
+    if (file == null) {
+      return '';
+    }
+    List<int> fileBytes = await file.readAsBytes();
+    String base64Image = base64Encode(fileBytes);
+    return base64Image;
   }
 
   //緯度経度から住所を取得する
