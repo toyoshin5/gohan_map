@@ -12,7 +12,7 @@ class Shop {
   late String shopAddress;
   late double shopLatitude;
   late double shopLongitude;
-  late int shopStar;
+  late double shopStar;
   late DateTime createdAt;
   late DateTime updatedAt;
 }

@@ -45,7 +45,7 @@ const ShopSchema = CollectionSchema(
     r'shopStar': PropertySchema(
       id: 5,
       name: r'shopStar',
-      type: IsarType.long,
+      type: IsarType.double,
     ),
     r'updatedAt': PropertySchema(
       id: 6,
@@ -89,7 +89,7 @@ void _shopSerialize(
   writer.writeDouble(offsets[2], object.shopLatitude);
   writer.writeDouble(offsets[3], object.shopLongitude);
   writer.writeString(offsets[4], object.shopName);
-  writer.writeLong(offsets[5], object.shopStar);
+  writer.writeDouble(offsets[5], object.shopStar);
   writer.writeDateTime(offsets[6], object.updatedAt);
 }
 
@@ -106,7 +106,7 @@ Shop _shopDeserialize(
   object.shopLatitude = reader.readDouble(offsets[2]);
   object.shopLongitude = reader.readDouble(offsets[3]);
   object.shopName = reader.readString(offsets[4]);
-  object.shopStar = reader.readLong(offsets[5]);
+  object.shopStar = reader.readDouble(offsets[5]);
   object.updatedAt = reader.readDateTime(offsets[6]);
   return object;
 }
@@ -129,7 +129,7 @@ P _shopDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readLong(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 6:
       return (reader.readDateTime(offset)) as P;
     default:
@@ -713,46 +713,55 @@ extension ShopQueryFilter on QueryBuilder<Shop, Shop, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopStarEqualTo(int value) {
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopStarEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'shopStar',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Shop, Shop, QAfterFilterCondition> shopStarGreaterThan(
-    int value, {
+    double value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
         property: r'shopStar',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Shop, Shop, QAfterFilterCondition> shopStarLessThan(
-    int value, {
+    double value, {
     bool include = false,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
         property: r'shopStar',
         value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Shop, Shop, QAfterFilterCondition> shopStarBetween(
-    int lower,
-    int upper, {
+    double lower,
+    double upper, {
     bool includeLower = true,
     bool includeUpper = true,
+    double epsilon = Query.epsilon,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -761,6 +770,7 @@ extension ShopQueryFilter on QueryBuilder<Shop, Shop, QFilterCondition> {
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -1090,7 +1100,7 @@ extension ShopQueryProperty on QueryBuilder<Shop, Shop, QQueryProperty> {
     });
   }
 
-  QueryBuilder<Shop, int, QQueryOperations> shopStarProperty() {
+  QueryBuilder<Shop, double, QQueryOperations> shopStarProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'shopStar');
     });
