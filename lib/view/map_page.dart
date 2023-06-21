@@ -52,10 +52,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     height: 80,
                     point: latLng,
                     builder: (context) {
-                      return const Icon(
-                        Icons.pin_drop,
-                        color: AppColors.pinColor,
-                        size: 80,
+                      //pin.png
+                      return Image.asset(
+                        'images/pin.png',
+                        width: 80,
+                        height: 80,
                       );
                     },
                   ),
@@ -124,10 +125,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               height: 80,
               point: LatLng(shop.shopLatitude, shop.shopLongitude),
               builder: (context) {
-                return const Icon(
-                  Icons.pin_drop,
-                  color: AppColors.pinColor,
-                  size: 80,
+                return Image.asset(
+                  'images/pin.png',
+                  width: 80,
+                  height: 80,
                 );
               },
             ),
