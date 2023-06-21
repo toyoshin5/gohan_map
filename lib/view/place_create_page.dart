@@ -38,6 +38,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            //飲食店名
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -59,17 +60,38 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 ),
               ],
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: FutureBuilder(
-                future: _getAddressFromLatLng(widget.latlng),
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data.toString());
-                  } else {
-                    return const Text('住所を取得中...');
-                  }
-                },
+            //住所
+            const Padding(
+              padding: 
+              EdgeInsets.fromLTRB(0, 16, 0, 4),
+              child: Text(
+                '住所',
+                style:TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            FutureBuilder(
+              future: _getAddressFromLatLng(widget.latlng),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(snapshot.data.toString());
+                } else {
+                  return const Text('住所を取得中...');
+                }
+              },
+            ),
+            //評価
+            const Padding(
+              padding: 
+              EdgeInsets.fromLTRB(0, 16, 0, 4),
+              child: Text(
+                '店の評価',
+                style:TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             _ShopRatingBar(
@@ -80,7 +102,18 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 });
               },
             ),
-
+            //最初の投稿
+            const Padding(
+              padding: 
+              EdgeInsets.fromLTRB(0, 16, 0, 8),
+              child: Text(
+                '最初の投稿',
+                style:TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
             PostFoodWidget(
               onImageChanged: (image) {
                 setState(() {
@@ -99,9 +132,10 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
               },
             ),
 
-            SizedBox(
+            Container(
               width: double.infinity,
               height: 50,
+              margin: const EdgeInsets.symmetric(vertical: 16),
               child: TextButton(
                 child: const Text('決定'),
                 style: TextButton.styleFrom(
@@ -155,24 +189,21 @@ class _ShopRatingBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0),
-      child: Center(
-        child: RatingBar(
-          initialRating: _rating,
-          minRating: 0,
-          maxRating: 5,
-          direction: Axis.horizontal,
-          //allowHalfRating: true,
-          itemCount: 5,
-          itemSize: 40.0,
-          glowColor: Colors.amber,
-          onRatingUpdate: onRatingUpdate,
-          ratingWidget: RatingWidget(
-            full: const Icon(Icons.star, color: Colors.amber),
-            half: const Icon(Icons.star_half, color: Colors.amber),
-            empty: const Icon(Icons.star, color: Color(0xffd3d3d3)),
-          ),
+    return Center(
+      child: RatingBar(
+        initialRating: _rating,
+        minRating: 0,
+        maxRating: 5,
+        direction: Axis.horizontal,
+        //allowHalfRating: true,
+        itemCount: 5,
+        itemSize: 40.0,
+        glowColor: Colors.amber,
+        onRatingUpdate: onRatingUpdate,
+        ratingWidget: RatingWidget(
+          full: const Icon(Icons.star, color: Colors.amber),
+          half: const Icon(Icons.star_half, color: Colors.amber),
+          empty: const Icon(Icons.star, color: Color(0xffd3d3d3)),
         ),
       ),
     );
@@ -188,6 +219,7 @@ class _ShopNameTextField extends StatelessWidget {
     return Flexible(
       child: TextField(
         decoration: InputDecoration(
+          hintText: '店名を入力',
           filled: true,
           fillColor: AppColors.textFieldColor,
           contentPadding: const EdgeInsets.all(16),

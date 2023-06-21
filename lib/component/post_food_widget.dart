@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
 
+//白い枠で囲まれた、投稿内容を入力する部分
 class PostFoodWidget extends StatefulWidget {
   const PostFoodWidget({
     Key? key,
@@ -28,7 +29,6 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 16),
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: AppColors.backgroundWhiteColor,
@@ -118,19 +118,22 @@ class _ImgSectionState extends State<_ImgSection> {
                   ),
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.upload_file,
-                      color: Colors.grey.shade800,
-                      size: 40,
-                    ),
-                    const Text(
-                      '写真を追加する',
-                      style: TextStyle(color: AppColors.blackTextColor),
-                    ),
-                  ],
+                child: AspectRatio(
+                  aspectRatio: 16/9,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.upload_file,
+                        color: Colors.grey.shade800,
+                        size: 40,
+                      ),
+                      const Text(
+                        '写真を追加する',
+                        style: TextStyle(color: AppColors.blackTextColor),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
