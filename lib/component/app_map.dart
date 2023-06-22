@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -5,7 +7,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
 class AppMap extends StatefulWidget {
-  const AppMap({Key? key}) : super(key: key);
+  final void Function(TapPosition, LatLng)? onLongPress;
+  final List<Marker>? pins;
+  final MapController? mapController;
+
+  const AppMap({Key? key,
+    required this.onLongPress,
+    this.pins,
+    this.mapController,
+  }) : super(key: key);
 
   @override
   State<AppMap> createState() => _AppMapState();
@@ -40,7 +50,9 @@ class _AppMapState extends State<AppMap> {
                   center:
                       LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
                   zoom: 13,
-                  interactiveFlags: InteractiveFlag.all),
+                  interactiveFlags: InteractiveFlag.all,
+                  onLongPress: widget.onLongPress),
+              mapController: widget.mapController,
               nonRotatedChildren: [
                 RichAttributionWidget(
                   attributions: [
@@ -55,6 +67,11 @@ class _AppMapState extends State<AppMap> {
               children: [
                 TileLayer(
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                ),
+                if (widget.pins != null)
+                MarkerLayer(
+                  markers: widget.pins!,
+                  rotate: true,
                 ),
               ],
             );

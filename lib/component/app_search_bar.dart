@@ -18,7 +18,7 @@ class AppSearchBar extends StatelessWidget {
         //角丸
         height: 46,
         decoration: BoxDecoration(
-          color: AppColors.searchBarColorColor,
+          color: AppColors.searchBarColor,
           borderRadius: BorderRadius.circular(23),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16),
