@@ -196,6 +196,25 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
         },
       );
       return;
+    } else if (address.isEmpty) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('住所を取得できません'),
+            content: const Text('インターネットへの接続状況をご確認ください。'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
     } else if (image == null && date == null && comment.isEmpty) {
       showCupertinoDialog(
         context: context,
