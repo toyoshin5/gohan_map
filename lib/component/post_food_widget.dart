@@ -14,10 +14,12 @@ class PostFoodWidget extends StatelessWidget {
   const PostFoodWidget({
     Key? key,
     required this.onImageChanged,
+    required this.onUmaiChanged,
     required this.onDateChanged,
     required this.onCommentChanged,
   }) : super(key: key);
   final Function(File?) onImageChanged;
+  final Function(bool) onUmaiChanged;
   final Function(DateTime) onDateChanged;
   final Function(String) onCommentChanged;
   @override
@@ -30,9 +32,13 @@ class PostFoodWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ImgSection(
             onChanged: onImageChanged,
+          ),
+          UmaiButton(
+            onChanged: onUmaiChanged,
           ),
           _DateSection(
             onChanged: onDateChanged,
@@ -52,7 +58,7 @@ class _ImgSection extends StatefulWidget {
     super.key,
     required this.onChanged,
   });
-  
+
   @override
   State<_ImgSection> createState() => _ImgSectionState();
 }
@@ -66,7 +72,7 @@ class _ImgSectionState extends State<_ImgSection> {
       borderType: BorderType.RRect,
       radius: const Radius.circular(10),
       dashPattern: const [5, 5],
-      color: (image == null) ? Colors.grey : Colors.transparent, 
+      color: (image == null) ? Colors.grey : Colors.transparent,
       child: SizedBox(
         width: double.infinity,
         child: Stack(
@@ -114,7 +120,7 @@ class _ImgSectionState extends State<_ImgSection> {
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
                 child: AspectRatio(
-                  aspectRatio: 16/9,
+                  aspectRatio: 16 / 9,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -154,7 +160,10 @@ class _ImgSectionState extends State<_ImgSection> {
                       image = null;
                     });
                   },
-                  icon: const Icon(Icons.cancel,color: AppColors.backgroundWhiteColor,),
+                  icon: const Icon(
+                    Icons.cancel,
+                    color: AppColors.backgroundWhiteColor,
+                  ),
                 ),
               ),
           ],
@@ -194,6 +203,71 @@ class _ImgSectionState extends State<_ImgSection> {
   }
 }
 
+class UmaiButton extends StatefulWidget {
+  const UmaiButton({
+    super.key,
+    required this.onChanged,
+  });
+
+  final Function(bool) onChanged;
+
+  @override
+  State<UmaiButton> createState() => _UmaiButtonState();
+}
+
+class _UmaiButtonState extends State<UmaiButton> {
+  bool isOn = false;
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          elevation: (isOn) ? 0 : 2,
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: BorderSide(
+              color: (isOn) ? Colors.pinkAccent : Colors.grey.shade400, //色
+            ),
+            borderRadius: BorderRadius.circular(100),
+          ),
+          padding: EdgeInsets.zero,
+        ),
+        onPressed: () {
+          setState(() {
+            isOn = !isOn;
+            widget.onChanged(isOn);
+          });
+        },
+        child: Container(
+          //角丸四角形
+          height: 32,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.star,
+                color: (isOn) ? Colors.pinkAccent : Colors.grey.shade400,
+                size: 22,
+              ),
+              const SizedBox(width: 2),
+              Text(
+                'うまい！',
+                style: TextStyle(
+                  color: (isOn) ? Colors.pinkAccent : Colors.grey.shade400,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _DateSection extends StatelessWidget {
   const _DateSection({
     super.key,
@@ -208,20 +282,18 @@ class _DateSection extends StatelessWidget {
       //角丸四角形
       width: double.infinity,
       margin: const EdgeInsets.symmetric(vertical: 16),
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
       decoration: BoxDecoration(
         color: AppColors.searchBarColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: DateTimePicker(
         type: DateTimePickerType.date,
-        //controller: _controller1,
         firstDate: DateTime(2000),
         lastDate: DateTime(2100),
         //icon: Icon(Icons.watch_later_outlined),
         dateLabelText: '訪問日',
-        //use24HourFormat: false,
-        //locale: Locale('pt', 'BR'),
+        use24HourFormat: true,
         selectableDayPredicate: (date) {
           if (date.weekday == 6 || date.weekday == 7) {
             return false;

@@ -33,6 +33,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   String address = '';
   double rating = 3;
   File? image;
+  bool isUmai = false;
   DateTime? date;
   String comment = '';
   @override
@@ -128,6 +129,11 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
               onImageChanged: (image) {
                 setState(() {
                   this.image = image;
+                });
+              },
+              onUmaiChanged: (isUmai) {
+                setState(() {
+                  this.isUmai = isUmai;
                 });
               },
               onDateChanged: (date) {
@@ -237,7 +243,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       final timeline = Timeline()
         ..image = base64Img
         ..comment = comment
-        ..umai = false
+        ..umai = isUmai
         ..createdAt = DateTime.now()
         ..updatedAt = DateTime.now()
         ..shopId = shopId
