@@ -12,6 +12,7 @@ import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
+import 'package:isar/isar.dart';
 import 'package:latlong2/latlong.dart';
 
 ///地図が表示されている画面
@@ -24,18 +25,18 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
   List<Marker> pins = [];
+  Map<Id, bool> tapFlgs = {};
   List<Shop> shops = [];
   final MapController mapController = MapController();
 
   @override
   void initState() {
     super.initState();
-    loadAllShop(); //DBから飲食店の情報を取得してピンを配置
+    _loadAllShop(); //DBから飲食店の情報を取得してピンを配置
   }
 
   @override
   Widget build(BuildContext context) {
-    // buildメソッドは、ウィジェットを構築するメソッド。画面が表示されるときに呼ばれる。
     return Stack(
       children: [
         Material(
@@ -46,24 +47,11 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               //画面の座標, 緯度経度
               setState(() {
                 //ピンを配置する
-                pins.add(
-                  Marker(
-                    width: 80,
-                    height: 80,
-                    point: latLng,
-                    builder: (context) {
-                      //pin.png
-                      return Image.asset(
-                        'images/pin.png',
-                        width: 80,
-                        height: 80,
-                      );
-                    },
-                  ),
-                );
+                _addPinToMap(latLng, null);
               });
               //mapをスクロールする
-              _moveToPin(latLng, 180);
+              final deviceHeight = MediaQuery.of(context).size.height;
+              _moveToPin(latLng, deviceHeight * 0.2);
               showModalBottomSheet(
                 barrierColor: Colors.black.withOpacity(0),
                 isDismissible: true,
@@ -76,63 +64,108 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   );
                 },
               ).then((value) {
-                loadAllShop();
+                _loadAllShop();
               });
             },
           ),
         ),
-        Center(
-          child: Column(
-            //縦に並べる
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text('MapPage'),
-              CupertinoButton(
-                //iOS風のボタン
-                child: const Text('Detail'),
-                onPressed: () {
+        //下の検索ボタン
+        // Center(
+        //   //画像ボタン
+        //   child: Stack(
+        //     children: [
+        //       Image.asset(
+        //         'images/pin_tap.png',
+        //         width: 100,
+        //         height: 100,
+        //       ),
+        //       Positioned.fill(
+        //         child: Material(
+        //           color: Colors.transparent,
+        //           child: InkWell(
+        //             onTap: () {
+        //               // ボタンがタップされたときの処理
+        //               print('Button tapped!');
+        //             },
+        //           ),
+        //         ),
+        //       ),
+        //     ],
+        //   ),
+        // ),
+        const _DummySearchWidget(),
+      ],
+    );
+  }
+
+  void _addPinToMap(LatLng latLng, Id? id) {
+    const markerSize = 50.0;
+    const focusAmp = 1.6; //>=1
+    const imgRatio = 126 / 175;
+    pins.add(
+      Marker(
+        width: markerSize * focusAmp * imgRatio, 
+        height: markerSize * focusAmp * 2,
+        point: latLng,
+        builder: (context) {
+          return AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeInOut,
+            padding: EdgeInsets.only(
+              left: (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
+              top:(tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
+              right:  (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
+              bottom:markerSize * focusAmp - 1
+            ),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                //ピンをタップしたときの処理
+                if (id != null) {
+                  setState(() {
+                    tapFlgs[id] = true;
+                  });
+                  final deviceHeight = MediaQuery.of(context).size.height;
+                  _moveToPin(latLng, deviceHeight * 0.2);
                   showModalBottomSheet(
                     barrierColor: Colors.black.withOpacity(0),
                     isDismissible: true,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     context: context,
-                    //isScrollControlled: true,
                     builder: (context) {
                       return const PlaceDetailPage(); //飲食店の詳細画面
                     },
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        //下の検索ボタン
-        const _DummySearchWidget(),
-      ],
+                  ).then((value) {
+                    setState(() {
+                      tapFlgs[id] = false;
+                    });
+                  });
+                }
+              },
+              child: (tapFlgs[id] == true)
+                  ? Image.asset(
+                      'images/pin_tap.png',
+                    )
+                  : Image.asset(
+                      'images/pin.png',
+                    ),
+            ),
+          );
+        },
+      ),
     );
   }
 
-  void loadAllShop() {
+  void _loadAllShop() {
     IsarUtils.getAllShops().then(
       (value) => setState(() {
         shops = value;
         pins = [];
+        tapFlgs = {};
         for (var shop in shops) {
-          pins.add(
-            Marker(
-              width: 80,
-              height: 80,
-              point: LatLng(shop.shopLatitude, shop.shopLongitude),
-              builder: (context) {
-                return Image.asset(
-                  'images/pin.png',
-                  width: 80,
-                  height: 80,
-                );
-              },
-            ),
-          );
+          tapFlgs.addAll({shop.id: false});
+          _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop.id);
         }
       }),
     );
