@@ -8,6 +8,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
+import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:http/http.dart' as http;
@@ -85,7 +86,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
               ),
             ),
             FutureBuilder(
-              future: getAddressFromLatLng(widget.latlng),
+              future: _getAddressFromLatLng(widget.latlng),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   address = snapshot.data.toString();
@@ -106,8 +107,8 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 ),
               ),
             ),
-            _ShopRatingBar(
-              rating: rating,
+            AppRatingBar(
+              initialRating: rating,
               onRatingUpdate: (rating) {
                 setState(() {
                   rating = rating;
@@ -147,13 +148,12 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 });
               },
             ),
-
+            //決定ボタン
             Container(
               width: double.infinity,
               height: 50,
               margin: const EdgeInsets.symmetric(vertical: 16),
               child: TextButton(
-                child: const Text('決定'),
                 style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -162,11 +162,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
                 onPressed: () {
-                  //iOS風のアラートを表示する
                   onTapComfirm(context);
-
-                  //Navigator.pop(context);
                 },
+                child: const Text('決定'),
               ),
             ),
             const SizedBox(height: 300),
@@ -215,7 +213,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
               CupertinoDialogAction(
                 child: const Text('店だけ登録'),
                 onPressed: () async {
-                  addToDB(false);
+                  _addToDB(false);
                   Navigator.pop(context);
                 },
               ),
@@ -225,10 +223,11 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       );
       return;
     }
-    addToDB(true);
+    _addToDB(true);
   }
 
-  Future<void> addToDB(bool initialPostFlg) async {
+  //DBに店を登録(initalPostFlg: 最初の投稿をするかどうか)
+  Future<void> _addToDB(bool initialPostFlg) async {
     final shop = Shop()
       ..shopName = shopName
       ..shopAddress = address //TODO
@@ -239,7 +238,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       ..updatedAt = DateTime.now();
     final shopId = await IsarUtils.createShop(shop);
     if (initialPostFlg) {
-      final base64Img = await fileToBase64(image);
+      final base64Img = await _fileToBase64(image);
       final timeline = Timeline()
         ..image = base64Img
         ..comment = comment
@@ -259,7 +258,8 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
     }
   }
 
-  Future<String> fileToBase64(File? file) async {
+  //画像をbase64に変換する関数
+  Future<String> _fileToBase64(File? file) async {
     if (file == null) {
       return '';
     }
@@ -269,7 +269,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   }
 
   //緯度経度から住所を取得する
-  Future<String> getAddressFromLatLng(LatLng latLng) async {
+  Future<String> _getAddressFromLatLng(LatLng latLng) async {
     const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
     final String apiUrl = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
     final response = await http.get(Uri.parse(apiUrl));
@@ -283,67 +283,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   }
 }
 
-class _ShopRatingBar extends StatelessWidget {
-  const _ShopRatingBar({
-    super.key,
-    required double rating,
-    required this.onRatingUpdate,
-  }) : _rating = rating;
-
-  final double _rating;
-  final Function(double) onRatingUpdate;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: RatingBar(
-        initialRating: _rating,
-        minRating: 0,
-        maxRating: 5,
-        direction: Axis.horizontal,
-        allowHalfRating: true,
-        itemCount: 5,
-        itemSize: 40.0,
-        glowColor: Colors.amber,
-        onRatingUpdate: onRatingUpdate,
-        ratingWidget: RatingWidget(
-          full: const Icon(Icons.star, color: Colors.amber),
-          half: const _HalfStarIcon(),
-          empty: const Icon(Icons.star, color: Color(0xffd3d3d3)),
-        ),
-      ),
-    );
-  }
-}
-
-class _HalfStarIcon extends StatelessWidget {
-  const _HalfStarIcon({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        const Icon(Icons.star, color: Color(0xffd3d3d3)),
-        ClipRect(
-          clipper: _HalfClipper(),
-          child: const Icon(Icons.star, color: Colors.amber),
-        ),
-      ],
-    );
-  }
-}
-
-class _HalfClipper extends CustomClipper<Rect> {
-  @override
-  Rect getClip(Size size) {
-    return Rect.fromLTRB(0, 0, size.width / 2, size.height);
-  }
-
-  @override
-  bool shouldReclip(_HalfClipper oldClipper) => false;
-}
-
-//AppTextField
+//店名を入力するWidget
 class _ShopNameTextField extends StatelessWidget {
   const _ShopNameTextField({
     Key? key,

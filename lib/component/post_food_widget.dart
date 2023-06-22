@@ -62,9 +62,10 @@ class _ImgSection extends StatefulWidget {
   @override
   State<_ImgSection> createState() => _ImgSectionState();
 }
-
+//画像選択欄
 class _ImgSectionState extends State<_ImgSection> {
   File? image;
+  bool isSelecting = false;//選択/ロード中か
   @override
   Widget build(BuildContext context) {
     return DottedBorder(
@@ -90,6 +91,9 @@ class _ImgSectionState extends State<_ImgSection> {
                         actions: [
                           CupertinoActionSheetAction(
                             onPressed: () {
+                              setState(() {
+                                isSelecting = true;
+                              });
                               takePhoto();
                               Navigator.pop(context);
                             },
@@ -97,6 +101,9 @@ class _ImgSectionState extends State<_ImgSection> {
                           ),
                           CupertinoActionSheetAction(
                             onPressed: () {
+                              setState(() {
+                                isSelecting = true;
+                              });
                               pickImage();
                               Navigator.pop(context);
                             },
@@ -129,10 +136,10 @@ class _ImgSectionState extends State<_ImgSection> {
                         color: Colors.grey.shade800,
                         size: 40,
                       ),
-                      const Text(
-                        '写真を追加する',
-                        style: TextStyle(color: AppColors.blackTextColor),
-                      ),
+                      Text(
+                        (isSelecting)? '写真を読み込み中..' :'写真を追加する',
+                        style: const TextStyle(color: AppColors.blackTextColor),
+                      ),  
                     ],
                   ),
                 ),
@@ -158,6 +165,7 @@ class _ImgSectionState extends State<_ImgSection> {
                     widget.onChanged(null);
                     setState(() {
                       image = null;
+                      isSelecting = false;
                     });
                   },
                   icon: const Icon(
@@ -180,7 +188,9 @@ class _ImgSectionState extends State<_ImgSection> {
 
       final imageTemp = File(image.path);
       widget.onChanged(imageTemp);
-      setState(() => this.image = imageTemp);
+      setState(() {
+        this.image = imageTemp;
+      });
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
     }
@@ -188,7 +198,6 @@ class _ImgSectionState extends State<_ImgSection> {
 
   // 画像をギャラリーから選ぶ関数
   Future pickImage() async {
-    //HEIFはダメ?
     try {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
       // 画像がnullの場合戻る
@@ -196,13 +205,16 @@ class _ImgSectionState extends State<_ImgSection> {
 
       final imageTemp = File(image.path);
       widget.onChanged(imageTemp);
-      setState(() => this.image = imageTemp);
+      setState(() {
+        this.image = imageTemp;
+      });
     } on PlatformException catch (e) {
       print('Failed to pick image: $e');
     }
   }
 }
 
+//うまいボタン
 class UmaiButton extends StatefulWidget {
   const UmaiButton({
     super.key,
@@ -268,6 +280,7 @@ class _UmaiButtonState extends State<UmaiButton> {
   }
 }
 
+//訪問日入力欄
 class _DateSection extends StatelessWidget {
   const _DateSection({
     super.key,
@@ -308,6 +321,7 @@ class _DateSection extends StatelessWidget {
   }
 }
 
+//コメント入力欄
 class _CommentSection extends StatelessWidget {
   const _CommentSection({
     super.key,
