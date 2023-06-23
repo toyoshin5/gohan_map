@@ -133,7 +133,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
                 onPressed: () {
-                  onTapComfirm(context);
+                  Navigator.pop(context);
                 },
                 child: const Text(
                   'キャンセル',
@@ -158,18 +158,10 @@ class _PlacePostPageState extends State<PlacePostPage> {
         builder: (context) {
           return CupertinoAlertDialog(
             title: const Text('投稿の入力がありません'),
-            content: const Text('最初の投稿なしで登録しますか？'),
             actions: [
               CupertinoDialogAction(
-                child: const Text('キャンセル'),
+                child: const Text('Close'),
                 onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              CupertinoDialogAction(
-                child: const Text('店だけ登録'),
-                onPressed: () async {
-                  _addToDB(false);
                   Navigator.pop(context);
                 },
               ),
@@ -179,6 +171,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
       );
       return;
     }
+
     _addToDB(true);
   }
 
@@ -194,13 +187,10 @@ class _PlacePostPageState extends State<PlacePostPage> {
       ..shopId = widget.shop.id
       ..date = date ?? DateTime.now();
     await IsarUtils.createTimeline(timeline);
-    if (context.mounted) {
-      Navigator.pop(context);
-      return;
-    }
 
     if (context.mounted) {
       Navigator.pop(context);
+      return;
     }
   }
 

@@ -62,10 +62,11 @@ class _ImgSection extends StatefulWidget {
   @override
   State<_ImgSection> createState() => _ImgSectionState();
 }
+
 //画像選択欄
 class _ImgSectionState extends State<_ImgSection> {
   File? image;
-  bool isSelecting = false;//選択/ロード中か
+  bool isSelecting = false; //選択/ロード中か
   @override
   Widget build(BuildContext context) {
     return DottedBorder(
@@ -137,9 +138,9 @@ class _ImgSectionState extends State<_ImgSection> {
                         size: 40,
                       ),
                       Text(
-                        (isSelecting)? '写真を読み込み中..' :'写真を追加する',
+                        (isSelecting) ? '写真を読み込み中..' : '写真を追加する',
                         style: const TextStyle(color: AppColors.blackTextColor),
-                      ),  
+                      ),
                     ],
                   ),
                 ),
@@ -309,12 +310,6 @@ class _DateSection extends StatelessWidget {
         dateLabelText: '訪問日',
         initialValue: DateTime.now().toString(),
         use24HourFormat: true,
-        selectableDayPredicate: (date) {
-          if (date.weekday == 6 || date.weekday == 7) {
-            return false;
-          }
-          return true;
-        },
         onChanged: (value) {
           onChanged(DateTime.parse(value));
         },
@@ -341,7 +336,8 @@ class _CommentSection extends StatelessWidget {
         hintText: 'コメント',
         filled: true,
         fillColor: AppColors.searchBarColor,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         enabledBorder: OutlineInputBorder(
           borderSide: const BorderSide(
             color: AppColors.textFieldColor,
