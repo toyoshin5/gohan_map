@@ -19,7 +19,7 @@ class PlaceDetailPage extends StatelessWidget {
               child: const Text('Post'),
               onPressed: () {
                 showModalBottomSheet(//モーダルを表示する関数
-                  barrierColor: Colors.black.withOpacity(0.3),//背景をどれぐらい暗くするか
+                  barrierColor: Colors.black.withOpacity(0),//背景をどれぐらい暗くするか
                   backgroundColor: Colors.transparent,
                   context: context,
                   isScrollControlled: true,//スクロールで閉じたりするか

@@ -39,48 +39,54 @@ class AppModal extends StatelessWidget {
       child: DraggableScrollableSheet(
         //スクロール可能なモーダルウィジェット
         builder: (BuildContext context, scrollController) {
-          return Container(
-            //モーダルの中身
-            decoration: BoxDecoration(
-              color: AppColors.backgroundModalColor,
-              border: Border.all(
-                color: AppColors.backgroundGrayColor,
-                width: 1,
+          return InkWell(
+            onTap: () {
+              //キーボードを閉じる
+              FocusScope.of(context).unfocus();
+            },//モーダルの内側をタップしてモーダルを閉じないようにタップイベントを無効化
+            child: Container(
+              //モーダルの中身
+              decoration: BoxDecoration(
+                color: AppColors.backgroundModalColor,
+                border: Border.all(
+                  color: AppColors.backgroundGrayColor,
+                  width: 1,
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
               ),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-            ),
-            child: ClipRRect(
-              //ぼかす領域を指定するためのウィジェット
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-              child: BackdropFilter(
-                //ぼかすためのウィジェット
-                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                child: SingleChildScrollView(
-                  //DraggableScrollableSheeの子要素は必ずScrollableなウィジェットである必要がある
-                  controller: scrollController,
-                  child: Column(
-                    children: [
-                      if (showKnob)
-                        Container(
-                          margin: const EdgeInsets.fromLTRB(0, 10, 0, 15),
-                          height: 5,
-                          width: 26,
-                          decoration: BoxDecoration(
-                            color: const Color(0x16000000),
-                            borderRadius: BorderRadius.circular(2.5),
+              child: ClipRRect(
+                //ぼかす領域を指定するためのウィジェット
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
+                child: BackdropFilter(
+                  //ぼかすためのウィジェット
+                  filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                  child: SingleChildScrollView(
+                    //DraggableScrollableSheeの子要素は必ずScrollableなウィジェットである必要がある
+                    controller: scrollController,
+                    child: Column(
+                      children: [
+                        if (showKnob)
+                          Container(
+                            margin: const EdgeInsets.fromLTRB(0, 10, 0, 15),
+                            height: 5,
+                            width: 26,
+                            decoration: BoxDecoration(
+                              color: const Color(0x16000000),
+                              borderRadius: BorderRadius.circular(2.5),
+                            ),
                           ),
+                        SizedBox(
+                          width: double.infinity,
+                          child: child,
                         ),
-                      SizedBox(
-                        width: double.infinity,
-                        child: child,
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
