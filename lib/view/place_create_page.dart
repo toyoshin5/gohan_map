@@ -35,7 +35,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   double rating = 3;
   File? image;
   bool isUmai = false;
-  DateTime? date;
+  DateTime date = DateTime.now();
   String comment = '';
   @override
   Widget build(BuildContext context) {
@@ -215,7 +215,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
         },
       );
       return;
-    } else if (image == null && date == null && comment.isEmpty) {
+    } else if (image == null && comment.isEmpty) {
       showCupertinoDialog(
         context: context,
         builder: (context) {

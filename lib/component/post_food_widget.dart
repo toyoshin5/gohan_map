@@ -304,8 +304,10 @@ class _DateSection extends StatelessWidget {
         type: DateTimePickerType.date,
         firstDate: DateTime(2000),
         lastDate: DateTime(2100),
+        dateMask: 'yyyy/MM/dd',
         //icon: Icon(Icons.watch_later_outlined),
         dateLabelText: '訪問日',
+        initialValue: DateTime.now().toString(),
         use24HourFormat: true,
         selectableDayPredicate: (date) {
           if (date.weekday == 6 || date.weekday == 7) {
