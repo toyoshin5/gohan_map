@@ -13,21 +13,19 @@ import 'package:gohan_map/component/app_modal.dart';
 
 /// 飲食店でのごはん投稿画面
 class PlacePostPage extends StatefulWidget {
-  const PlacePostPage({Key? key}) : super(key: key);
+  final Shop shop;
+  PlacePostPage({Key? key, required this.shop}) : super(key: key);
 
   @override
   State<PlacePostPage> createState() => _PlacePostPageState();
 }
 
 class _PlacePostPageState extends State<PlacePostPage> {
-  String shopName = '';
-  String address = '';
-  int shopId = 1;
-  double rating = 3;
   File? image;
   bool isUmai = false;
   DateTime date = DateTime.now();
   String comment = '';
+
   @override
   Widget build(BuildContext context) {
     return AppModal(
@@ -37,6 +35,43 @@ class _PlacePostPageState extends State<PlacePostPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 30, left: 30, right: 20),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    //飲食店名
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                            child: Text(
+                          widget.shop.shopName,
+                          style: const TextStyle(
+                            fontSize: 30,
+                          ),
+                        )),
+                        const SizedBox(width: 24),
+                        SizedBox(
+                          height: 30,
+                          width: 30,
+                          child: IconButton(
+                            icon: const Icon(
+                              Icons.cancel_outlined,
+                              size: 32,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context); //前の画面に戻る
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    //住所
+                    Text(widget.shop.shopAddress),
+                  ]),
+            ),
+
             // 追加の投稿
             PostFoodWidget(
               onImageChanged: (image) {
@@ -64,7 +99,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
             Container(
               width: double.infinity,
               height: 50,
-              margin: const EdgeInsets.symmetric(vertical: 16),
+              margin: const EdgeInsets.only(top: 30, bottom: 8),
               child: TextButton(
                 style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -76,10 +111,38 @@ class _PlacePostPageState extends State<PlacePostPage> {
                 onPressed: () {
                   onTapComfirm(context);
                 },
-                child: const Text('決定'),
+                child: const Text(
+                  '決定',
+                  style: TextStyle(
+                      color: AppColors.blueTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-            const SizedBox(height: 300),
+            // キャンセルボタン
+            Container(
+              width: double.infinity,
+              height: 50,
+              margin: const EdgeInsets.only(bottom: 50),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  foregroundColor: AppColors.blackTextColor,
+                  backgroundColor: AppColors.backgroundWhiteColor,
+                ),
+                onPressed: () {
+                  onTapComfirm(context);
+                },
+                child: const Text(
+                  'キャンセル',
+                  style: TextStyle(
+                      color: AppColors.redTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -128,7 +191,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
       ..umai = isUmai
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now()
-      ..shopId = shopId
+      ..shopId = widget.shop.id
       ..date = date ?? DateTime.now();
     await IsarUtils.createTimeline(timeline);
     if (context.mounted) {
