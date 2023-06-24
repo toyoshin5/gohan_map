@@ -175,7 +175,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
     _addToDB(true);
   }
 
-  //DBに店を登録(initalPostFlg: 最初の投稿をするかどうか)
+  //DBに店を登録
   Future<void> _addToDB(bool initialPostFlg) async {
     final base64Img = await _fileToBase64(image);
     final timeline = Timeline()
