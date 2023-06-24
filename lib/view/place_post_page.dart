@@ -36,7 +36,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 30, left: 30, right: 20),
+              margin: const EdgeInsets.only(bottom: 30, right: 20),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -48,8 +48,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                             child: Text(
                           widget.shop.shopName,
                           style: const TextStyle(
-                            fontSize: 30,
-                          ),
+                              fontSize: 24, fontWeight: FontWeight.bold),
                         )),
                         const SizedBox(width: 24),
                         SizedBox(
