@@ -1,15 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:date_time_picker/date_time_picker.dart';
-import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
+import 'package:gohan_map/utils/common.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -257,7 +255,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       ..updatedAt = DateTime.now();
     final shopId = await IsarUtils.createShop(shop);
     if (initialPostFlg) {
-      final base64Img = await _fileToBase64(image);
+      final base64Img = await fileToBase64(image);
       final timeline = Timeline()
         ..image = base64Img
         ..comment = comment
@@ -277,20 +275,11 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
     }
   }
 
-  //画像をbase64に変換する関数
-  Future<String> _fileToBase64(File? file) async {
-    if (file == null) {
-      return '';
-    }
-    List<int> fileBytes = await file.readAsBytes();
-    String base64Image = base64Encode(fileBytes);
-    return base64Image;
-  }
-
   //緯度経度から住所を取得する
   Future<String> _getAddressFromLatLng(LatLng latLng) async {
     const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
-    final String apiUrl = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
+    final String apiUrl =
+        'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
     final response = await http.get(Uri.parse(apiUrl));
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
