@@ -6,6 +6,7 @@ import 'package:flutter/Material.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
+import 'package:gohan_map/utils/common.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -176,7 +177,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
 
   //DBに店を登録
   Future<void> _addToDB(bool initialPostFlg) async {
-    final base64Img = await _fileToBase64(image);
+    final base64Img = await fileToBase64(image);
     final timeline = Timeline()
       ..image = base64Img
       ..comment = comment
@@ -191,15 +192,5 @@ class _PlacePostPageState extends State<PlacePostPage> {
       Navigator.pop(context);
       return;
     }
-  }
-
-  //画像をbase64に変換する関数
-  Future<String> _fileToBase64(File? file) async {
-    if (file == null) {
-      return '';
-    }
-    List<int> fileBytes = await file.readAsBytes();
-    String base64Image = base64Encode(fileBytes);
-    return base64Image;
   }
 }
