@@ -104,7 +104,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     const imgRatio = 126 / 175;
     pins.add(
       Marker(
-        width: markerSize * focusAmp * imgRatio, 
+        width: markerSize * focusAmp * imgRatio,
         height: markerSize * focusAmp * 2,
         point: latLng,
         builder: (context) {
@@ -112,11 +112,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
             padding: EdgeInsets.only(
-              left: (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
-              top:(tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
-              right:  (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
-              bottom:markerSize * focusAmp - 1
-            ),
+                left: (tapFlgs[id] == true)
+                    ? 0
+                    : markerSize * (focusAmp - 1) * imgRatio / 2,
+                top: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
+                right: (tapFlgs[id] == true)
+                    ? 0
+                    : markerSize * (focusAmp - 1) * imgRatio / 2,
+                bottom: markerSize * focusAmp - 1),
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -134,7 +137,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     backgroundColor: Colors.transparent,
                     context: context,
                     builder: (context) {
-                      return const PlaceDetailPage(); //飲食店の詳細画面
+                      return PlaceDetailPage(
+                        id: id,
+                      ); //飲食店の詳細画面
                     },
                   ).then((value) {
                     setState(() {
@@ -177,22 +182,31 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     var rot = mapController.rotation;
     //1ピクセルあたりの緯度経度
     var pixelPerLat = pow(2, zoom + 8) / 360;
-    var pixelPerLng = pow(2, zoom + 8) / 360 * cos(pinLocation.latitude * pi / 180);
+    var pixelPerLng =
+        pow(2, zoom + 8) / 360 * cos(pinLocation.latitude * pi / 180);
     //ピンの位置から下へ移動する
-    var lat = pinLocation.latitude - (offset / pixelPerLat * cos(rot * pi / 180));
-    var lng = pinLocation.longitude + (offset / pixelPerLng * sin(rot * pi / 180));
+    var lat =
+        pinLocation.latitude - (offset / pixelPerLat * cos(rot * pi / 180));
+    var lng =
+        pinLocation.longitude + (offset / pixelPerLng * sin(rot * pi / 180));
     _animatedMapMove(LatLng(lat, lng), zoom);
   }
 
   //flutter_mapにはアニメーションありのmoveメソッドがないため、AnimationControllerで作成
   void _animatedMapMove(LatLng destLocation, double destZoom) {
-    final latTween = Tween<double>(begin: mapController.center.latitude, end: destLocation.latitude);
-    final lngTween = Tween<double>(begin: mapController.center.longitude, end: destLocation.longitude);
+    final latTween = Tween<double>(
+        begin: mapController.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: mapController.center.longitude, end: destLocation.longitude);
     final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
-    final controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
     controller.addListener(() {
-      mapController.move(LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)), zoomTween.evaluate(animation));
+      mapController.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
     });
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -264,16 +278,16 @@ class _DummySearchWidget extends StatelessWidget {
               (value) {
                 //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
                 if (value != null) {
-                  showModalBottomSheet(
-                    barrierColor: Colors.black.withOpacity(0),
-                    context: context,
-                    isDismissible: true,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) {
-                      return const PlaceDetailPage(); //飲食店の詳細画面
-                    },
-                  );
+                  // showModalBottomSheet(
+                  //   barrierColor: Colors.black.withOpacity(0),
+                  //   context: context,
+                  //   isDismissible: true,
+                  //   isScrollControlled: true,
+                  //   backgroundColor: Colors.transparent,
+                  //   builder: (context) {
+                  //     return PlaceDetailPage; //飲食店の詳細画面
+                  //   },
+                  // );
                 }
               },
             );

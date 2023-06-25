@@ -8,7 +8,7 @@ import '../collections/timeline.dart';
 
 class IsarUtils {
   static Isar? isar;
-  static bool get isInitialized => isar != null;//isarが初期化されているか
+  static bool get isInitialized => isar != null; //isarが初期化されているか
   IsarUtils._() {
     throw AssertionError("private Constructor");
   } //コンストラクタを隠蔽
@@ -44,6 +44,13 @@ class IsarUtils {
     return shops.toList();
   }
 
+  // shopの取得
+  static Future<Shop?> getShopById(Id id) async {
+    await ensureInitialized();
+    final shop = await isar!.shops.get(id);
+    return shop;
+  }
+
   // shopの作成
   static Future<Id> createShop(Shop shop) async {
     await ensureInitialized();
@@ -67,7 +74,8 @@ class IsarUtils {
   // timelineの取得
   static Future<List<Timeline>> getTimelinesByShopId(int shopId) async {
     await ensureInitialized();
-    final timelines = await isar!.timelines.where().shopIdEqualTo(shopId).findAll();
+    final timelines =
+        await isar!.timelines.where().shopIdEqualTo(shopId).findAll();
     return timelines.toList();
   }
 
