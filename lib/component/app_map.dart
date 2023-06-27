@@ -49,6 +49,8 @@ class _AppMapState extends State<AppMap> {
               options: MapOptions(
                   center:
                       LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
+                  minZoom: 3,
+                  maxZoom: 18,
                   zoom: 13,
                   interactiveFlags: InteractiveFlag.all,
                   onLongPress: widget.onLongPress),
