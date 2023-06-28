@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
@@ -9,6 +10,7 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/view/change_map_page.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
@@ -37,7 +39,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    useiOSMap = Theme.of(context).platform == TargetPlatform.iOS;
     return Stack(
       children: [
         Material(
@@ -71,6 +72,50 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             },
           ),
         ),
+        //マップ切り替えボタン(iosのみ)
+        if (Platform.isIOS)
+          Positioned(
+            top: 60,
+            left: 20,
+            child: SizedBox(
+              width: 40,
+              height: 40,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  backgroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Icon(Icons.map, color: AppColors.blackTextColor),
+                onPressed: () {
+                  showModalBottomSheet(
+                    barrierColor: Colors.black.withOpacity(0),
+                    isDismissible: true,
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) {
+                      return ChangeMapPage(
+                        isIOS: useiOSMap,
+                      );
+                    },
+                  ).then((value) {
+                    if (value == "apple") {
+                      setState(() {
+                        useiOSMap = true;
+                      });
+                    }else if (value == "osm") {
+                      setState(() {
+                        useiOSMap = false;
+                      });
+                    }
+                  });
+                },
+              ),
+            ),
+          ),
         const _DummySearchWidget(),
       ],
     );
@@ -81,7 +126,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       tapFlgs[id] = true;
     });
     final deviceHeight = MediaQuery.of(context).size.height;
-    if (!useiOSMap){
+    if (!useiOSMap) {
       _moveToPin(latLng, deviceHeight * 0.1);
     }
     showModalBottomSheet(
