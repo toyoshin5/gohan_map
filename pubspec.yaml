@@ -47,6 +47,7 @@ dependencies:
   date_time_picker: ^2.1.0
   dotted_border: ^2.0.0+3
   image_picker: ^0.8.9
+  apple_maps_flutter: ^1.2.0
 
 dev_dependencies:
   flutter_test:

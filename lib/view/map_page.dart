@@ -24,11 +24,11 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
-  List<Marker> pins = [];
+  List<Pin> pins = [];
   Map<Id, bool> tapFlgs = {};
   List<Shop> shops = [];
   final MapController mapController = MapController();
-
+  bool useiOSMap = false;
   @override
   void initState() {
     super.initState();
@@ -37,21 +37,20 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    useiOSMap = Theme.of(context).platform == TargetPlatform.iOS;
     return Stack(
       children: [
         Material(
           child: AppMap(
+            isAppleMap: useiOSMap,
             pins: pins,
             mapController: mapController,
-            onLongPress: (_, latLng) {
+            onLongPress: (latLng) {
               //画面の座標, 緯度経度
               setState(() {
                 //ピンを配置する
                 _addPinToMap(latLng, null);
               });
-              //mapをスクロールする
-              final deviceHeight = MediaQuery.of(context).size.height;
-              _moveToPin(latLng, deviceHeight * 0.2);
               showModalBottomSheet(
                 barrierColor: Colors.black.withOpacity(0),
                 isDismissible: true,
@@ -67,44 +66,48 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 _loadAllShop();
               });
             },
+            onTapApplePin: (id, latLng) {
+              _tapPin(id, context, latLng);
+            },
           ),
         ),
-        //下の検索ボタン
-        // Center(
-        //   //画像ボタン
-        //   child: Stack(
-        //     children: [
-        //       Image.asset(
-        //         'images/pin_tap.png',
-        //         width: 100,
-        //         height: 100,
-        //       ),
-        //       Positioned.fill(
-        //         child: Material(
-        //           color: Colors.transparent,
-        //           child: InkWell(
-        //             onTap: () {
-        //               // ボタンがタップされたときの処理
-        //               print('Button tapped!');
-        //             },
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         const _DummySearchWidget(),
       ],
     );
+  }
+
+  void _tapPin(int id, BuildContext context, LatLng latLng) {
+    setState(() {
+      tapFlgs[id] = true;
+    });
+    final deviceHeight = MediaQuery.of(context).size.height;
+    if (!useiOSMap){
+      _moveToPin(latLng, deviceHeight * 0.1);
+    }
+    showModalBottomSheet(
+      barrierColor: Colors.black.withOpacity(0),
+      isDismissible: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) {
+        return const PlaceDetailPage(); //飲食店の詳細画面
+      },
+    ).then((value) {
+      setState(() {
+        tapFlgs[id] = false;
+      });
+    });
   }
 
   void _addPinToMap(LatLng latLng, Id? id) {
     const markerSize = 50.0;
     const focusAmp = 1.6; //>=1
     const imgRatio = 126 / 175;
-    pins.add(
+    pins.add(Pin(
+      id,
       Marker(
-        width: markerSize * focusAmp * imgRatio, 
+        width: markerSize * focusAmp * imgRatio,
         height: markerSize * focusAmp * 2,
         point: latLng,
         builder: (context) {
@@ -112,35 +115,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
             padding: EdgeInsets.only(
-              left: (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
-              top:(tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
-              right:  (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
-              bottom:markerSize * focusAmp - 1
-            ),
+                left: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1) * imgRatio / 2,
+                top: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
+                right: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1) * imgRatio / 2,
+                bottom: markerSize * focusAmp - 1),
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 //ピンをタップしたときの処理
                 if (id != null) {
-                  setState(() {
-                    tapFlgs[id] = true;
-                  });
-                  final deviceHeight = MediaQuery.of(context).size.height;
-                  _moveToPin(latLng, deviceHeight * 0.1);
-                  showModalBottomSheet(
-                    barrierColor: Colors.black.withOpacity(0),
-                    isDismissible: true,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    context: context,
-                    builder: (context) {
-                      return const PlaceDetailPage(); //飲食店の詳細画面
-                    },
-                  ).then((value) {
-                    setState(() {
-                      tapFlgs[id] = false;
-                    });
-                  });
+                  _tapPin(id, context, latLng);
                 }
               },
               child: (tapFlgs[id] == true)
@@ -154,8 +138,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           );
         },
       ),
-    );
+    ));
   }
+
+
 
   void _loadAllShop() {
     IsarUtils.getAllShops().then(
