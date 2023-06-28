@@ -18,10 +18,11 @@ class Pin {
 
 class AppMap extends StatefulWidget {
   final bool isAppleMap;
-  final void Function(LatLng)? onLongPress;
+  final void Function(LatLng)? onLongPress;//両Map共通
   final void Function(Id, LatLng)? onTapApplePin; //ピンをタップしたときの処理(AppleMapのみ)
-  final List<Pin>? pins; //FlutterMapはピンがButtonなので、こちらにタップ時動作を記述。onTapApplePinは使わない。
-  final MapController? mapController;
+  final List<Pin>? pins; //両Map共通。FlutterMapはピンがButtonなので、こちらにピンのタップ時処理も記述。
+  final MapController? mapController;//FlutterMap用のコントローラー
+  final void Function(Apple.AppleMapController)? onAppleMapCreated;//AppleMap用のコントローラー
 
   const AppMap({
     Key? key,
@@ -30,6 +31,7 @@ class AppMap extends StatefulWidget {
     this.onTapApplePin,
     this.pins,
     this.mapController,
+    this.onAppleMapCreated,
   }) : super(key: key);
 
   @override
@@ -39,7 +41,6 @@ class AppMap extends StatefulWidget {
 class _AppMapState extends State<AppMap> {
   late Future<Position> future;
   late Uint8List markerIcon;
-  Apple.AppleMapController? _mapController;
 
   @override
   void initState() {
@@ -75,15 +76,11 @@ class _AppMapState extends State<AppMap> {
                 ),
                 onLongPress: (widget.onLongPress != null)
                     ? (latLng) {
-                        final deviceHeight = MediaQuery.of(context).size.height;
-                        _moveToPin(latLng, deviceHeight * 0.2);
                         widget.onLongPress!(toFlutterLatlng(latLng));
                       }
                     : null,
                 annotations: toAppleAnnotation(widget.pins),
-                onMapCreated: (controller) {
-                  _mapController = controller;
-                },
+                onMapCreated: widget.onAppleMapCreated,
               );
             }
             //Android:OpenStreetMap
@@ -150,20 +147,7 @@ class _AppMapState extends State<AppMap> {
     return position;
   }
 
-  //ピンの位置に移動する。offsetはピンを画面の中央から何dp上にずらして表示するか
-  void _moveToPin(Apple.LatLng pinLocation, double offset) {
-    _mapController?.getVisibleRegion().then((value) {
-      final ne = value.northeast;
-      final sw = value.southwest;
-      final height = MediaQuery.of(context).size.height;
-      final lat = -(ne.latitude - sw.latitude) * (offset / height) + pinLocation.latitude;
-      final lng = pinLocation.longitude;
-      _mapController?.animateCamera(
-        Apple.CameraUpdate.newLatLng(Apple.LatLng(lat, lng)),
-      );
-    });
-  }
-
+  
   Future<Uint8List> getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
     Codec codec = await instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
@@ -183,8 +167,6 @@ class _AppMapState extends State<AppMap> {
         icon: Apple.BitmapDescriptor.fromBytes(markerIcon),
         onTap: (widget.onTapApplePin != null && e.id != null)
             ? () {
-                final height = MediaQuery.of(context).size.height;
-                _moveToPin(toAppleLatlng(e.marker.point), height * 0.1);
                 widget.onTapApplePin!(e.id!, e.marker.point);
               }
             : null,

@@ -16,6 +16,7 @@ import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
 import 'package:isar/isar.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:apple_maps_flutter/apple_maps_flutter.dart' as Apple;
 
 ///地図が表示されている画面
 class MapPage extends StatefulWidget {
@@ -30,6 +31,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Map<Id, bool> tapFlgs = {};
   List<Shop> shops = [];
   final MapController mapController = MapController();
+  Apple.AppleMapController? appleMapController;
   bool useiOSMap = false;
   @override
   void initState() {
@@ -48,6 +50,12 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             mapController: mapController,
             onLongPress: (latLng) {
               //画面の座標, 緯度経度
+              final deviceHeight = MediaQuery.of(context).size.height;
+              if (useiOSMap) {
+                _moveToPinApple(toAppleLatlng(latLng), deviceHeight * 0.2);
+              } else {
+                _moveToPin(latLng, deviceHeight * 0.2);
+              }
               setState(() {
                 //ピンを配置する
                 _addPinToMap(latLng, null);
@@ -69,6 +77,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             },
             onTapApplePin: (id, latLng) {
               _tapPin(id, context, latLng);
+            },
+            onAppleMapCreated: (mapController) {
+              appleMapController = mapController;
             },
           ),
         ),
@@ -106,7 +117,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       setState(() {
                         useiOSMap = true;
                       });
-                    }else if (value == "osm") {
+                    } else if (value == "osm") {
                       setState(() {
                         useiOSMap = false;
                       });
@@ -126,7 +137,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       tapFlgs[id] = true;
     });
     final deviceHeight = MediaQuery.of(context).size.height;
-    if (!useiOSMap) {
+    if (useiOSMap) {
+      _moveToPinApple(toAppleLatlng(latLng), deviceHeight * 0.1);
+    }
+    else{
       _moveToPin(latLng, deviceHeight * 0.1);
     }
     showModalBottomSheet(
@@ -186,8 +200,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     ));
   }
 
-
-
   void _loadAllShop() {
     IsarUtils.getAllShops().then(
       (value) => setState(() {
@@ -200,6 +212,20 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         }
       }),
     );
+  }
+
+  //ピンの位置に移動する。offsetはピンを画面の中央から何dp上にずらして表示するか
+  void _moveToPinApple(Apple.LatLng pinLocation, double offset) {
+    appleMapController?.getVisibleRegion().then((value) {
+      final ne = value.northeast;
+      final sw = value.southwest;
+      final height = MediaQuery.of(context).size.height;
+      final lat = -(ne.latitude - sw.latitude) * (offset / height) + pinLocation.latitude;
+      final lng = pinLocation.longitude;
+      appleMapController?.animateCamera(
+        Apple.CameraUpdate.newLatLng(Apple.LatLng(lat, lng)),
+      );
+    });
   }
 
   //ピンの位置に移動する。offsetはピンを画面の中央から何dp上にずらして表示するか
@@ -233,6 +259,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       }
     });
     controller.forward();
+  }
+
+  //LatlngからApple.LatLngに変換する関数
+  Apple.LatLng toAppleLatlng(LatLng latLng) {
+    return Apple.LatLng(latLng.latitude, latLng.longitude);
+  }
+
+  //Apple.LatLngからLatlngに変換する関数
+  LatLng toFlutterLatlng(Apple.LatLng latLng) {
+    return LatLng(latLng.latitude, latLng.longitude);
   }
 }
 
