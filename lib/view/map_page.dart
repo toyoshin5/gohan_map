@@ -30,8 +30,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   List<Pin> pins = [];
   Map<Id, bool> tapFlgs = {};
   List<Shop> shops = [];
-  final MapController mapController = MapController();
-  Apple.AppleMapController? appleMapController;
+  final MapController mapController = MapController();//FlutterMap用のコントローラー
+  Apple.AppleMapController? appleMapController;//AppleMap用のコントローラー
   bool useiOSMap = false;
   @override
   void initState() {
