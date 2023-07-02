@@ -52,11 +52,13 @@
 		<string>https</string>
 		<string>http</string>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Need photo library access for uploading photos.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Need camera access for uploading photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-    <string>Required to post location information when posting photos and videos.</string>
-    <key>NSLocationAlwaysUsageDescription</key>
-    <string>Required to post location information when posting photos and videos.</string>
+	<string>Required to post location information when posting photos and videos.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Required to post location information when posting photos and videos.</string>
 </dict>
 </plist>
