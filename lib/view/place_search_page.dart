@@ -1,7 +1,8 @@
-
 import 'package:flutter/material.dart';
+import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
+import 'package:gohan_map/utils/isar_utils.dart';
 
 import '../component/app_search_bar.dart';
 
@@ -14,7 +15,9 @@ class PlaceSearchPage extends StatefulWidget {
 }
 
 class _PlaceSearchPageState extends State<PlaceSearchPage> {
-  var isSearch = false;
+  String searchText = "";
+  List<Shop> shopList = [];
+
   @override
   Widget build(BuildContext context) {
     return AppModal(
@@ -32,15 +35,16 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
               autofocus: true,
               onSubmitted: (text) {
                 setState(() {
-                  isSearch = true;
+                  searchText = text;
                 });
+                _searchShops(text);
               },
             ),
             const SizedBox(
               height: 16,
             ),
-            for (var i = 0; i < 20; i++)
-              if (isSearch)
+            for (var shop in shopList)
+              if (searchText != "")
                 Card(
                   //影付きの角丸四角形
                   elevation: 0, //影を消す
@@ -49,9 +53,16 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                     borderRadius: BorderRadius.circular(8), //角丸の大きさ
                   ),
                   child: ListTile(
-                    title: Text('place$i'),
+                    title: Text(shop.shopName),
+                    titleTextStyle: const TextStyle(
+                        fontSize: 18,
+                        color: AppColors.blackTextColor,
+                        overflow: TextOverflow.ellipsis),
+                    subtitle: Text(shop.shopAddress),
+                    subtitleTextStyle:
+                        const TextStyle(overflow: TextOverflow.ellipsis),
                     onTap: () {
-                      Navigator.pop(context, "<searchid>");
+                      Navigator.pop(context, shop.id);
                     },
                   ),
                 ),
@@ -60,5 +71,12 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
       ),
     );
   }
-}
 
+  void _searchShops(String text) {
+    IsarUtils.searchShops(text).then(
+      (value) => setState(() {
+        shopList = value;
+      }),
+    );
+  }
+}
