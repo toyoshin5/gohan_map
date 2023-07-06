@@ -12,10 +12,13 @@ import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
 
-/// 飲食店でのごはん投稿画面
+// 飲食店でのごはん投稿・編集画面
 class PlacePostPage extends StatefulWidget {
   final Shop shop;
-  PlacePostPage({Key? key, required this.shop}) : super(key: key);
+  final Timeline? timeline; // 編集ページの際に外部から初期データを渡す
+
+  PlacePostPage({Key? key, required this.shop, this.timeline})
+      : super(key: key);
 
   @override
   State<PlacePostPage> createState() => _PlacePostPageState();
@@ -26,6 +29,17 @@ class _PlacePostPageState extends State<PlacePostPage> {
   bool isUmai = false;
   DateTime date = DateTime.now();
   String comment = '';
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.timeline != null) {
+      this.image = base64ImageToFile(widget.timeline?.image);
+      this.isUmai = widget.timeline?.umai ?? false;
+      this.date = widget.timeline?.date ?? DateTime.now();
+      this.comment = widget.timeline?.comment ?? "";
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,21 +88,25 @@ class _PlacePostPageState extends State<PlacePostPage> {
 
             // 追加の投稿
             PostFoodWidget(
+              initialImage: this.image,
               onImageChanged: (image) {
                 setState(() {
                   this.image = image;
                 });
               },
+              initialIsUmai: this.isUmai,
               onUmaiChanged: (isUmai) {
                 setState(() {
                   this.isUmai = isUmai;
                 });
               },
+              initialDate: this.date,
               onDateChanged: (date) {
                 setState(() {
                   this.date = date;
                 });
               },
+              initialComment: this.comment,
               onCommentChanged: (comment) {
                 setState(() {
                   this.comment = comment;
@@ -172,17 +190,41 @@ class _PlacePostPageState extends State<PlacePostPage> {
       return;
     }
 
-    _addToDB(true);
+    if (widget.timeline != null) {
+      _updateTimeline();
+    } else {
+      _addToDB();
+    }
   }
 
-  //DBに店を登録
-  Future<void> _addToDB(bool initialPostFlg) async {
+  //DBに店を新規登録
+  Future<void> _addToDB() async {
     final base64Img = await fileToBase64(image);
     final timeline = Timeline()
       ..image = base64Img
       ..comment = comment
       ..umai = isUmai
       ..createdAt = DateTime.now()
+      ..updatedAt = DateTime.now()
+      ..shopId = widget.shop.id
+      ..date = date ?? DateTime.now();
+    await IsarUtils.createTimeline(timeline);
+
+    if (context.mounted) {
+      Navigator.pop(context);
+      return;
+    }
+  }
+
+  //DBに店を新規登録
+  Future<void> _updateTimeline() async {
+    final base64Img = await fileToBase64(image);
+    final timeline = Timeline()
+      ..id = widget.timeline!.id
+      ..image = base64Img
+      ..comment = comment
+      ..umai = isUmai
+      ..createdAt = widget.timeline!.createdAt
       ..updatedAt = DateTime.now()
       ..shopId = widget.shop.id
       ..date = date ?? DateTime.now();

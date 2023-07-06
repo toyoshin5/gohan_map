@@ -79,7 +79,7 @@ class IsarUtils {
     return timelines.toList();
   }
 
-  // timelineの作成
+  // timelineの作成・更新
   static Future<void> createTimeline(Timeline timeline) async {
     await ensureInitialized();
     await isar!.writeTxn(() async {
