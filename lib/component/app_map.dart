@@ -24,12 +24,15 @@ class AppMap extends StatefulWidget {
 
 class _AppMapState extends State<AppMap> {
   late Future<Position> future;
+  Marker? presetLocationMarker;
 
   @override
   void initState() {
     super.initState();
     future = Future(() async {
-      return await getCurrentPosition();
+      var pos = await getCurrentPosition();
+      setPresetLocationMarker(LatLng(pos.latitude, pos.longitude));
+      return pos;
     });
   }
 
@@ -74,7 +77,7 @@ class _AppMapState extends State<AppMap> {
                 ),
                 if (widget.pins != null)
                   MarkerLayer(
-                    markers: widget.pins!,
+                    markers: [...widget.pins!, presetLocationMarker!],
                     rotate: true,
                   ),
               ],
@@ -108,5 +111,36 @@ class _AppMapState extends State<AppMap> {
     var position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     return position;
+  }
+
+  void setPresetLocationMarker(LatLng latlng) {
+    const markerSize = 30.0;
+
+    var marker = Marker(
+        width: markerSize,
+        height: markerSize,
+        point: LatLng(latlng.latitude, latlng.longitude),
+        builder: (context) => Container(
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 10, color: Colors.black26, spreadRadius: 3)
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  Icons.circle,
+                  size: 27,
+                  color: Colors.blue.shade600,
+                ),
+              ),
+            ));
+
+    setState(() {
+      presetLocationMarker = marker;
+    });
   }
 }
