@@ -11,7 +11,8 @@ class AppMap extends StatefulWidget {
   final List<Marker>? pins;
   final MapController? mapController;
 
-  const AppMap({Key? key,
+  const AppMap({
+    Key? key,
     required this.onLongPress,
     this.pins,
     this.mapController,
@@ -52,7 +53,8 @@ class _AppMapState extends State<AppMap> {
                   minZoom: 3,
                   maxZoom: 18,
                   zoom: 13,
-                  interactiveFlags: InteractiveFlag.all,
+                  interactiveFlags:
+                      InteractiveFlag.all & ~InteractiveFlag.rotate, // 回転を無効化する
                   onLongPress: widget.onLongPress),
               mapController: widget.mapController,
               nonRotatedChildren: [
@@ -71,10 +73,10 @@ class _AppMapState extends State<AppMap> {
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 ),
                 if (widget.pins != null)
-                MarkerLayer(
-                  markers: widget.pins!,
-                  rotate: true,
-                ),
+                  MarkerLayer(
+                    markers: widget.pins!,
+                    rotate: true,
+                  ),
               ],
             );
         }
