@@ -68,7 +68,7 @@ class _AppMapState extends State<AppMap> {
               ],
               children: [
                 TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  urlTemplate: 'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
                 ),
                 if (widget.pins != null)
                 MarkerLayer(
