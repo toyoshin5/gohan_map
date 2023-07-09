@@ -115,8 +115,10 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                       minZoom: 3.0,
                       onPositionChanged: (position, hasGesture) {
                         if (position.center != null) {
-                          shopLatitude = position.center!.latitude;
-                          shopLongitude = position.center!.longitude;
+                          setState(() {
+                            shopLatitude = position.center!.latitude;
+                            shopLongitude = position.center!.longitude;
+                          });
                         }
                       },
                       onTap: (tapPosition, latlng) {
@@ -333,14 +335,20 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
   Future<String> _getAddressFromLatLng(LatLng latLng) async {
     const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
     final String apiUrl = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
-    final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 1));
-    if (response.statusCode == 200) {
+    try{
+      final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 1));
+      if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       final address = responseData['Feature'][0]['Property']['Address'];
       return address;
-    } else {
+      } else {
+        return '住所を取得できませんでした';
+      }
+    }catch(e){
       return '住所を取得できませんでした';
     }
+    
+   
   }
 }
 
