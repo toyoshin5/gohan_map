@@ -206,7 +206,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now()
       ..shopId = widget.shop.id
-      ..date = date ?? DateTime.now();
+      ..date = date;
     await IsarUtils.createTimeline(timeline);
 
     if (context.mounted) {

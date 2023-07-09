@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
+import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -31,8 +33,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
     shopLongitude = widget.shop.shopLongitude;
     shopStar = widget.shop.shopStar;
   }
-
-  bool hasEditPos = false;
   MapController mapController = MapController();
   late LatLng defaultLatLng;
 
@@ -115,11 +115,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                       maxZoom: 17.0,
                       minZoom: 3.0,
                       onPositionChanged: (position, hasGesture) {
-                        if (hasGesture) {
-                          setState(() {
-                            hasEditPos = true;
-                          });
-                        }
                         if (position.center != null) {
                           shopLatitude = position.center!.latitude;
                           shopLongitude = position.center!.longitude;
@@ -130,9 +125,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                         }
                       },
                       onTap: (tapPosition, latlng) {
-                        setState(() {
-                          hasEditPos = true;
-                        });
                         _animatedMapMove(latlng, 15, 500);
                       },
                     ),
@@ -158,7 +150,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                     ),
                   ),
                   //右下に戻すボタンを表示
-                  if (hasEditPos)
+                  if (defaultLatLng.latitude != shopLatitude || defaultLatLng.longitude != shopLongitude)
                     Align(
                       alignment: Alignment.bottomRight,
                       child: Padding(
@@ -175,9 +167,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                               backgroundColor: AppColors.backgroundWhiteColor,
                             ),
                             onPressed: () {
-                              setState(() {
-                                hasEditPos = false;
-                              });
                               _animatedMapMove(defaultLatLng, 15, 500);
                             },
                             child: const Icon(
@@ -224,7 +213,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
                 onPressed: () {
-                  onTapComfirm(context);
+                  _onTapComfirm(context);
                 },
                 child: const Text(
                   '決定',
@@ -260,28 +249,70 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
     );
   }
 
-  //決定ボタンを押した時の処理
-  void onTapComfirm(BuildContext context) {}
 
-  // //DBに店を新規登録
-  // Future<void> _addToDB() async {
-  //   final base64Img = await fileToBase64(image);
-  //   final timeline = Timeline()
-  //     ..image = base64Img
-  //     ..comment = comment
-  //     ..umai = isUmai
-  //     ..createdAt = DateTime.now()
-  //     ..updatedAt = DateTime.now()
-  //     ..shopId = widget.shop.id
-  //     ..date = date ?? DateTime.now();
-  //   await IsarUtils.createTimeline(timeline);
 
-  //   if (context.mounted) {
-  //     Navigator.pop(context);
-  //     return;
-  //   }
-  // }
-  
+//決定ボタンを押した時の処理
+  void _onTapComfirm(BuildContext context) {
+    //バリデーション
+    if (shopName.isEmpty) {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('店名を入力してください'),
+            content: const Text('店を登録するためには、店名の入力が必要です。'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    } else if (shopAddress.isEmpty || shopAddress == "住所を取得できませんでした") {
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('住所を取得できません'),
+            content: const Text('インターネットへの接続状況をご確認ください。'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('OK'),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    } 
+    _updateDB();
+  }
+
+  Future<void> _updateDB() async {
+     final shop = Shop()
+      ..id = widget.shop.id
+      ..shopName = shopName
+      ..shopAddress = shopAddress 
+      ..shopLatitude = shopLatitude
+      ..shopLongitude = shopLongitude
+      ..shopStar = shopStar
+      ..createdAt = widget.shop.createdAt
+      ..updatedAt = DateTime.now();
+    await IsarUtils.createShop(shop);
+    if (context.mounted) {
+      Navigator.pop(context);
+      return;
+    }
+  }
+
   void _animatedMapMove(LatLng destLocation, double destZoom, int millsec) {
     final latTween = Tween<double>(begin: mapController.center.latitude, end: destLocation.latitude);
     final lngTween = Tween<double>(begin: mapController.center.longitude, end: destLocation.longitude);
