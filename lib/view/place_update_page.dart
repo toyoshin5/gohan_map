@@ -28,16 +28,15 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
     super.initState();
     defaultLatLng = LatLng(widget.shop.shopLatitude, widget.shop.shopLongitude);
     shopName = widget.shop.shopName;
-    shopAddress = widget.shop.shopAddress;
     shopLatitude = widget.shop.shopLatitude;
     shopLongitude = widget.shop.shopLongitude;
     shopStar = widget.shop.shopStar;
   }
+
   MapController mapController = MapController();
   late LatLng defaultLatLng;
 
   late String shopName;
-  late String shopAddress;
   late double shopLatitude;
   late double shopLongitude;
   late double shopStar;
@@ -96,7 +95,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
               child: Text(
-                "住所",
+                "場所",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -118,10 +117,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                         if (position.center != null) {
                           shopLatitude = position.center!.latitude;
                           shopLongitude = position.center!.longitude;
-                          shopAddress = "";
-                          _getAddressFromLatLng(position.center!).then((value) => setState(() {
-                                shopAddress = value;
-                              }));
                         }
                       },
                       onTap: (tapPosition, latlng) {
@@ -180,7 +175,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                 ],
               ),
             ),
-            Text((shopAddress!="")?shopAddress:"住所を取得中...", style: const TextStyle(fontSize: 12)),
             //評価
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
@@ -193,12 +187,12 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
               ),
             ),
             AppRatingBar(
-              onRatingUpdate: (value) {
-                setState(() {
-                  shopStar = value;
-                });
-              }, 
-              initialRating: shopStar),
+                onRatingUpdate: (value) {
+                  setState(() {
+                    shopStar = value;
+                  });
+                },
+                initialRating: shopStar),
             //決定ボタン
             Container(
               width: double.infinity,
@@ -249,12 +243,13 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
     );
   }
 
-
-
 //決定ボタンを押した時の処理
-  void _onTapComfirm(BuildContext context) {
+  Future<void> _onTapComfirm(BuildContext context) async {
+    //住所取得
+    final shopAddress = await _getAddressFromLatLng(LatLng(shopLatitude, shopLongitude));
     //バリデーション
-    if (shopName.isEmpty) {
+    if(context.mounted){
+      if (shopName.isEmpty) {
       showCupertinoDialog(
         context: context,
         builder: (context) {
@@ -292,15 +287,17 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
         },
       );
       return;
-    } 
-    _updateDB();
+    }
+    _updateDB(shopAddress);
+    }
+    
   }
 
-  Future<void> _updateDB() async {
-     final shop = Shop()
+  Future<void> _updateDB(String shopAddress) async {
+    final shop = Shop()
       ..id = widget.shop.id
       ..shopName = shopName
-      ..shopAddress = shopAddress 
+      ..shopAddress = shopAddress
       ..shopLatitude = shopLatitude
       ..shopLongitude = shopLongitude
       ..shopStar = shopStar
@@ -336,7 +333,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
   Future<String> _getAddressFromLatLng(LatLng latLng) async {
     const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
     final String apiUrl = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
-    final response = await http.get(Uri.parse(apiUrl));
+    final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 1));
     if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       final address = responseData['Feature'][0]['Property']['Address'];
