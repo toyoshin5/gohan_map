@@ -336,7 +336,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
     const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
     final String apiUrl = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
     try{
-      final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 1));
+      final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 3));
       if (response.statusCode == 200) {
       final responseData = json.decode(response.body);
       final address = responseData['Feature'][0]['Property']['Address'];
