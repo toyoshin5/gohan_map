@@ -50,7 +50,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 30, right: 20),
+              margin: const EdgeInsets.only(bottom: 20, right: 20),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -160,6 +160,8 @@ class _PlacePostPageState extends State<PlacePostPage> {
                 ),
               ),
             ),
+            const SizedBox(
+              height: 100,)
           ],
         ),
       ),
