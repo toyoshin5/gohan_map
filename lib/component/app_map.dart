@@ -60,8 +60,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     minZoom: 3,
                     maxZoom: 18,
                     zoom: 13,
-                    interactiveFlags: InteractiveFlag.all &
-                        ~InteractiveFlag.rotate, // 回転を無効化する
+                    interactiveFlags: InteractiveFlag.all,
+                    enableMultiFingerGestureRace: true,
                     onLongPress: widget.onLongPress,
                     onPositionChanged: (position, hasGesture) {
                       if (hasGesture && isCurrentLocation) {
@@ -90,7 +90,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     ),
                     if (widget.pins != null)
                       MarkerLayer(
-                        markers: widget.pins!,
+                        markers: [...widget.pins!, presetLocationMarker!],
                         rotate: true,
                       ),
                   ],
