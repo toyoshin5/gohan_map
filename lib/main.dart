@@ -2,6 +2,7 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/map_page.dart';
 
 /// アプリが起動したときに呼ばれる
@@ -19,6 +20,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //セーフエリア外の高さを保存しておく
+    SafeAreaUtil.unSafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
+    SafeAreaUtil.unSafeAreaTopHeight = MediaQuery.of(context).padding.top;
     return const MaterialApp(
       title: 'Gohan Map',
       debugShowCheckedModeBanner: false,

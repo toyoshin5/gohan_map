@@ -13,14 +13,25 @@ import 'package:image_picker/image_picker.dart';
 class PostFoodWidget extends StatelessWidget {
   const PostFoodWidget({
     Key? key,
+    this.initialImage,
     required this.onImageChanged,
+    this.initialIsUmai,
     required this.onUmaiChanged,
+    this.initialDate,
     required this.onDateChanged,
+    this.initialComment,
     required this.onCommentChanged,
   }) : super(key: key);
+  final File? initialImage;
   final Function(File?) onImageChanged;
+
+  final bool? initialIsUmai;
   final Function(bool) onUmaiChanged;
+
+  final DateTime? initialDate;
   final Function(DateTime) onDateChanged;
+
+  final String? initialComment;
   final Function(String) onCommentChanged;
   @override
   Widget build(BuildContext context) {
@@ -35,15 +46,19 @@ class PostFoodWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ImgSection(
+            initialImage: this.initialImage,
             onChanged: onImageChanged,
           ),
           UmaiButton(
+            initialIsUmai: this.initialIsUmai,
             onChanged: onUmaiChanged,
           ),
           _DateSection(
+            initialDate: this.initialDate,
             onChanged: onDateChanged,
           ),
           _CommentSection(
+            initialComment: this.initialComment,
             onChanged: onCommentChanged,
           ),
         ],
@@ -53,9 +68,11 @@ class PostFoodWidget extends StatelessWidget {
 }
 
 class _ImgSection extends StatefulWidget {
+  final File? initialImage;
   final Function(File?) onChanged;
   const _ImgSection({
     super.key,
+    this.initialImage,
     required this.onChanged,
   });
 
@@ -67,6 +84,13 @@ class _ImgSection extends StatefulWidget {
 class _ImgSectionState extends State<_ImgSection> {
   File? image;
   bool isSelecting = false; //選択/ロード中か
+
+  @override
+  void initState() {
+    super.initState();
+    this.image = widget.initialImage;
+  }
+
   @override
   Widget build(BuildContext context) {
     return DottedBorder(
@@ -219,9 +243,11 @@ class _ImgSectionState extends State<_ImgSection> {
 class UmaiButton extends StatefulWidget {
   const UmaiButton({
     super.key,
+    this.initialIsUmai,
     required this.onChanged,
   });
 
+  final bool? initialIsUmai;
   final Function(bool) onChanged;
 
   @override
@@ -230,6 +256,13 @@ class UmaiButton extends StatefulWidget {
 
 class _UmaiButtonState extends State<UmaiButton> {
   bool isOn = false;
+
+  @override
+  void initState() {
+    super.initState();
+    this.isOn = widget.initialIsUmai ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -285,9 +318,11 @@ class _UmaiButtonState extends State<UmaiButton> {
 class _DateSection extends StatelessWidget {
   const _DateSection({
     super.key,
+    this.initialDate,
     required this.onChanged,
   });
 
+  final DateTime? initialDate;
   final Function(DateTime) onChanged;
 
   @override
@@ -308,7 +343,9 @@ class _DateSection extends StatelessWidget {
         dateMask: 'yyyy/MM/dd',
         //icon: Icon(Icons.watch_later_outlined),
         dateLabelText: '訪問日',
-        initialValue: DateTime.now().toString(),
+        initialValue: initialDate != null
+            ? initialDate.toString()
+            : DateTime.now().toString(),
         use24HourFormat: true,
         onChanged: (value) {
           onChanged(DateTime.parse(value));
@@ -322,16 +359,19 @@ class _DateSection extends StatelessWidget {
 class _CommentSection extends StatelessWidget {
   const _CommentSection({
     super.key,
+    this.initialComment,
     required this.onChanged,
   });
+  final String? initialComment;
   final Function(String) onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       keyboardType: TextInputType.multiline,
       maxLines: null,
       minLines: 3,
+      initialValue: initialComment,
       decoration: InputDecoration(
         hintText: 'コメント',
         filled: true,

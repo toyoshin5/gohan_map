@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
@@ -12,10 +11,13 @@ import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
 
-/// 飲食店でのごはん投稿画面
+// 飲食店でのごはん投稿・編集画面
 class PlacePostPage extends StatefulWidget {
   final Shop shop;
-  PlacePostPage({Key? key, required this.shop}) : super(key: key);
+  final Timeline? timeline; // 編集ページの際に外部から初期データを渡す
+
+  const PlacePostPage({Key? key, required this.shop, this.timeline})
+      : super(key: key);
 
   @override
   State<PlacePostPage> createState() => _PlacePostPageState();
@@ -28,6 +30,17 @@ class _PlacePostPageState extends State<PlacePostPage> {
   String comment = '';
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.timeline != null) {
+      image = base64ImageToFile(widget.timeline?.image);
+      isUmai = widget.timeline?.umai ?? false;
+      date = widget.timeline?.date ?? DateTime.now();
+      comment = widget.timeline?.comment ?? "";
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppModal(
       initialChildSize: 0.6,
@@ -37,17 +50,19 @@ class _PlacePostPageState extends State<PlacePostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 30, right: 20),
+              margin: const EdgeInsets.only(bottom: 20, right: 20),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     //飲食店名
+                    Text(widget.shop.shopName,style: const TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                             child: Text(
-                          widget.shop.shopName,
+                          (widget.timeline != null)?"投稿編集":"新規投稿",
                           style: const TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                         )),
@@ -67,28 +82,30 @@ class _PlacePostPageState extends State<PlacePostPage> {
                         ),
                       ],
                     ),
-                    //住所
-                    Text(widget.shop.shopAddress),
+                    
                   ]),
             ),
-
             // 追加の投稿
             PostFoodWidget(
+              initialImage: image,
               onImageChanged: (image) {
                 setState(() {
                   this.image = image;
                 });
               },
+              initialIsUmai: isUmai,
               onUmaiChanged: (isUmai) {
                 setState(() {
                   this.isUmai = isUmai;
                 });
               },
+              initialDate: date,
               onDateChanged: (date) {
                 setState(() {
                   this.date = date;
                 });
               },
+              initialComment: comment,
               onCommentChanged: (comment) {
                 setState(() {
                   this.comment = comment;
@@ -143,6 +160,8 @@ class _PlacePostPageState extends State<PlacePostPage> {
                 ),
               ),
             ),
+            const SizedBox(
+              height: 100,)
           ],
         ),
       ),
@@ -172,11 +191,15 @@ class _PlacePostPageState extends State<PlacePostPage> {
       return;
     }
 
-    _addToDB(true);
+    if (widget.timeline != null) {
+      _updateTimeline();
+    } else {
+      _addToDB();
+    }
   }
 
-  //DBに店を登録
-  Future<void> _addToDB(bool initialPostFlg) async {
+  //DBに店を新規登録
+  Future<void> _addToDB() async {
     final base64Img = await fileToBase64(image);
     final timeline = Timeline()
       ..image = base64Img
@@ -185,7 +208,27 @@ class _PlacePostPageState extends State<PlacePostPage> {
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now()
       ..shopId = widget.shop.id
-      ..date = date ?? DateTime.now();
+      ..date = date;
+    await IsarUtils.createTimeline(timeline);
+
+    if (context.mounted) {
+      Navigator.pop(context);
+      return;
+    }
+  }
+
+  //DBに店を新規登録
+  Future<void> _updateTimeline() async {
+    final base64Img = await fileToBase64(image);
+    final timeline = Timeline()
+      ..id = widget.timeline!.id
+      ..image = base64Img
+      ..comment = comment
+      ..umai = isUmai
+      ..createdAt = widget.timeline!.createdAt
+      ..updatedAt = DateTime.now()
+      ..shopId = widget.shop.id
+      ..date = date;
     await IsarUtils.createTimeline(timeline);
 
     if (context.mounted) {

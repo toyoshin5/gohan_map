@@ -9,6 +9,7 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
@@ -144,6 +145,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   ).then((value) {
                     setState(() {
                       tapFlgs[id] = false;
+                      _loadAllShop();
                     });
                   });
                 }
@@ -226,6 +228,9 @@ class _DummySearchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final paddingBottom = (SafeAreaUtil.unSafeAreaBottomHeight == 0)
+        ? 24.0
+        : SafeAreaUtil.unSafeAreaBottomHeight + 4.0;
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
@@ -255,7 +260,7 @@ class _DummySearchWidget extends StatelessWidget {
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 28, 16, 40),
+                    padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
                     child: AppSearchBar(
                       onSubmitted: (value) {},
                     ),

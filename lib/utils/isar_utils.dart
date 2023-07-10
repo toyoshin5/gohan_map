@@ -44,11 +44,11 @@ class IsarUtils {
     return shops.toList();
   }
 
-  // shopの取得
-  static Future<Shop?> getShopById(Id id) async {
+  // shopを条件で絞り込み検索
+  static Future<List<Shop>> searchShops(String text) async {
     await ensureInitialized();
-    final shop = await isar!.shops.get(id);
-    return shop;
+    final shops = await isar!.shops.filter().shopNameContains(text).findAll();
+    return shops.toList();
   }
 
   // shopの作成
@@ -79,7 +79,7 @@ class IsarUtils {
     return timelines.toList();
   }
 
-  // timelineの作成
+  // timelineの作成・更新
   static Future<void> createTimeline(Timeline timeline) async {
     await ensureInitialized();
     await isar!.writeTxn(() async {

@@ -1,11 +1,13 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/collections/shop.dart';
+import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/app_modal.dart';
 import 'package:gohan_map/view/place_post_page.dart';
 import 'package:isar/isar.dart';
 
 import '../utils/isar_utils.dart';
+import 'package:gohan_map/view/place_update_page.dart';
 
 ///飲食店の詳細画面
 class PlaceDetailPage extends StatefulWidget {
@@ -52,6 +54,41 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   builder: (context) {
                     return PlacePostPage(
                       shop: selectedShop!,
+                    ); //ご飯投稿
+                  },
+                );
+              },
+            ),
+            CupertinoButton(
+              child: const Text('Edit'),
+              onPressed: () {
+                showModalBottomSheet(
+                  //モーダルを表示する関数
+                  barrierColor: Colors.black.withOpacity(0), //背景をどれぐらい暗くするか
+                  backgroundColor: Colors.transparent,
+                  context: context,
+                  isScrollControlled: true, //スクロールで閉じたりするか
+                  builder: (context) {
+                    return PlacePostPage(
+                      shop: dummyShop,
+                      timeline: dummyTimeline,
+                    ); //ご飯投稿
+                  },
+                );
+              },
+            ),
+            CupertinoButton(
+              child: const Text('EditShop'),
+              onPressed: () {
+                showModalBottomSheet(
+                  //モーダルを表示する関数
+                  barrierColor: Colors.black.withOpacity(0), //背景をどれぐらい暗くするか
+                  backgroundColor: Colors.transparent,
+                  context: context,
+                  isScrollControlled: true, //スクロールで閉じたりするか
+                  builder: (context) {
+                    return PlaceUpdatePage(
+                      shop: dummyShop,
                     ); //ご飯投稿
                   },
                 );

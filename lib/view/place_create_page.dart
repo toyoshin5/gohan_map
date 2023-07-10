@@ -160,7 +160,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
                 onPressed: () {
-                  onTapComfirm(context);
+                  _onTapComfirm(context);
                 },
                 child: const Text('決定'),
               ),
@@ -173,7 +173,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   }
 
   //決定ボタンを押した時の処理
-  void onTapComfirm(BuildContext context) {
+  void _onTapComfirm(BuildContext context) {
     //バリデーション
     if (shopName.isEmpty) {
       showCupertinoDialog(
