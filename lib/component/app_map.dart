@@ -28,6 +28,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
   LatLng? currentPosition;
   late StreamSubscription<Position> positionStream;
   bool isCurrentLocation = true;
+  late AnimationController plMarkerController;
 
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
@@ -160,6 +161,45 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
 
   void setPresetLocationMarker(LatLng latlng) {
     const markerSize = 24.0;
+    const shrinkSize = 0.8;
+
+    plMarkerController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 5));
+
+    var animation = TweenSequence<double>([
+      TweenSequenceItem(
+          tween: Tween(
+            begin: 1,
+            end: shrinkSize,
+          ),
+          weight: 3),
+      TweenSequenceItem(
+          tween: Tween(
+            begin: shrinkSize,
+            end: shrinkSize,
+          ),
+          weight: 1),
+      TweenSequenceItem(
+          tween: Tween(
+            begin: shrinkSize,
+            end: 1,
+          ),
+          weight: 5),
+      TweenSequenceItem(
+          tween: Tween(
+            begin: 1,
+            end: 1,
+          ),
+          weight: 3),
+    ]).animate(plMarkerController);
+
+    plMarkerController
+      ..forward()
+      ..addListener(() {
+        if (plMarkerController.isCompleted) {
+          plMarkerController.repeat();
+        }
+      });
 
     var marker = Marker(
         width: markerSize,
@@ -174,14 +214,16 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 ],
               ),
               child: CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.white,
-                child: Icon(
-                  Icons.circle,
-                  size: 20,
-                  color: Colors.blue.shade600,
-                ),
-              ),
+                  radius: 24,
+                  backgroundColor: Colors.white,
+                  child: ScaleTransition(
+                    scale: animation,
+                    child: Icon(
+                      Icons.circle,
+                      size: 22,
+                      color: Colors.blue.shade600,
+                    ),
+                  )),
             ));
 
     setState(() {
@@ -221,5 +263,11 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
       }
     });
     controller.forward();
+  }
+
+  @override
+  void dispose() {
+    plMarkerController.dispose();
+    super.dispose();
   }
 }
