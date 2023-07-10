@@ -105,7 +105,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     const imgRatio = 126 / 175;
     pins.add(
       Marker(
-        width: markerSize * focusAmp * imgRatio, 
+        width: markerSize * focusAmp * imgRatio,
         height: markerSize * focusAmp * 2,
         point: latLng,
         builder: (context) {
@@ -113,11 +113,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
             padding: EdgeInsets.only(
-              left: (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
-              top:(tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
-              right:  (tapFlgs[id] == true)? 0 : markerSize*(focusAmp-1)*imgRatio/2,
-              bottom:markerSize * focusAmp - 1
-            ),
+                left: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1) * imgRatio / 2,
+                top: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
+                right: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1) * imgRatio / 2,
+                bottom: markerSize * focusAmp - 1),
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -140,6 +139,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   ).then((value) {
                     setState(() {
                       tapFlgs[id] = false;
+                      _loadAllShop();
                     });
                   });
                 }
@@ -213,7 +213,7 @@ class _DummySearchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final paddingBottom = (SafeAreaUtil.unSafeAreaBottomHeight == 0)? 24.0 : SafeAreaUtil.unSafeAreaBottomHeight+4.0;
+    final paddingBottom = (SafeAreaUtil.unSafeAreaBottomHeight == 0) ? 24.0 : SafeAreaUtil.unSafeAreaBottomHeight + 4.0;
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(

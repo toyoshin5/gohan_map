@@ -1,7 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:gohan_map/colors/app_colors.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
@@ -22,9 +21,11 @@ class AppMap extends StatefulWidget {
   State<AppMap> createState() => _AppMapState();
 }
 
-class _AppMapState extends State<AppMap> {
+class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
   late Future<Position> future;
   Marker? presetLocationMarker;
+  late LatLng currentPosition;
+  bool isCurrentLocation = true;
 
   @override
   void initState() {
@@ -49,37 +50,80 @@ class _AppMapState extends State<AppMap> {
           case ConnectionState.active:
             return const SizedBox();
           case ConnectionState.done:
-            return FlutterMap(
-              options: MapOptions(
-                  center:
-                      LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
-                  minZoom: 3,
-                  maxZoom: 18,
-                  zoom: 13,
-                  interactiveFlags:
-                      InteractiveFlag.all & ~InteractiveFlag.rotate, // 回転を無効化する
-                  onLongPress: widget.onLongPress),
-              mapController: widget.mapController,
-              nonRotatedChildren: [
-                RichAttributionWidget(
-                  attributions: [
-                    TextSourceAttribution(
-                      'OpenStreetMap contributors',
-                      onTap: () => launchUrl(
-                          Uri.parse('https://openstreetmap.org/copyright')),
+            currentPosition =
+                LatLng(snapshot.data!.latitude, snapshot.data!.longitude);
+            return Stack(
+              children: [
+                FlutterMap(
+                  options: MapOptions(
+                    center: currentPosition,
+                    minZoom: 3,
+                    maxZoom: 18,
+                    zoom: 13,
+                    interactiveFlags: InteractiveFlag.all &
+                        ~InteractiveFlag.rotate, // 回転を無効化する
+                    onLongPress: widget.onLongPress,
+                    onPositionChanged: (position, hasGesture) {
+                      if (hasGesture && isCurrentLocation) {
+                        setState(() {
+                          isCurrentLocation = false;
+                        });
+                      }
+                    },
+                  ),
+                  mapController: widget.mapController,
+                  nonRotatedChildren: [
+                    RichAttributionWidget(
+                      attributions: [
+                        TextSourceAttribution(
+                          'OpenStreetMap contributors',
+                          onTap: () => launchUrl(
+                              Uri.parse('https://openstreetmap.org/copyright')),
+                        ),
+                      ],
                     ),
                   ],
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                    ),
+                    if (widget.pins != null)
+                      MarkerLayer(
+                        markers: widget.pins!,
+                        rotate: true,
+                      ),
+                  ],
                 ),
-              ],
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                ),
-                if (widget.pins != null)
-                  MarkerLayer(
-                    markers: [...widget.pins!, presetLocationMarker!],
-                    rotate: true,
+                //現在地に戻るボタン
+                Positioned(
+                  bottom: 120,
+                  right: 20,
+                  child: SizedBox(
+                    width: 44,
+                    height: 44,
+                    child: ElevatedButton(
+                      //角丸で白
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.all(0),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10)),
+                        ),
+                        backgroundColor: Colors.white,
+                        foregroundColor: AppColors.blueTextColor,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          isCurrentLocation = true;
+                        });
+                        _animatedMapMove(currentPosition, 13);
+                      },
+                      child: Icon((isCurrentLocation)
+                          ? Icons.near_me
+                          : Icons.near_me_outlined),
+                    ),
                   ),
+                ),
               ],
             );
         }
@@ -142,5 +186,39 @@ class _AppMapState extends State<AppMap> {
     setState(() {
       presetLocationMarker = marker;
     });
+  }
+
+  void _animatedMapMove(LatLng destLocation, double destZoom) {
+    if (widget.mapController == null) {
+      return;
+    }
+    final latTween = Tween<double>(
+        begin: widget.mapController!.center.latitude,
+        end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: widget.mapController!.center.longitude,
+        end: destLocation.longitude);
+    final zoomTween =
+        Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
+    final rotateTween =
+        Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    controller.addListener(() {
+      widget.mapController!.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
+      widget.mapController!.rotate(rotateTween.evaluate(animation));
+    });
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        controller.dispose();
+      } else if (status == AnimationStatus.dismissed) {
+        controller.dispose();
+      }
+    });
+    controller.forward();
   }
 }
