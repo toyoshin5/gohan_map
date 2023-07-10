@@ -10,7 +10,8 @@ class AppMap extends StatefulWidget {
   final List<Marker>? pins;
   final MapController? mapController;
 
-  const AppMap({Key? key,
+  const AppMap({
+    Key? key,
     required this.onLongPress,
     this.pins,
     this.mapController,
@@ -45,18 +46,20 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
           case ConnectionState.active:
             return const SizedBox();
           case ConnectionState.done:
-            currentPosition = LatLng(snapshot.data!.latitude, snapshot.data!.longitude);
+            currentPosition =
+                LatLng(snapshot.data!.latitude, snapshot.data!.longitude);
             return Stack(
               children: [
                 FlutterMap(
                   options: MapOptions(
-                    center: currentPosition, 
-                    minZoom: 3, maxZoom: 18, 
-                    zoom: 13, 
-                    interactiveFlags: InteractiveFlag.all, 
+                    center: currentPosition,
+                    minZoom: 3,
+                    maxZoom: 18,
+                    zoom: 13,
+                    interactiveFlags: InteractiveFlag.all,
                     onLongPress: widget.onLongPress,
                     onPositionChanged: (position, hasGesture) {
-                      if(hasGesture&&isCurrentLocation) {
+                      if (hasGesture && isCurrentLocation) {
                         setState(() {
                           isCurrentLocation = false;
                         });
@@ -69,14 +72,16 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                       attributions: [
                         TextSourceAttribution(
                           'OpenStreetMap contributors',
-                          onTap: () => launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+                          onTap: () => launchUrl(
+                              Uri.parse('https://openstreetmap.org/copyright')),
                         ),
                       ],
                     ),
                   ],
                   children: [
                     TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate:
+                          'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
                     ),
                     if (widget.pins != null)
                       MarkerLayer(
@@ -108,7 +113,9 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                         });
                         _animatedMapMove(currentPosition, 13);
                       },
-                      child: Icon((isCurrentLocation)?Icons.near_me:Icons.near_me_outlined),
+                      child: Icon((isCurrentLocation)
+                          ? Icons.near_me
+                          : Icons.near_me_outlined),
                     ),
                   ),
                 ),
@@ -149,14 +156,24 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     if (widget.mapController == null) {
       return;
     }
-    final latTween = Tween<double>(begin: widget.mapController!.center.latitude, end: destLocation.latitude);
-    final lngTween = Tween<double>(begin: widget.mapController!.center.longitude, end: destLocation.longitude);
-    final zoomTween = Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
-    final rotateTween = Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
-    final controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final latTween = Tween<double>(
+        begin: widget.mapController!.center.latitude,
+        end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: widget.mapController!.center.longitude,
+        end: destLocation.longitude);
+    final zoomTween =
+        Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
+    final rotateTween =
+        Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
     controller.addListener(() {
-      widget.mapController!.move(LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)), zoomTween.evaluate(animation));
+      widget.mapController!.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
       widget.mapController!.rotate(rotateTween.evaluate(animation));
     });
     animation.addStatusListener((status) {
