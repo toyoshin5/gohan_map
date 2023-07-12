@@ -28,7 +28,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
   bool isUmai = false;
   DateTime date = DateTime.now();
   String comment = '';
-
+  bool avoidkeyBoard = false;
   @override
   void initState() {
     super.initState();
@@ -44,6 +44,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
   Widget build(BuildContext context) {
     return AppModal(
       initialChildSize: 0.6,
+      avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -111,6 +112,11 @@ class _PlacePostPageState extends State<PlacePostPage> {
                   this.comment = comment;
                 });
               },
+              onCommentFocusChanged: (isFocus) {
+                setState(() {
+                  avoidkeyBoard = isFocus;
+                });
+              },
             ),
             //決定ボタン
             Container(
@@ -160,8 +166,6 @@ class _PlacePostPageState extends State<PlacePostPage> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 100,)
           ],
         ),
       ),
