@@ -55,14 +55,17 @@ class _PlacePostPageState extends State<PlacePostPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     //飲食店名
-                    Text(widget.shop.shopName,style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),),
+                    Text(
+                      widget.shop.shopName,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                             child: Text(
-                          (widget.timeline != null)?"投稿編集":"新規投稿",
+                          (widget.timeline != null) ? "投稿編集" : "新規投稿",
                           style: const TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                         )),
@@ -82,7 +85,6 @@ class _PlacePostPageState extends State<PlacePostPage> {
                         ),
                       ],
                     ),
-                    
                   ]),
             ),
             // 追加の投稿
@@ -161,7 +163,8 @@ class _PlacePostPageState extends State<PlacePostPage> {
               ),
             ),
             const SizedBox(
-              height: 100,)
+              height: 100,
+            )
           ],
         ),
       ),
