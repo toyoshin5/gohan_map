@@ -15,7 +15,7 @@ Future<String> fileToBase64(File? file) async {
 
 // base64の画像ファイルをFileクラスに変換する関数
 File? base64ImageToFile(String? base64Image) {
-  if (base64Image == null) {
+  if (base64Image == null || base64Image.isEmpty) {
     return null;
   }
 
