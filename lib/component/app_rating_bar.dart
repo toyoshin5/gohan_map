@@ -1,16 +1,17 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-
 //レーティングのバー
 class AppRatingBar extends StatelessWidget {
   const AppRatingBar({
     super.key,
     this.initialRating = 3.0,
+    this.itemSize = 40.0,
     required this.onRatingUpdate,
   });
 
   final double initialRating;
+  final double itemSize;
   final Function(double) onRatingUpdate;
 
   @override
@@ -23,7 +24,7 @@ class AppRatingBar extends StatelessWidget {
         direction: Axis.horizontal,
         allowHalfRating: true,
         itemCount: 5,
-        itemSize: 40.0,
+        itemSize: itemSize,
         glowColor: Colors.amber,
         onRatingUpdate: onRatingUpdate,
         ratingWidget: RatingWidget(
