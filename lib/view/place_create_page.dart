@@ -35,10 +35,13 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   bool isUmai = false;
   DateTime date = DateTime.now();
   String comment = '';
+  bool avoidkeyBoard = false;
+
   @override
   Widget build(BuildContext context) {
     return AppModal(
       initialChildSize: 0.6,
+      avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -145,6 +148,11 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   this.comment = comment;
                 });
               },
+              onCommentFocusChanged: (isFocus) {
+                setState(() {
+                  avoidkeyBoard = isFocus;
+                });
+              },
             ),
             //決定ボタン
             Container(
@@ -162,10 +170,38 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 onPressed: () {
                   _onTapComfirm(context);
                 },
-                child: const Text('決定'),
+                child: const Text(
+                  '決定',
+                  style: TextStyle(
+                      color: AppColors.blueTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-            const SizedBox(height: 300),
+            // キャンセルボタン
+            Container(
+              width: double.infinity,
+              height: 50,
+              margin: const EdgeInsets.only(bottom: 50),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  foregroundColor: AppColors.blackTextColor,
+                  backgroundColor: AppColors.backgroundWhiteColor,
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'キャンセル',
+                  style: TextStyle(
+                      color: AppColors.redTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
           ],
         ),
       ),

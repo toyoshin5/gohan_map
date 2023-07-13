@@ -28,7 +28,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
   bool isUmai = false;
   DateTime date = DateTime.now();
   String comment = '';
-
+  bool avoidkeyBoard = false;
   @override
   void initState() {
     super.initState();
@@ -44,25 +44,29 @@ class _PlacePostPageState extends State<PlacePostPage> {
   Widget build(BuildContext context) {
     return AppModal(
       initialChildSize: 0.6,
+      avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 30, right: 20),
+              margin: const EdgeInsets.only(bottom: 20, right: 20),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     //飲食店名
-                    Text(widget.shop.shopName,style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold),),
+                    Text(
+                      widget.shop.shopName,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Expanded(
                             child: Text(
-                          (widget.timeline != null)?"投稿編集":"新規投稿",
+                          (widget.timeline != null) ? "投稿編集" : "新規投稿",
                           style: const TextStyle(
                               fontSize: 24, fontWeight: FontWeight.bold),
                         )),
@@ -82,7 +86,6 @@ class _PlacePostPageState extends State<PlacePostPage> {
                         ),
                       ],
                     ),
-                    
                   ]),
             ),
             // 追加の投稿
@@ -109,6 +112,11 @@ class _PlacePostPageState extends State<PlacePostPage> {
               onCommentChanged: (comment) {
                 setState(() {
                   this.comment = comment;
+                });
+              },
+              onCommentFocusChanged: (isFocus) {
+                setState(() {
+                  avoidkeyBoard = isFocus;
                 });
               },
             ),

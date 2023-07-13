@@ -94,4 +94,10 @@ class IsarUtils {
       await isar!.timelines.delete(id);
     });
   }
+
+  static Future<Shop?> getShopById(Id id) async {
+    await ensureInitialized();
+    final shop = await isar!.shops.get(id);
+    return shop;
+  }
 }
