@@ -168,9 +168,6 @@ class _PlacePostPageState extends State<PlacePostPage> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 100,
-            )
           ],
         ),
       ),
