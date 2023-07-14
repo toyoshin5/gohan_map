@@ -49,6 +49,7 @@ dependencies:
   image_picker: ^0.8.9
   intl: ^0.17.0
   pull_down_button: ^0.9.1
+  flutter_compass: ^0.7.0
 
 dev_dependencies:
   flutter_test:

@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/component/app_direction_light.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,7 +27,6 @@ class AppMap extends StatefulWidget {
 }
 
 class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
-  Marker? presetLocationMarker;
   LatLng? currentPosition;
   late StreamSubscription<Position> positionStream;
   bool isCurrentLocation = true;
@@ -49,47 +51,80 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
 
     return Stack(
       children: [
-        FlutterMap(
-          options: MapOptions(
-            center: currentPosition,
-            minZoom: 3,
-            maxZoom: 18,
-            zoom: 13,
-            interactiveFlags: InteractiveFlag.all,
-            enableMultiFingerGestureRace: true,
-            onLongPress: widget.onLongPress,
-            onPositionChanged: (position, hasGesture) {
-              if (hasGesture && isCurrentLocation) {
-                setState(() {
-                  isCurrentLocation = false;
-                });
+        StreamBuilder<CompassEvent>(
+            stream: FlutterCompass.events,
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Text('Error reading heading: ${snapshot.error}');
               }
-            },
-          ),
-          mapController: widget.mapController,
-          nonRotatedChildren: [
-            RichAttributionWidget(
-              attributions: [
-                TextSourceAttribution(
-                  'OpenStreetMap contributors',
-                  onTap: () => launchUrl(
-                      Uri.parse('https://openstreetmap.org/copyright')),
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+
+              double? direction = snapshot.data!.heading;
+
+              // if direction is null, then device does not support this sensor
+              // show error message
+              if (direction == null)
+                return Center(
+                  child: Text("Device does not have sensors !"),
+                );
+
+              var presetLocationMarker = _buildPresetLocationMarker();
+              var compassMarker = _buildCompassMarker(direction);
+
+              return FlutterMap(
+                options: MapOptions(
+                  center: currentPosition,
+                  minZoom: 3,
+                  maxZoom: 18,
+                  zoom: 13,
+                  interactiveFlags: InteractiveFlag.all,
+                  enableMultiFingerGestureRace: true,
+                  onLongPress: widget.onLongPress,
+                  onPositionChanged: (position, hasGesture) {
+                    if (hasGesture && isCurrentLocation) {
+                      setState(() {
+                        isCurrentLocation = false;
+                      });
+                    }
+                  },
                 ),
-              ],
-            ),
-          ],
-          children: [
-            TileLayer(
-              urlTemplate:
-                  'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
-            ),
-            if (widget.pins != null)
-              MarkerLayer(
-                markers: [...widget.pins!, presetLocationMarker!],
-                rotate: true,
-              ),
-          ],
-        ),
+                mapController: widget.mapController,
+                nonRotatedChildren: [
+                  RichAttributionWidget(
+                    attributions: [
+                      TextSourceAttribution(
+                        'OpenStreetMap contributors',
+                        onTap: () => launchUrl(
+                            Uri.parse('https://openstreetmap.org/copyright')),
+                      ),
+                    ],
+                  ),
+                ],
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                  ),
+                  if (widget.pins != null)
+                    MarkerLayer(
+                      markers: widget.pins!,
+                      rotate: true,
+                    ),
+                  MarkerLayer(
+                    markers: [
+                      compassMarker,
+                      presetLocationMarker,
+                    ],
+                    rotate: false,
+                  )
+                ],
+              );
+            }),
         //現在地に戻るボタン
         Positioned(
           bottom: 120,
@@ -130,7 +165,6 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         Geolocator.getPositionStream(locationSettings: locationSettings)
             .listen((Position position) {
       var latLng = LatLng(position.latitude, position.longitude);
-      setPresetLocationMarker(latLng);
       setState(() {
         currentPosition = latLng;
       });
@@ -159,7 +193,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     }
   }
 
-  void setPresetLocationMarker(LatLng latlng) {
+  Marker _buildPresetLocationMarker() {
     const markerSize = 24.0;
     const shrinkSize = 0.8;
 
@@ -204,7 +238,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     var marker = Marker(
         width: markerSize,
         height: markerSize,
-        point: LatLng(latlng.latitude, latlng.longitude),
+        point: currentPosition!,
         builder: (context) => Container(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
@@ -226,9 +260,26 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   )),
             ));
 
-    setState(() {
-      presetLocationMarker = marker;
-    });
+    return marker;
+  }
+
+  Marker _buildCompassMarker(
+    double direction,
+  ) {
+    const markerSize = 12.0;
+
+    return Marker(
+        width: markerSize,
+        height: markerSize / 2 * math.sqrt(3),
+        point: currentPosition!,
+        builder: (context) {
+          return Transform.translate(
+              offset: const Offset(0, -16),
+              child: Transform.rotate(
+                  angle: (direction * (math.pi / 180)),
+                  origin: const Offset(0, 16),
+                  child: AppDirectionLight()));
+        });
   }
 
   void _animatedMapMove(LatLng destLocation, double destZoom) {
