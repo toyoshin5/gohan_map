@@ -29,19 +29,33 @@ class _PlacePostPageState extends State<PlacePostPage> {
   DateTime date = DateTime.now();
   String comment = '';
   bool avoidkeyBoard = false;
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    if (widget.timeline != null) {
-      image = base64ImageToFile(widget.timeline?.image);
-      isUmai = widget.timeline?.umai ?? false;
-      date = widget.timeline?.date ?? DateTime.now();
-      comment = widget.timeline?.comment ?? "";
-    }
+
+    Future(() async {
+      if (widget.timeline != null) {
+        // 編集画面
+        image = await base64ImageToFile(widget.timeline?.image);
+        isUmai = widget.timeline?.umai ?? false;
+        date = widget.timeline?.date ?? DateTime.now();
+        comment = widget.timeline?.comment ?? "";
+      }
+      setState(() {
+        // reload
+        isLoading = false;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return const CircularProgressIndicator();
+    }
+
     return AppModal(
       initialChildSize: 0.6,
       avoidKeyboardFlg: avoidkeyBoard,
