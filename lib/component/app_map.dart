@@ -11,7 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
 class AppMap extends StatefulWidget {
-  final void Function(TapPosition, LatLng)? onLongPress;
+  final void Function(TapPosition?, LatLng) onLongPress;
   final List<Marker>? pins;
   final MapController? mapController;
 
@@ -59,20 +59,20 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
               }
 
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
+                return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
 
               double? direction = snapshot.data!.heading;
 
-              // if direction is null, then device does not support this sensor
-              // show error message
-              if (direction == null)
-                return Center(
+              if (direction == null) {
+                return const Center(
                   child: Text("Device does not have sensors !"),
                 );
+              }
 
+              // 現在位置と方向のマーカーを作成する
               var presetLocationMarker = _buildPresetLocationMarker();
               var compassMarker = _buildCompassMarker(direction);
 
@@ -239,7 +239,14 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         width: markerSize,
         height: markerSize,
         point: currentPosition!,
-        builder: (context) => Container(
+        builder: (context) => GestureDetector(
+            onTap: () {
+              if (currentPosition == null) {
+                return;
+              }
+              widget.onLongPress(null, currentPosition!);
+            },
+            child: Container(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
@@ -258,7 +265,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                       color: Colors.blue.shade600,
                     ),
                   )),
-            ));
+            )));
 
     return marker;
   }
