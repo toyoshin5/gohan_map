@@ -113,7 +113,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   center: currentPosition,
                   minZoom: 3,
                   maxZoom: 18,
-                  zoom: 13,
+                  zoom: 15,
                   interactiveFlags: InteractiveFlag.all,
                   enableMultiFingerGestureRace: true,
                   onLongPress: widget.onLongPress,
@@ -176,7 +176,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 setState(() {
                   isCurrentLocation = true;
                 });
-                _animatedMapMove(currentPosition!, 13);
+                _animatedMapMove(currentPosition!, 15);
               },
               child: Icon((isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
             ),
