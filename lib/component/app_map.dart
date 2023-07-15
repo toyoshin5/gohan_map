@@ -31,17 +31,55 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
   LatLng? currentPosition;
   late StreamSubscription<Position> positionStream;
   bool isCurrentLocation = true;
-  late AnimationController plMarkerController;
 
   final LocationSettings locationSettings = const LocationSettings(
     accuracy: LocationAccuracy.high,
     distanceFilter: 1,
   );
 
+  late Animation<double> currentIconAni;
+  late AnimationController plMarkerController;
   @override
   void initState() {
     super.initState();
     init();
+    //アニメーションの定義
+    plMarkerController = AnimationController(vsync: this, duration: const Duration(seconds: 5));
+    const shrinkSize = 0.8;
+    currentIconAni = TweenSequence<double>([
+      TweenSequenceItem(
+          tween: Tween(
+            begin: 1,
+            end: shrinkSize,
+          ),
+          weight: 3),
+      TweenSequenceItem(
+          tween: Tween(
+            begin: shrinkSize,
+            end: shrinkSize,
+          ),
+          weight: 1),
+      TweenSequenceItem(
+          tween: Tween(
+            begin: shrinkSize,
+            end: 1,
+          ),
+          weight: 5),
+      TweenSequenceItem(
+          tween: Tween(
+            begin: 1,
+            end: 1,
+          ),
+          weight: 3),
+    ]).animate(plMarkerController);
+
+    plMarkerController
+      ..forward()
+      ..addListener(() {
+        if (plMarkerController.isCompleted) {
+          plMarkerController.repeat();
+        }
+      });
   }
 
   @override
@@ -59,7 +97,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 return Text('Error reading heading: ${snapshot.error}');
               }
               //シミュレーターの場合は無視
-              if (snapshot.connectionState == ConnectionState.waiting&&kReleaseMode == true) {
+              if (snapshot.connectionState == ConnectionState.waiting && kReleaseMode == true) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
@@ -93,16 +131,14 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     attributions: [
                       TextSourceAttribution(
                         'OpenStreetMap contributors',
-                        onTap: () => launchUrl(
-                            Uri.parse('https://openstreetmap.org/copyright')),
+                        onTap: () => launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
                       ),
                     ],
                   ),
                 ],
                 children: [
                   TileLayer(
-                    urlTemplate:
-                        'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                    urlTemplate: 'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
                   ),
                   if (widget.pins != null)
                     MarkerLayer(
@@ -142,8 +178,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 });
                 _animatedMapMove(currentPosition!, 13);
               },
-              child: Icon(
-                  (isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
+              child: Icon((isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
             ),
           ),
         ),
@@ -155,9 +190,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     await checkGPSPermission();
 
     // ユーザの現在位置を取得し続ける
-    positionStream =
-        Geolocator.getPositionStream(locationSettings: locationSettings)
-            .listen((Position position) {
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position position) {
       var latLng = LatLng(position.latitude, position.longitude);
       setState(() {
         currentPosition = latLng;
@@ -182,53 +215,12 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
 
     // 永久に拒否されている場合はエラーを返す
     if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
     }
   }
 
   Marker _buildPresetLocationMarker() {
     const markerSize = 24.0;
-    const shrinkSize = 0.8;
-
-    plMarkerController =
-        AnimationController(vsync: this, duration: const Duration(seconds: 5));
-
-    var animation = TweenSequence<double>([
-      TweenSequenceItem(
-          tween: Tween(
-            begin: 1,
-            end: shrinkSize,
-          ),
-          weight: 3),
-      TweenSequenceItem(
-          tween: Tween(
-            begin: shrinkSize,
-            end: shrinkSize,
-          ),
-          weight: 1),
-      TweenSequenceItem(
-          tween: Tween(
-            begin: shrinkSize,
-            end: 1,
-          ),
-          weight: 5),
-      TweenSequenceItem(
-          tween: Tween(
-            begin: 1,
-            end: 1,
-          ),
-          weight: 3),
-    ]).animate(plMarkerController);
-
-    plMarkerController
-      ..forward()
-      ..addListener(() {
-        if (plMarkerController.isCompleted) {
-          plMarkerController.repeat();
-        }
-      });
-
     var marker = Marker(
         width: markerSize,
         height: markerSize,
@@ -243,16 +235,13 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
             child: Container(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                      blurRadius: 10, color: Colors.black26, spreadRadius: 3)
-                ],
+                boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26, spreadRadius: 3)],
               ),
               child: CircleAvatar(
                   radius: 24,
                   backgroundColor: Colors.white,
                   child: ScaleTransition(
-                    scale: animation,
+                    scale: currentIconAni,
                     child: Icon(
                       Icons.circle,
                       size: 22,
@@ -274,12 +263,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         height: markerSize / 2 * math.sqrt(3),
         point: currentPosition!,
         builder: (context) {
-          return Transform.translate(
-              offset: const Offset(0, -16),
-              child: Transform.rotate(
-                  angle: (direction * (math.pi / 180)),
-                  origin: const Offset(0, 16),
-                  child: AppDirectionLight()));
+          return Transform.translate(offset: const Offset(0, -16), child: Transform.rotate(angle: (direction * (math.pi / 180)), origin: const Offset(0, 16), child: AppDirectionLight()));
         });
   }
 
@@ -287,24 +271,14 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     if (widget.mapController == null) {
       return;
     }
-    final latTween = Tween<double>(
-        begin: widget.mapController!.center.latitude,
-        end: destLocation.latitude);
-    final lngTween = Tween<double>(
-        begin: widget.mapController!.center.longitude,
-        end: destLocation.longitude);
-    final zoomTween =
-        Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
-    final rotateTween =
-        Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
-    final controller = AnimationController(
-        duration: const Duration(milliseconds: 500), vsync: this);
-    final Animation<double> animation =
-        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final latTween = Tween<double>(begin: widget.mapController!.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(begin: widget.mapController!.center.longitude, end: destLocation.longitude);
+    final zoomTween = Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
+    final rotateTween = Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
+    final controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
     controller.addListener(() {
-      widget.mapController!.move(
-          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
-          zoomTween.evaluate(animation));
+      widget.mapController!.move(LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)), zoomTween.evaluate(animation));
       widget.mapController!.rotate(rotateTween.evaluate(animation));
     });
     animation.addStatusListener((status) {
