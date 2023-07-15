@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -57,21 +58,14 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
               if (snapshot.hasError) {
                 return Text('Error reading heading: ${snapshot.error}');
               }
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
+              //シミュレーターの場合は無視
+              if (snapshot.connectionState == ConnectionState.waiting&&kReleaseMode == true) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
               }
 
-              double? direction = snapshot.data!.heading;
-
-              if (direction == null) {
-                return const Center(
-                  child: Text("Device does not have sensors !"),
-                );
-              }
-
+              double direction = snapshot.data?.heading ?? 0;
               // 現在位置と方向のマーカーを作成する
               var presetLocationMarker = _buildPresetLocationMarker();
               var compassMarker = _buildCompassMarker(direction);
