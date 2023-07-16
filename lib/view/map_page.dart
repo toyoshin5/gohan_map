@@ -180,6 +180,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       tapFlgs.addAll({shop.id: false});
       _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop.id);
     }
+    setState(() {
+      // reload
+    });
   }
 
   //ピンの位置に移動する。offsetはピンを画面の中央から何dp上にずらして表示するか
