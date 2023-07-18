@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
@@ -33,7 +34,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _loadAllShop(); //DBから飲食店の情報を取得してピンを配置
+
+    Future(() async {
+      await _loadAllShop(); //DBから飲食店の情報を取得してピンを配置
+
+      await Future.delayed(
+          const Duration(milliseconds: 500)); // 高速に画面が切り替わることを避ける
+      FlutterNativeSplash.remove();
+    });
   }
 
   @override
@@ -164,18 +172,17 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     );
   }
 
-  void _loadAllShop() {
-    IsarUtils.getAllShops().then(
-      (value) => setState(() {
-        shops = value;
-        pins = [];
-        tapFlgs = {};
-        for (var shop in shops) {
-          tapFlgs.addAll({shop.id: false});
-          _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop.id);
-        }
-      }),
-    );
+  Future<void> _loadAllShop() async {
+    shops = await IsarUtils.getAllShops();
+    pins = [];
+    tapFlgs = {};
+    for (var shop in shops) {
+      tapFlgs.addAll({shop.id: false});
+      _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop.id);
+    }
+    setState(() {
+      // reload
+    });
   }
 
   //ピンの位置に移動する。offsetはピンを画面の中央から何dp上にずらして表示するか

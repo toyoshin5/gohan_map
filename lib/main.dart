@@ -1,6 +1,7 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/map_page.dart';
@@ -10,6 +11,9 @@ void main() {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));
+  // スプラッシュ画面をロードが終わるまで表示する
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   runApp(const MyApp());
 }
 
