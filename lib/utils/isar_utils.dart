@@ -65,10 +65,10 @@ class IsarUtils {
   static Future<void> deleteShop(Id id) async {
     await ensureInitialized();
     await isar!.writeTxn(() async {
+      // timelineの削除
+      await isar!.timelines.where().shopIdEqualTo(id).deleteAll();
       await isar!.shops.delete(id);
     });
-    // timelineの削除
-    isar!.timelines.where().shopIdEqualTo(id).deleteAll();
   }
 
   // timelineの取得

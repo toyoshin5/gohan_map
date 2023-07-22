@@ -118,22 +118,26 @@ class _ImgSectionState extends State<_ImgSection> {
                         title: const Text('写真を追加'),
                         actions: [
                           CupertinoActionSheetAction(
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 isSelecting = true;
                               });
-                              takePhoto();
-                              Navigator.pop(context);
+                              await takePhoto();
+                              if (mounted) {
+                                Navigator.pop(context);
+                              }
                             },
                             child: const Text('カメラで撮影'),
                           ),
                           CupertinoActionSheetAction(
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 isSelecting = true;
                               });
-                              pickImage();
-                              Navigator.pop(context);
+                              await pickImage();
+                              if (mounted) {
+                                Navigator.pop(context);
+                              }
                             },
                             child: const Text('アルバムから選択'),
                           ),
@@ -346,7 +350,9 @@ class _DateSection extends StatelessWidget {
         dateMask: 'yyyy/MM/dd',
         //icon: Icon(Icons.watch_later_outlined),
         dateLabelText: '訪問日',
-        initialValue: initialDate != null ? initialDate.toString() : DateTime.now().toString(),
+        initialValue: initialDate != null
+            ? initialDate.toString()
+            : DateTime.now().toString(),
         use24HourFormat: true,
         onChanged: (value) {
           onChanged(DateTime.parse(value));
@@ -381,7 +387,8 @@ class _CommentSection extends StatelessWidget {
           hintText: 'コメント',
           filled: true,
           fillColor: AppColors.searchBarColor,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(
               color: AppColors.textFieldColor,
