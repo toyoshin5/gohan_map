@@ -10,6 +10,7 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/utils/mapPins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
@@ -109,6 +110,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   void _addPinToMap(LatLng latLng, Shop? shop) {
     const markerSize = 40.0;
+    final shopMapPin = findPinByKind(shop?.shopMapIconKind);
+
     pins.add(
       Marker(
         width: markerSize,
@@ -155,17 +158,18 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Image.asset(
-                      'images/pins/pin_default.png',
-                    ),
-                    if (shop?.id != null)
+                    Image.asset(shopMapPin != null
+                        ? shopMapPin.pinImagePath
+                        : 'images/pins/pin_default.png'),
+                    if (shop != null && shopMapPin != null)
                       Positioned(
                         left: 35,
                         top: 7,
                         child: Text(
-                          shop!.shopName,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.red),
+                          shop.shopName,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: shopMapPin.textColor),
                         ),
                       )
                   ],
