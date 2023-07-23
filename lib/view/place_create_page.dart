@@ -80,12 +80,21 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
             //住所
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
-              child: Text(
-                '住所',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.place,
+                    color: Colors.blue,
+                  ),
+                  Padding(padding: EdgeInsets.only(right: 5)),
+                  Text(
+                    '住所',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
               ),
             ),
             FutureBuilder(
@@ -340,7 +349,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
         ..createdAt = DateTime.now()
         ..updatedAt = DateTime.now()
         ..shopId = shopId
-        ..date = date ?? DateTime.now();
+        ..date = date;
       await IsarUtils.createTimeline(timeline);
       if (context.mounted) {
         Navigator.pop(context);
