@@ -107,35 +107,29 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     );
   }
 
-  void _addPinToMap(LatLng latLng, Id? id) {
-    const markerSize = 50.0;
-    const focusAmp = 1.6; //>=1
-    const imgRatio = 126 / 175;
+  void _addPinToMap(LatLng latLng, Shop? shop) {
+    const markerSize = 40.0;
     pins.add(
       Marker(
-        width: markerSize * focusAmp * imgRatio,
-        height: markerSize * focusAmp * 2,
+        width: markerSize,
+        height: markerSize,
         point: latLng,
         builder: (context) {
           return AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            padding: EdgeInsets.only(
-                left: (tapFlgs[id] == true)
-                    ? 0
-                    : markerSize * (focusAmp - 1) * imgRatio / 2,
-                top: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
-                right: (tapFlgs[id] == true)
-                    ? 0
-                    : markerSize * (focusAmp - 1) * imgRatio / 2,
-                bottom: markerSize * focusAmp - 1),
+            transform: Matrix4.diagonal3Values(
+                tapFlgs[shop?.id] == true ? 1.3 : 1,
+                tapFlgs[shop?.id] == true ? 1.3 : 1,
+                1),
+            transformAlignment: Alignment.center,
             child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
                   //ピンをタップしたときの処理
-                  if (id != null) {
+                  if (shop?.id != null) {
                     setState(() {
-                      tapFlgs[id] = true;
+                      tapFlgs[shop!.id] = true;
                     });
                     final deviceHeight = MediaQuery.of(context).size.height;
                     _moveToPin(latLng, deviceHeight * 0.1);
@@ -147,19 +141,34 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       context: context,
                       builder: (context) {
                         return PlaceDetailPage(
-                          id: id,
+                          id: shop!.id,
                         ); //飲食店の詳細画面
                       },
                     ).then((value) {
                       setState(() {
-                        tapFlgs[id] = false;
+                        tapFlgs[shop!.id] = false;
                         _loadAllShop();
                       });
                     });
                   }
                 },
-                child: Image.asset(
-                  'images/pins/pin_default.png',
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Image.asset(
+                      'images/pins/pin_default.png',
+                    ),
+                    if (shop?.id != null)
+                      Positioned(
+                        left: 35,
+                        top: 7,
+                        child: Text(
+                          shop!.shopName,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.red),
+                        ),
+                      )
+                  ],
                 )),
           );
         },
@@ -173,7 +182,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     tapFlgs = {};
     for (var shop in shops) {
       tapFlgs.addAll({shop.id: false});
-      _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop.id);
+      _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop);
     }
     setState(() {
       // reload
