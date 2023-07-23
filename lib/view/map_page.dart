@@ -130,42 +130,37 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     : markerSize * (focusAmp - 1) * imgRatio / 2,
                 bottom: markerSize * focusAmp - 1),
             child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                //ピンをタップしたときの処理
-                if (id != null) {
-                  setState(() {
-                    tapFlgs[id] = true;
-                  });
-                  final deviceHeight = MediaQuery.of(context).size.height;
-                  _moveToPin(latLng, deviceHeight * 0.1);
-                  showModalBottomSheet(
-                    barrierColor: Colors.black.withOpacity(0),
-                    isDismissible: true,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    context: context,
-                    builder: (context) {
-                      return PlaceDetailPage(
-                        id: id,
-                      ); //飲食店の詳細画面
-                    },
-                  ).then((value) {
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  //ピンをタップしたときの処理
+                  if (id != null) {
                     setState(() {
-                      tapFlgs[id] = false;
-                      _loadAllShop();
+                      tapFlgs[id] = true;
                     });
-                  });
-                }
-              },
-              child: (tapFlgs[id] == true)
-                  ? Image.asset(
-                      'images/pin_tap.png',
-                    )
-                  : Image.asset(
-                      'images/pin.png',
-                    ),
-            ),
+                    final deviceHeight = MediaQuery.of(context).size.height;
+                    _moveToPin(latLng, deviceHeight * 0.1);
+                    showModalBottomSheet(
+                      barrierColor: Colors.black.withOpacity(0),
+                      isDismissible: true,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (context) {
+                        return PlaceDetailPage(
+                          id: id,
+                        ); //飲食店の詳細画面
+                      },
+                    ).then((value) {
+                      setState(() {
+                        tapFlgs[id] = false;
+                        _loadAllShop();
+                      });
+                    });
+                  }
+                },
+                child: Image.asset(
+                  'images/pins/pin_default.png',
+                )),
           );
         },
       ),

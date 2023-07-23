@@ -143,7 +143,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                         SizedBox(
                           height: 35,
                           width: 35,
-                          child: Image.asset("images/pin.png"),
+                          child: Image.asset("images/pins/pin_default.png"),
                         ),
                         const SizedBox(height: 35),
                       ],
