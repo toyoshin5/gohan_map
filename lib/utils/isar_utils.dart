@@ -50,7 +50,6 @@ class IsarUtils {
     //テキストをローマ字に変換
     final kanaKit = KanaKit();
     final romaji = kanaKit.toRomaji(text);
-    print(romaji);
     await ensureInitialized();
     final shops = await isar!.shops.filter().shopNameContains(text).findAll();
     return shops.toList();
@@ -79,7 +78,8 @@ class IsarUtils {
   // timelineの取得
   static Future<List<Timeline>> getTimelinesByShopId(int shopId) async {
     await ensureInitialized();
-    final timelines = await isar!.timelines.where().shopIdEqualTo(shopId).findAll();
+    final timelines =
+        await isar!.timelines.where().shopIdEqualTo(shopId).findAll();
     return timelines.toList();
   }
 
