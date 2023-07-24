@@ -255,6 +255,8 @@ class _PlacePostPageState extends State<PlacePostPage> {
     await IsarUtils.createTimeline(timeline);
 
     if (context.mounted) {
+      //振動
+      Haptic.onSuccess();
       Navigator.pop(context);
       return;
     }
