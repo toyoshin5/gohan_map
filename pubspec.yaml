@@ -52,6 +52,7 @@ dependencies:
   kana_kit: ^2.0.0
   flutter_compass: ^0.7.0
   flutter_native_splash: ^2.3.1
+  flutter_haptic: ^0.0.3
 
 dev_dependencies:
   flutter_test:

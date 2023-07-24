@@ -310,6 +310,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.0"
+  flutter_haptic:
+    dependency: "direct main"
+    description:
+      name: flutter_haptic
+      sha256: "6acf0199372e67bb41f52c826788dcdc659df7c8f930be5b92f1c63009a8d6a0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
   flutter_lints:
     dependency: "direct dev"
     description:
