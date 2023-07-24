@@ -70,12 +70,15 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
       ),
     );
   }
-
   void _searchShops(String text) {
     IsarUtils.searchShops(text).then(
-      (value) => setState(() {
+      (value) {
+        //更新日順に並び替え
+        value.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+        setState(() {
         shopList = value;
-      }),
+        });
+      },
     );
   }
 }
