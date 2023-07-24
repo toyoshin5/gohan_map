@@ -1,3 +1,4 @@
+import 'package:kana_kit/kana_kit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
 import 'package:flutter/widgets.dart';
@@ -46,6 +47,9 @@ class IsarUtils {
 
   // shopを条件で絞り込み検索
   static Future<List<Shop>> searchShops(String text) async {
+    //テキストをローマ字に変換
+    final kanaKit = KanaKit();
+    final romaji = kanaKit.toRomaji(text);
     await ensureInitialized();
     final shops = await isar!.shops.filter().shopNameContains(text).findAll();
     return shops.toList();
