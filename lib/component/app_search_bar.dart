@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 
 class AppSearchBar extends StatelessWidget {
-  final Function(String) onSubmitted;
+  final Function(String)? onSubmitted;
+  final Function(String)? onChanged;
   final bool autofocus;
   const AppSearchBar({
     Key? key,
-    required this.onSubmitted,
+    this.onSubmitted,
+    this.onChanged,
     this.autofocus = false,
   }) : super(key: key);
 
@@ -37,6 +39,7 @@ class AppSearchBar extends StatelessWidget {
                   border: InputBorder.none,
                 ),
                 onSubmitted: onSubmitted,
+                onChanged: onChanged,
               ),
             ),
           ],
