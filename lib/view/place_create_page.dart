@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
+import 'package:flutter_haptic/haptic.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
@@ -352,11 +353,15 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
         ..date = date;
       await IsarUtils.createTimeline(timeline);
       if (context.mounted) {
+        //振動
+        Haptic.onSuccess();
         Navigator.pop(context);
         return;
       }
     }
     if (context.mounted) {
+      //振動
+      Haptic.onSuccess();
       Navigator.pop(context);
     }
   }

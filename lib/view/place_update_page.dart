@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
+import 'package:flutter_haptic/haptic.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
@@ -384,6 +385,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
       ..updatedAt = DateTime.now();
     await IsarUtils.createShop(shop);
     if (context.mounted) {
+      //振動
+      Haptic.onSuccess();
       Navigator.pop(context);
     }
     setState(() {

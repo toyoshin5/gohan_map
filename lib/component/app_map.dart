@@ -142,7 +142,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   ),
                   if (widget.pins != null)
                     MarkerLayer(
-                      markers: widget.pins!,
+                      markers: sortByLat(widget.pins)!,
                       rotate: true,
                     ),
                   MarkerLayer(
@@ -289,6 +289,15 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
       }
     });
     controller.forward();
+  }
+
+  //緯度でソート(南のピンが上に来るようにする)
+  List<Marker>? sortByLat(List<Marker>? pins){
+    if(widget.pins == null){
+      return null;
+    }
+    widget.pins!.sort((a, b) => b.point.latitude.compareTo(a.point.latitude));
+    return widget.pins;
   }
 
   @override

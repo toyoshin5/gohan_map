@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/collections/shop.dart';
@@ -55,6 +56,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             mapController: mapController,
             onLongPress: (_, latLng) {
               //画面の座標, 緯度経度
+              //振動
+              HapticFeedback.mediumImpact();
+
               setState(() {
                 //ピンを配置する
                 _addPinToMap(latLng, null);
@@ -103,11 +107,109 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         //     ],
         //   ),
         // ),
-        const _DummySearchWidget(),
+        buildDummySearchWidget(),
       ],
     );
   }
 
+  //下の検索バー
+  Widget buildDummySearchWidget() {
+    final paddingBottom = (SafeAreaUtil.unSafeAreaBottomHeight == 0)
+        ? 24.0
+        : SafeAreaUtil.unSafeAreaBottomHeight + 4.0;
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: SizedBox(
+        width: double.infinity,
+        child: GestureDetector(
+          child: AbsorbPointer(
+            child: ClipRRect(
+              //ぼかす領域を指定するためのウィジェット
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
+              ),
+              child: BackdropFilter(
+                //ぼかすためのウィジェット
+                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                child: Container(
+                  //モーダル風UIの中身
+                  decoration: BoxDecoration(
+                    color: AppColors.backgroundModalColor,
+                    border: Border.all(
+                      color: AppColors.backgroundGrayColor,
+                      width: 1,
+                    ),
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(20.0),
+                      topRight: Radius.circular(20.0),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
+                    child: AppSearchBar(
+                      onSubmitted: (value) {},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          onTap: () {
+            //検索バーをタップしたときの処理
+            showModalBottomSheet(
+              barrierColor: Colors.black.withOpacity(0),
+              context: context,
+              isDismissible: true,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              builder: (context) {
+                return const PlaceSearchPage(); //飲食店を検索する画面
+              },
+            ).then(
+              (id) {
+                //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
+                if (id != null) {
+                  setState(() {
+                    tapFlgs[id] = true;
+                  });
+                  showModalBottomSheet(
+                    barrierColor: Colors.black.withOpacity(0),
+                    context: context,
+                    isDismissible: true,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) {
+                      return PlaceDetailPage(
+                        id: id,
+                      ); //飲食店の詳細画面
+                    },
+                  ).then((value) {
+                    setState(() {
+                      tapFlgs[id] = true;
+                      _loadAllShop();
+                    });
+                  });
+                  //ピンの緯度経度を取得
+                  IsarUtils.getShopById(id).then((shop) {
+                    if (shop != null) {
+                      final latLng =
+                          LatLng(shop.shopLatitude, shop.shopLongitude);
+                      //ピンの位置に移動する
+                      final deviceHeight = MediaQuery.of(context).size.height;
+                      _moveToPin(latLng, deviceHeight * 0.2);
+                    }
+                  });
+                }
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  //1つのピンを、地図に描画するための配列pinsに追加する関数
   void _addPinToMap(LatLng latLng, Shop? shop) {
     const markerSize = 40.0;
     final shopMapPin = findPinByKind(shop?.shopMapIconKind);
@@ -180,6 +282,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     );
   }
 
+  //DBから飲食店の情報を全て取得してピンを配置する関数
   Future<void> _loadAllShop() async {
     shops = await IsarUtils.getAllShops();
     pins = [];
@@ -233,87 +336,5 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       }
     });
     controller.forward();
-  }
-}
-
-class _DummySearchWidget extends StatelessWidget {
-  const _DummySearchWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final paddingBottom = (SafeAreaUtil.unSafeAreaBottomHeight == 0)
-        ? 24.0
-        : SafeAreaUtil.unSafeAreaBottomHeight + 4.0;
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: SizedBox(
-        width: double.infinity,
-        child: GestureDetector(
-          child: AbsorbPointer(
-            child: ClipRRect(
-              //ぼかす領域を指定するためのウィジェット
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
-              ),
-              child: BackdropFilter(
-                //ぼかすためのウィジェット
-                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                child: Container(
-                  //モーダル風UIの中身
-                  decoration: BoxDecoration(
-                    color: AppColors.backgroundModalColor,
-                    border: Border.all(
-                      color: AppColors.backgroundGrayColor,
-                      width: 1,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
-                    child: AppSearchBar(
-                      onSubmitted: (value) {},
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          onTap: () {
-            showModalBottomSheet(
-              barrierColor: Colors.black.withOpacity(0),
-              context: context,
-              isDismissible: true,
-              isScrollControlled: true,
-              backgroundColor: Colors.transparent,
-              builder: (context) {
-                return const PlaceSearchPage(); //飲食店を検索する画面
-              },
-            ).then(
-              (value) {
-                //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
-                if (value != null) {
-                  // showModalBottomSheet(
-                  //   barrierColor: Colors.black.withOpacity(0),
-                  //   context: context,
-                  //   isDismissible: true,
-                  //   isScrollControlled: true,
-                  //   backgroundColor: Colors.transparent,
-                  //   builder: (context) {
-                  //     return PlaceDetailPage; //飲食店の詳細画面
-                  //   },
-                  // );
-                }
-              },
-            );
-          },
-        ),
-      ),
-    );
   }
 }
