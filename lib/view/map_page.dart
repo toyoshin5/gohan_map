@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/collections/shop.dart';
@@ -52,8 +53,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           child: AppMap(
             pins: pins,
             mapController: mapController,
-            onLongPress: (_, latLng) {
-              //画面の座標, 緯度経度
+            onLongPress: (_, latLng) {//画面の座標, 緯度経度
+              //振動
+              HapticFeedback.mediumImpact();
               setState(() {
                 //ピンを配置する
                 _addPinToMap(latLng, null);
