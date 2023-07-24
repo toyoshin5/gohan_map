@@ -21,6 +21,7 @@ class PostFoodWidget extends StatelessWidget {
     required this.onDateChanged,
     this.initialComment,
     required this.onCommentChanged,
+    this.onCommentFocusChanged,
   }) : super(key: key);
   final File? initialImage;
   final Function(File?) onImageChanged;
@@ -33,6 +34,8 @@ class PostFoodWidget extends StatelessWidget {
 
   final String? initialComment;
   final Function(String) onCommentChanged;
+
+  final Function(bool)? onCommentFocusChanged;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -46,20 +49,21 @@ class PostFoodWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ImgSection(
-            initialImage: this.initialImage,
+            initialImage: initialImage,
             onChanged: onImageChanged,
           ),
           UmaiButton(
-            initialIsUmai: this.initialIsUmai,
+            initialIsUmai: initialIsUmai,
             onChanged: onUmaiChanged,
           ),
           _DateSection(
-            initialDate: this.initialDate,
+            initialDate: initialDate,
             onChanged: onDateChanged,
           ),
           _CommentSection(
-            initialComment: this.initialComment,
+            initialComment: initialComment,
             onChanged: onCommentChanged,
+            onFocusChanged: onCommentFocusChanged,
           ),
         ],
       ),
@@ -71,7 +75,6 @@ class _ImgSection extends StatefulWidget {
   final File? initialImage;
   final Function(File?) onChanged;
   const _ImgSection({
-    super.key,
     this.initialImage,
     required this.onChanged,
   });
@@ -115,22 +118,26 @@ class _ImgSectionState extends State<_ImgSection> {
                         title: const Text('写真を追加'),
                         actions: [
                           CupertinoActionSheetAction(
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 isSelecting = true;
                               });
-                              takePhoto();
-                              Navigator.pop(context);
+                              await takePhoto();
+                              if (mounted) {
+                                Navigator.pop(context);
+                              }
                             },
                             child: const Text('カメラで撮影'),
                           ),
                           CupertinoActionSheetAction(
-                            onPressed: () {
+                            onPressed: () async {
                               setState(() {
                                 isSelecting = true;
                               });
-                              pickImage();
-                              Navigator.pop(context);
+                              await pickImage();
+                              if (mounted) {
+                                Navigator.pop(context);
+                              }
                             },
                             child: const Text('アルバムから選択'),
                           ),
@@ -361,37 +368,42 @@ class _CommentSection extends StatelessWidget {
     super.key,
     this.initialComment,
     required this.onChanged,
+    this.onFocusChanged,
   });
   final String? initialComment;
   final Function(String) onChanged;
+  final Function(bool)? onFocusChanged;
 
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      keyboardType: TextInputType.multiline,
-      maxLines: null,
-      minLines: 3,
-      initialValue: initialComment,
-      decoration: InputDecoration(
-        hintText: 'コメント',
-        filled: true,
-        fillColor: AppColors.searchBarColor,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: AppColors.textFieldColor,
+    return Focus(
+      onFocusChange: onFocusChanged,
+      child: TextFormField(
+        keyboardType: TextInputType.multiline,
+        maxLines: null,
+        minLines: 3,
+        initialValue: initialComment,
+        decoration: InputDecoration(
+          hintText: 'コメント',
+          filled: true,
+          fillColor: AppColors.searchBarColor,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          enabledBorder: OutlineInputBorder(
+            borderSide: const BorderSide(
+              color: AppColors.textFieldColor,
+            ),
+            borderRadius: BorderRadius.circular(8),
           ),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: AppColors.textFieldColor,
+          focusedBorder: OutlineInputBorder(
+            borderSide: const BorderSide(
+              color: AppColors.textFieldColor,
+            ),
+            borderRadius: BorderRadius.circular(8),
           ),
-          borderRadius: BorderRadius.circular(8),
         ),
+        onChanged: onChanged,
       ),
-      onChanged: onChanged,
     );
   }
 }

@@ -22,7 +22,8 @@ class PlaceUpdatePage extends StatefulWidget {
   State<PlaceUpdatePage> createState() => _PlaceUpdatePageState();
 }
 
-class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderStateMixin {
+class _PlaceUpdatePageState extends State<PlaceUpdatePage>
+    with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
@@ -40,6 +41,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
   late double shopLatitude;
   late double shopLongitude;
   late double shopStar;
+  bool isValidating = false;
 
   @override
   Widget build(BuildContext context) {
@@ -127,7 +129,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                     ),
                     children: [
                       TileLayer(
-                        urlTemplate: 'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                        urlTemplate:
+                            'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
                       ),
                     ],
                   ),
@@ -147,7 +150,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                     ),
                   ),
                   //右下に戻すボタンを表示
-                  if (defaultLatLng.latitude != shopLatitude || defaultLatLng.longitude != shopLongitude)
+                  if (defaultLatLng.latitude != shopLatitude ||
+                      defaultLatLng.longitude != shopLongitude)
                     Align(
                       alignment: Alignment.bottomRight,
                       child: Padding(
@@ -208,12 +212,32 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                   foregroundColor: AppColors.blackTextColor,
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
-                onPressed: () {
-                  _onTapComfirm(context);
-                },
-                child: const Text(
-                  '決定',
-                  style: TextStyle(color: AppColors.blueTextColor, fontWeight: FontWeight.bold),
+                onPressed: (isValidating)
+                    ? null
+                    : () {
+                        _onTapComfirm(context);
+                      },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    //ロード中はインジケーターを表示
+                    if (isValidating)
+                      Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        height: 14,
+                        width: 14,
+                        child: const CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.blueTextColor),
+                        ),
+                      ),
+                    const Text(
+                      '決定',
+                      style: TextStyle(
+                          color: AppColors.blueTextColor,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -231,11 +255,13 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
                   backgroundColor: AppColors.backgroundWhiteColor,
                 ),
                 onPressed: () {
-                  Navigator.pop(context);
+                  _deleteShop();
                 },
                 child: const Text(
-                  'キャンセル',
-                  style: TextStyle(color: AppColors.redTextColor, fontWeight: FontWeight.bold),
+                  '削除',
+                  style: TextStyle(
+                      color: AppColors.redTextColor,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -247,52 +273,61 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
 
 //決定ボタンを押した時の処理
   Future<void> _onTapComfirm(BuildContext context) async {
+    setState(() {
+      isValidating = true;
+    });
     //住所取得
-    final shopAddress = await _getAddressFromLatLng(LatLng(shopLatitude, shopLongitude));
+    final shopAddress =
+        await _getAddressFromLatLng(LatLng(shopLatitude, shopLongitude));
     //バリデーション
-    if(context.mounted){
+    if (context.mounted) {
       if (shopName.isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('店名を入力してください'),
-            content: const Text('店を登録するためには、店名の入力が必要です。'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    } else if (shopAddress.isEmpty || shopAddress == "住所を取得できませんでした") {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('住所を取得できません'),
-            content: const Text('インターネットへの接続状況をご確認ください。'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
+        showCupertinoDialog(
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: const Text('店名を入力してください'),
+              content: const Text('店を登録するためには、店名の入力が必要です。'),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('OK'),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        setState(() {
+          isValidating = false;
+        });
+        return;
+      } else if (shopAddress.isEmpty || shopAddress == "住所を取得できませんでした") {
+        showCupertinoDialog(
+          context: context,
+          builder: (context) {
+            return CupertinoAlertDialog(
+              title: const Text('住所を取得できません'),
+              content: const Text('インターネットへの接続状況をご確認ください。'),
+              actions: [
+                CupertinoDialogAction(
+                  child: const Text('OK'),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        setState(() {
+          isValidating = false;
+        });
+        return;
+      }
+      _updateDB(shopAddress);
     }
-    _updateDB(shopAddress);
-    }
-    
   }
 
   Future<void> _updateDB(String shopAddress) async {
@@ -308,18 +343,61 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
     await IsarUtils.createShop(shop);
     if (context.mounted) {
       Navigator.pop(context);
-      return;
     }
+    setState(() {
+      isValidating = false;
+    });
+  }
+
+  Future<void> _deleteShop() async {
+    showCupertinoDialog(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: const Text('店情報を削除しますか？'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('キャンセル'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            CupertinoDialogAction(
+              child: const Text(
+                '削除',
+                style: TextStyle(
+                    color: AppColors.redTextColor, fontWeight: FontWeight.bold),
+              ),
+              onPressed: () async {
+                await IsarUtils.deleteShop(widget.shop.id);
+                if (mounted) {
+                  setState(() {
+                    // reload
+                  });
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _animatedMapMove(LatLng destLocation, double destZoom, int millsec) {
-    final latTween = Tween<double>(begin: mapController.center.latitude, end: destLocation.latitude);
-    final lngTween = Tween<double>(begin: mapController.center.longitude, end: destLocation.longitude);
+    final latTween = Tween<double>(
+        begin: mapController.center.latitude, end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: mapController.center.longitude, end: destLocation.longitude);
     final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
-    final controller = AnimationController(duration: Duration(milliseconds: millsec), vsync: this);
-    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final controller = AnimationController(
+        duration: Duration(milliseconds: millsec), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
     controller.addListener(() {
-      mapController.move(LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)), zoomTween.evaluate(animation));
+      mapController.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
     });
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -334,21 +412,22 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage> with TickerProviderSt
   //緯度経度から住所を取得する
   Future<String> _getAddressFromLatLng(LatLng latLng) async {
     const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
-    final String apiUrl = 'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
-    try{
-      final response = await http.get(Uri.parse(apiUrl)).timeout(const Duration(seconds: 3));
+    final String apiUrl =
+        'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
+    try {
+      final response = await http
+          .get(Uri.parse(apiUrl))
+          .timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final address = responseData['Feature'][0]['Property']['Address'];
-      return address;
+        final responseData = json.decode(response.body);
+        final address = responseData['Feature'][0]['Property']['Address'];
+        return address;
       } else {
         return '住所を取得できませんでした';
       }
-    }catch(e){
+    } catch (e) {
       return '住所を取得できませんでした';
     }
-    
-   
   }
 }
 
