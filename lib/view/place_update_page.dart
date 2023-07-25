@@ -353,19 +353,14 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   }
 
   Future<void> _deleteShop() async {
-    showCupertinoDialog(
+    showCupertinoModalPopup(
       context: context,
       builder: (context) {
-        return CupertinoAlertDialog(
+        return CupertinoActionSheet(
           title: const Text('店情報を削除しますか？'),
+          message: const Text("店に関する全ての投稿も削除されます。"),
           actions: [
-            CupertinoDialogAction(
-              child: const Text('キャンセル'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            CupertinoDialogAction(
+            CupertinoActionSheetAction(
               child: const Text(
                 '削除',
                 style: TextStyle(
@@ -382,6 +377,12 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               },
             ),
           ],
+          cancelButton: CupertinoActionSheetAction(
+            child: const Text('キャンセル'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
         );
       },
     );
