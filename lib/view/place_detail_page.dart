@@ -160,6 +160,17 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
+            //投稿がない場合
+            if (shopTimeline == null || shopTimeline!.isEmpty)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 32),
+                  child: Text(
+                    '投稿がありません',
+                    style: TextStyle(fontSize: 16,color: Colors.black54),
+                  ),
+                ),
+              ),
             for (var timeline in (shopTimeline ?? []).reversed)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),

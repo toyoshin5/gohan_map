@@ -26,7 +26,9 @@ class PlaceSearchPage extends StatefulWidget {
 class _PlaceSearchPageState extends State<PlaceSearchPage> {
   String searchText = "";
   List<Shop> shopList = [];
-  List<HotPepperShop> hpShopList = [];
+  List<HotPepperShop>? hpShopList;
+
+  bool isGettingHpLatlng = false;
   @override
   void initState() {
     super.initState();
@@ -96,18 +98,18 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                   },
                 ),
               ),
-            if (hpShopList.isNotEmpty && shopList.isNotEmpty) ...[
+            if ((hpShopList?.isNotEmpty??true) && shopList.isNotEmpty&&searchText.isNotEmpty) ...[
               const Divider(
                 height: 32,
                 color: Colors.black54,
               ),
             ],
             //新規飲食店
-            if (hpShopList.isNotEmpty) ...[
+            if ((hpShopList?.isNotEmpty??true) &&searchText.isNotEmpty) ...[
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Text(
-                  '新規飲食店',
+                  '新規飲食店を追加',
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[800],
@@ -118,8 +120,19 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                 height: 8,
               ),
             ],
+            //検索結果が多すぎる場合
+            if (hpShopList==null&&searchText.isNotEmpty)
+              const Center(
+                child: Text(
+                  '検索結果が多すぎます',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
             //新規飲食店検索結果一覧
-            for (var hpShop in hpShopList)
+            for (var hpShop in hpShopList ?? [])
               Card(
                 //影付きの角丸四角形
                 elevation: 0,
@@ -159,8 +172,21 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                   }),
                 ),
               ),
+            //クレジット
+            if (hpShopList != null && hpShopList!.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Image.asset(
+                      'images/hotpepper-s.gif',
+                    )
+                  ],
+                ),
+              ),
             //検索結果なし
-            if (hpShopList.isEmpty && shopList.isEmpty)
+            if (((hpShopList?.isEmpty)??false) && shopList.isEmpty)
               const Center(
                 child: Text(
                   '検索結果がありません',
@@ -191,7 +217,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   http.Client client = http.Client(); // HTTPクライアントを格納する
 
   //店名からHotPepperの店舗一覧を取得,検索バーに入力するたびに呼び出す
-  Future<List<HotPepperShop>> _getHpShopListFromName(String name) async {
+  Future<List<HotPepperShop>?> _getHpShopListFromName(String name) async {
     const String apiKey = String.fromEnvironment("HOTPEPPER_API_KEY");
     final String apiUrl = 'http://webservice.recruit.co.jp/hotpepper/shop/v1?key=$apiKey&keyword=$name&format=json';
     try {
@@ -206,6 +232,10 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
           }
           return shops;
         } else {
+          final String errorMsg = responseData['results']['error'][0]['message'];
+          if (errorMsg == "条件を絞り込んでください。") {
+            return null; //検索結果が多すぎ
+          }
           return [];
         }
       } else {
@@ -240,5 +270,3 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
     }
   }
 }
-
-
