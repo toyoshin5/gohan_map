@@ -52,50 +52,62 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Row(
-                children: [
-                  Text(
-                    selectedShop?.shopName ?? '',
-                    style: const TextStyle(
-                        fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(width: 2),
-                  IconButton(
-                      onPressed: () {
-                        showModalBottomSheet(
-                          //モーダルを表示する関数
-                          barrierColor:
-                              Colors.black.withOpacity(0), //背景をどれぐらい暗くするか
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          isScrollControlled: true, //スクロールで閉じたりするか
-                          builder: (context) {
-                            return PlaceUpdatePage(
-                              shop: selectedShop!,
-                            ); //ご飯投稿
-                          },
-                        ).then((value) {
-                          IsarUtils.getShopById(widget.id).then((shop) {
-                            setState(() {
-                              selectedShop = shop;
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        selectedShop?.shopName ?? '',
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(width: 2),
+                    SizedBox(
+                      height: 44,
+                      child: IconButton(
+                          onPressed: () {
+                            showModalBottomSheet(
+                              //モーダルを表示する関数
+                              barrierColor: Colors.black.withOpacity(0), //背景をどれぐらい暗くするか
+                              backgroundColor: Colors.transparent,
+                              context: context,
+                              isScrollControlled: true, //スクロールで閉じたりするか
+                              builder: (context) {
+                                return PlaceUpdatePage(
+                                  shop: selectedShop!,
+                                ); //ご飯投稿
+                              },
+                            ).then((value) {
+                              IsarUtils.getShopById(widget.id).then((shop) {
+                                setState(() {
+                                  selectedShop = shop;
+                                });
+                              });
                             });
-                          });
-                        });
-                      },
-                      icon: const Icon(Icons.mode,
-                          size: 20, color: Color.fromARGB(255, 103, 103, 103))),
-                ],
+                          },
+                          icon: const Icon(Icons.mode, size: 20, color: Color.fromARGB(255, 103, 103, 103))),
+                    ),
+                  ],
+                ),
               ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(
-                  Icons.cancel_outlined,
+              SizedBox(
+                height: 44,
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.cancel_outlined,
+                  ),
                 ),
               )
             ]),
+            const SizedBox(height: 4),
             Text(
               selectedShop?.shopAddress ?? '',
               style: const TextStyle(fontSize: 12),

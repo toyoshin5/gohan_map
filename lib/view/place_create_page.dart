@@ -19,9 +19,13 @@ import 'package:gohan_map/component/app_modal.dart';
 //飲食店の登録画面
 class PlaceCreatePage extends StatefulWidget {
   final LatLng latlng;
+  final String? initShopName;
+  final String? initAddress;
   const PlaceCreatePage({
     Key? key,
     required this.latlng,
+    this.initShopName,
+    this.initAddress,
   }) : super(key: key);
 
   @override
@@ -39,6 +43,12 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   bool avoidkeyBoard = false;
 
   @override
+  void initState() {
+    super.initState();
+    address = widget.initAddress ?? '';
+    shopName = widget.initShopName ?? '';
+  }
+  @override
   Widget build(BuildContext context) {
     return AppModal(
       initialChildSize: 0.6,
@@ -53,6 +63,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _ShopNameTextField(
+                  initialValue: widget.initShopName,
                   onChanged: (value) {
                     setState(() {
                       shopName = value;
@@ -87,6 +98,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 ),
               ),
             ),
+            if (widget.initAddress != null)
+              Text(widget.initAddress!)
+            else
             FutureBuilder(
               future: _getAddressFromLatLng(widget.latlng),
               builder: (context, snapshot) {
@@ -337,13 +351,16 @@ class _ShopNameTextField extends StatelessWidget {
   const _ShopNameTextField({
     Key? key,
     required this.onChanged,
+    this.initialValue,
   }) : super(key: key);
   final Function(String) onChanged;
+  final String? initialValue;
   @override
   Widget build(BuildContext context) {
     //角丸,白いぬりつぶし,枠線なし
     return Flexible(
-      child: TextField(
+      child: TextFormField(
+        initialValue: initialValue,
         decoration: InputDecoration(
           hintText: '店名を入力',
           filled: true,

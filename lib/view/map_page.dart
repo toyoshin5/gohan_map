@@ -10,6 +10,7 @@ import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
+import 'package:gohan_map/model/hotpepper_shop.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
@@ -166,8 +167,15 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 return const PlaceSearchPage(); //飲食店を検索する画面
               },
             ).then(
-              (id) {
-                //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
+              (value) {
+                //valueの型がInt→詳細画面
+                //int型ならそのまま、Id型ならばnullにしたい
+                int? id = (value is int) ? value : null;
+                //valueの型がHotPepper→検索から新規作成
+                HotPepperShop? hpShop =
+                    (value is HotPepperShop) ? value : null;
+
+                //検索画面で追加済みの店を選択した場合、選択した場所の詳細画面を表示する。
                 if (id != null) {
                   setState(() {
                     tapFlgs[id] = true;
@@ -198,6 +206,33 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       final deviceHeight = MediaQuery.of(context).size.height;
                       _moveToPin(latLng, deviceHeight * 0.2);
                     }
+                  });
+                }
+
+                //検索画面で新規店舗を選択した場合、新規作成画面を表示する。
+                if(hpShop != null && hpShop.latlng != null){
+                  setState(() {
+                    //ピンを配置する
+                    _addPinToMap(hpShop.latlng!, null);
+                  });
+                  //mapをスクロールする
+                  final deviceHeight = MediaQuery.of(context).size.height;
+                  _moveToPin(hpShop.latlng!, deviceHeight * 0.2);
+                  showModalBottomSheet(
+                    barrierColor: Colors.black.withOpacity(0),
+                    isDismissible: true,
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) {
+                      return PlaceCreatePage(
+                        latlng: hpShop.latlng!,
+                        initShopName: hpShop.name,
+                        initAddress: hpShop.address,
+                      );
+                    },
+                  ).then((value) {
+                    _loadAllShop();
                   });
                 }
               },
