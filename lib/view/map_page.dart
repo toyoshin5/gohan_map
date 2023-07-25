@@ -183,12 +183,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         id: id,
                       ); //飲食店の詳細画面
                     },
-                  ).then((value) {
-                    setState(() {
-                      tapFlgs[id] = true;
-                      _loadAllShop();
-                    });
-                  });
+                  ).then((value) => _onModalPop(value, id));
                   //ピンの緯度経度を取得
                   IsarUtils.getShopById(id).then((shop) {
                     if (shop != null) {
@@ -252,12 +247,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         id: id,
                       ); //飲食店の詳細画面
                     },
-                  ).then((value) {
-                    setState(() {
-                      tapFlgs[id] = false;
-                      _loadAllShop();
-                    });
-                  });
+                  ).then((value) => _onModalPop(value, id));
                 }
               },
               child: (tapFlgs[id] == true)
@@ -285,6 +275,23 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     }
     setState(() {
       // reload
+    });
+  }
+
+  //modalから戻ってきたときに実行される関数
+  void _onModalPop(dynamic value, int id) {
+    //ピンの位置に移動する
+    IsarUtils.getShopById(id).then((shop) {
+      if (shop != null) {
+        final latLng = LatLng(shop.shopLatitude, shop.shopLongitude);
+        
+        final deviceHeight = MediaQuery.of(context).size.height;
+        _moveToPin(latLng, deviceHeight * 0.1);
+      }
+    });
+    setState(() {
+      tapFlgs[id] = false;
+      _loadAllShop();
     });
   }
 
