@@ -60,6 +60,17 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                   });
                 });
               },
+              onSubmitted: (text) {
+                setState(() {
+                  searchText = text;
+                });
+                _searchShops(text);
+                _getHpShopListFromName(text).then((list) {
+                  setState(() {
+                    hpShopList = list;
+                  });
+                });
+              },
             ),
             const SizedBox(
               height: 32,
