@@ -9,6 +9,7 @@ import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
 import 'package:gohan_map/utils/common.dart';
+import 'package:gohan_map/utils/mapPins.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -36,6 +37,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   String shopName = '';
   String address = '';
   double rating = 3;
+  String shopMapIconKind = "default";
   File? image;
   bool isUmai = false;
   DateTime date = DateTime.now();
@@ -90,12 +92,21 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
             //住所
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
-              child: Text(
-                '住所',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.place,
+                    color: Colors.blue,
+                  ),
+                  Padding(padding: EdgeInsets.only(right: 5)),
+                  Text(
+                    '住所',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
               ),
             ),
             if (widget.initAddress != null)
@@ -130,6 +141,44 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   rating = rating;
                 });
               },
+            ),
+            // ピンの種類
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
+              child: Text(
+                'ピンの種類',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DropdownButton(
+              items: [
+                for (var v in mapPins)
+                  DropdownMenuItem(
+                      value: v.kind,
+                      child: Row(children: [
+                        Container(
+                          width: 30,
+                          height: 40,
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Image.asset(
+                            v.pinImagePath,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Text(v.displayName),
+                      ]))
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+
+                setState(() {
+                  shopMapIconKind = value;
+                });
+              },
+              value: shopMapIconKind,
             ),
             //最初の投稿
             const Padding(
@@ -302,6 +351,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       ..shopLatitude = widget.latlng.latitude
       ..shopLongitude = widget.latlng.longitude
       ..shopStar = rating
+      ..shopMapIconKind = shopMapIconKind
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now();
     final shopId = await IsarUtils.createShop(shop);
@@ -314,7 +364,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
         ..createdAt = DateTime.now()
         ..updatedAt = DateTime.now()
         ..shopId = shopId
-        ..date = date ?? DateTime.now();
+        ..date = date;
       await IsarUtils.createTimeline(timeline);
       if (context.mounted) {
         //振動

@@ -10,6 +10,7 @@ class Shop {
 
   late String shopName;
   late String shopAddress;
+  late String shopMapIconKind;
   late double shopLatitude;
   late double shopLongitude;
   late double shopStar;

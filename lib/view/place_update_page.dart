@@ -7,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/utils/mapPins.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -32,6 +33,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
     shopName = widget.shop.shopName;
     shopLatitude = widget.shop.shopLatitude;
     shopLongitude = widget.shop.shopLongitude;
+    shopMapIconKind = widget.shop.shopMapIconKind;
     shopStar = widget.shop.shopStar;
   }
 
@@ -41,6 +43,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   late String shopName;
   late double shopLatitude;
   late double shopLongitude;
+  late String shopMapIconKind;
   late double shopStar;
   bool isValidating = false;
 
@@ -71,6 +74,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     height: 30,
                     width: 30,
                     child: IconButton(
+                      padding: const EdgeInsets.all(0),
                       icon: const Icon(
                         Icons.cancel_outlined,
                         size: 32,
@@ -144,7 +148,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                         SizedBox(
                           height: 35,
                           width: 35,
-                          child: Image.asset("images/pin.png"),
+                          child: Image.asset("images/pins/pin_default.png"),
                         ),
                         const SizedBox(height: 35),
                       ],
@@ -200,6 +204,44 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                   });
                 },
                 initialRating: shopStar),
+            // ピンの種類
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
+              child: Text(
+                'ピンの種類',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DropdownButton(
+              items: [
+                for (var v in mapPins)
+                  DropdownMenuItem(
+                      value: v.kind,
+                      child: Row(children: [
+                        Container(
+                          width: 30,
+                          height: 40,
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Image.asset(
+                            v.pinImagePath,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Text(v.displayName),
+                      ]))
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+
+                setState(() {
+                  shopMapIconKind = value;
+                });
+              },
+              value: shopMapIconKind,
+            ),
             //決定ボタン
             Container(
               width: double.infinity,
@@ -339,13 +381,15 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
       ..shopLatitude = shopLatitude
       ..shopLongitude = shopLongitude
       ..shopStar = shopStar
+      ..shopMapIconKind = shopMapIconKind
       ..createdAt = widget.shop.createdAt
       ..updatedAt = DateTime.now();
     await IsarUtils.createShop(shop);
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context);
+      //最初に戻る
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
     setState(() {
       isValidating = false;
@@ -353,19 +397,14 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   }
 
   Future<void> _deleteShop() async {
-    showCupertinoDialog(
+    showCupertinoModalPopup(
       context: context,
       builder: (context) {
-        return CupertinoAlertDialog(
+        return CupertinoActionSheet(
           title: const Text('店情報を削除しますか？'),
+          message: const Text("店に関する全ての投稿も削除されます。"),
           actions: [
-            CupertinoDialogAction(
-              child: const Text('キャンセル'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            CupertinoDialogAction(
+            CupertinoActionSheetAction(
               child: const Text(
                 '削除',
                 style: TextStyle(
@@ -382,6 +421,12 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               },
             ),
           ],
+          cancelButton: CupertinoActionSheetAction(
+            child: const Text('キャンセル'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
         );
       },
     );

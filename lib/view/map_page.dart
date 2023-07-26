@@ -12,6 +12,7 @@ import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/model/hotpepper_shop.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/utils/mapPins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
@@ -191,12 +192,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         id: id,
                       ); //飲食店の詳細画面
                     },
-                  ).then((value) {
-                    setState(() {
-                      tapFlgs[id] = true;
-                      _loadAllShop();
-                    });
-                  });
+                  ).then((value) => _onModalPop(value, id));
                   //ピンの緯度経度を取得
                   IsarUtils.getShopById(id).then((shop) {
                     if (shop != null) {
@@ -244,65 +240,69 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   }
 
   //1つのピンを、地図に描画するための配列pinsに追加する関数
-  void _addPinToMap(LatLng latLng, Id? id) {
-    const markerSize = 50.0;
-    const focusAmp = 1.6; //>=1
-    const imgRatio = 126 / 175;
+  void _addPinToMap(LatLng latLng, Shop? shop) {
+    const markerSize = 40.0;
+    const imgRatio = 345 / 512;
+    final shopMapPin = findPinByKind(shop?.shopMapIconKind);
+
     pins.add(
       Marker(
-        width: markerSize * focusAmp * imgRatio,
-        height: markerSize * focusAmp * 2,
+        width: markerSize * imgRatio,
+        height: markerSize,
+        anchorPos: AnchorPos.align(AnchorAlign.top),
         point: latLng,
         builder: (context) {
           return AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
-            padding: EdgeInsets.only(
-                left: (tapFlgs[id] == true)
-                    ? 0
-                    : markerSize * (focusAmp - 1) * imgRatio / 2,
-                top: (tapFlgs[id] == true) ? 0 : markerSize * (focusAmp - 1.0),
-                right: (tapFlgs[id] == true)
-                    ? 0
-                    : markerSize * (focusAmp - 1) * imgRatio / 2,
-                bottom: markerSize * focusAmp - 1),
+            transform: Matrix4.diagonal3Values(
+                tapFlgs[shop?.id] == true ? 1.3 : 1,
+                tapFlgs[shop?.id] == true ? 1.3 : 1,
+                1),
+            transformAlignment: Alignment.bottomCenter,
             child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                //ピンをタップしたときの処理
-                if (id != null) {
-                  setState(() {
-                    tapFlgs[id] = true;
-                  });
-                  final deviceHeight = MediaQuery.of(context).size.height;
-                  _moveToPin(latLng, deviceHeight * 0.1);
-                  showModalBottomSheet(
-                    barrierColor: Colors.black.withOpacity(0),
-                    isDismissible: true,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    context: context,
-                    builder: (context) {
-                      return PlaceDetailPage(
-                        id: id,
-                      ); //飲食店の詳細画面
-                    },
-                  ).then((value) {
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  //ピンをタップしたときの処理
+                  if (shop != null) {
                     setState(() {
-                      tapFlgs[id] = false;
-                      _loadAllShop();
+                      tapFlgs[shop.id] = true;
                     });
-                  });
-                }
-              },
-              child: (tapFlgs[id] == true)
-                  ? Image.asset(
-                      'images/pin_tap.png',
-                    )
-                  : Image.asset(
-                      'images/pin.png',
-                    ),
-            ),
+                    final deviceHeight = MediaQuery.of(context).size.height;
+                    _moveToPin(latLng, deviceHeight * 0.1);
+                    showModalBottomSheet(
+                      barrierColor: Colors.black.withOpacity(0),
+                      isDismissible: true,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (context) {
+                        return PlaceDetailPage(
+                          id: shop.id,
+                        ); //飲食店の詳細画面
+                      },
+                    ).then((value) => _onModalPop(value, shop.id));
+                  }
+                },
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Image.asset(shopMapPin != null
+                        ? shopMapPin.pinImagePath
+                        : 'images/pins/pin_default.png'),
+                    if (shop != null && shopMapPin != null)
+                      Positioned(
+                        left: 35,
+                        top: 7,
+                        child: Text(
+                          shop.shopName,
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: shopMapPin.textColor),
+                        ),
+                      )
+                  ],
+                )),
           );
         },
       ),
@@ -316,10 +316,27 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     tapFlgs = {};
     for (var shop in shops) {
       tapFlgs.addAll({shop.id: false});
-      _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop.id);
+      _addPinToMap(LatLng(shop.shopLatitude, shop.shopLongitude), shop);
     }
     setState(() {
       // reload
+    });
+  }
+
+  //modalから戻ってきたときに実行される関数
+  void _onModalPop(dynamic value, int id) {
+    //ピンの位置に移動する
+    IsarUtils.getShopById(id).then((shop) {
+      if (shop != null) {
+        final latLng = LatLng(shop.shopLatitude, shop.shopLongitude);
+
+        final deviceHeight = MediaQuery.of(context).size.height;
+        _moveToPin(latLng, deviceHeight * 0.1);
+      }
+    });
+    setState(() {
+      tapFlgs[id] = false;
+      _loadAllShop();
     });
   }
 
