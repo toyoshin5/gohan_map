@@ -7,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/utils/mapPins.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -32,6 +33,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
     shopName = widget.shop.shopName;
     shopLatitude = widget.shop.shopLatitude;
     shopLongitude = widget.shop.shopLongitude;
+    shopMapIconKind = widget.shop.shopMapIconKind;
     shopStar = widget.shop.shopStar;
   }
 
@@ -41,6 +43,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   late String shopName;
   late double shopLatitude;
   late double shopLongitude;
+  late String shopMapIconKind;
   late double shopStar;
   bool isValidating = false;
 
@@ -145,7 +148,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                         SizedBox(
                           height: 35,
                           width: 35,
-                          child: Image.asset("images/pin.png"),
+                          child: Image.asset("images/pins/pin_default.png"),
                         ),
                         const SizedBox(height: 35),
                       ],
@@ -201,6 +204,44 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                   });
                 },
                 initialRating: shopStar),
+            // ピンの種類
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
+              child: Text(
+                'ピンの種類',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            DropdownButton(
+              items: [
+                for (var v in mapPins)
+                  DropdownMenuItem(
+                      value: v.kind,
+                      child: Row(children: [
+                        Container(
+                          width: 30,
+                          height: 40,
+                          padding: const EdgeInsets.only(right: 10),
+                          child: Image.asset(
+                            v.pinImagePath,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        Text(v.displayName),
+                      ]))
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+
+                setState(() {
+                  shopMapIconKind = value;
+                });
+              },
+              value: shopMapIconKind,
+            ),
             //決定ボタン
             Container(
               width: double.infinity,
@@ -340,6 +381,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
       ..shopLatitude = shopLatitude
       ..shopLongitude = shopLongitude
       ..shopStar = shopStar
+      ..shopMapIconKind = shopMapIconKind
       ..createdAt = widget.shop.createdAt
       ..updatedAt = DateTime.now();
     await IsarUtils.createShop(shop);

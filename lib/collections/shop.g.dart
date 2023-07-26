@@ -37,18 +37,23 @@ const ShopSchema = CollectionSchema(
       name: r'shopLongitude',
       type: IsarType.double,
     ),
-    r'shopName': PropertySchema(
+    r'shopMapIconKind': PropertySchema(
       id: 4,
+      name: r'shopMapIconKind',
+      type: IsarType.string,
+    ),
+    r'shopName': PropertySchema(
+      id: 5,
       name: r'shopName',
       type: IsarType.string,
     ),
     r'shopStar': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'shopStar',
       type: IsarType.double,
     ),
     r'updatedAt': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -74,6 +79,7 @@ int _shopEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.shopAddress.length * 3;
+  bytesCount += 3 + object.shopMapIconKind.length * 3;
   bytesCount += 3 + object.shopName.length * 3;
   return bytesCount;
 }
@@ -88,9 +94,10 @@ void _shopSerialize(
   writer.writeString(offsets[1], object.shopAddress);
   writer.writeDouble(offsets[2], object.shopLatitude);
   writer.writeDouble(offsets[3], object.shopLongitude);
-  writer.writeString(offsets[4], object.shopName);
-  writer.writeDouble(offsets[5], object.shopStar);
-  writer.writeDateTime(offsets[6], object.updatedAt);
+  writer.writeString(offsets[4], object.shopMapIconKind);
+  writer.writeString(offsets[5], object.shopName);
+  writer.writeDouble(offsets[6], object.shopStar);
+  writer.writeDateTime(offsets[7], object.updatedAt);
 }
 
 Shop _shopDeserialize(
@@ -105,9 +112,10 @@ Shop _shopDeserialize(
   object.shopAddress = reader.readString(offsets[1]);
   object.shopLatitude = reader.readDouble(offsets[2]);
   object.shopLongitude = reader.readDouble(offsets[3]);
-  object.shopName = reader.readString(offsets[4]);
-  object.shopStar = reader.readDouble(offsets[5]);
-  object.updatedAt = reader.readDateTime(offsets[6]);
+  object.shopMapIconKind = reader.readString(offsets[4]);
+  object.shopName = reader.readString(offsets[5]);
+  object.shopStar = reader.readDouble(offsets[6]);
+  object.updatedAt = reader.readDateTime(offsets[7]);
   return object;
 }
 
@@ -129,8 +137,10 @@ P _shopDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
+      return (reader.readDouble(offset)) as P;
+    case 7:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -584,6 +594,136 @@ extension ShopQueryFilter on QueryBuilder<Shop, Shop, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shopMapIconKind',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'shopMapIconKind',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'shopMapIconKind',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'shopMapIconKind',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'shopMapIconKind',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'shopMapIconKind',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'shopMapIconKind',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'shopMapIconKind',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'shopMapIconKind',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> shopMapIconKindIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'shopMapIconKind',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<Shop, Shop, QAfterFilterCondition> shopNameEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -882,6 +1022,18 @@ extension ShopQuerySortBy on QueryBuilder<Shop, Shop, QSortBy> {
     });
   }
 
+  QueryBuilder<Shop, Shop, QAfterSortBy> sortByShopMapIconKind() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shopMapIconKind', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterSortBy> sortByShopMapIconKindDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shopMapIconKind', Sort.desc);
+    });
+  }
+
   QueryBuilder<Shop, Shop, QAfterSortBy> sortByShopName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'shopName', Sort.asc);
@@ -980,6 +1132,18 @@ extension ShopQuerySortThenBy on QueryBuilder<Shop, Shop, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Shop, Shop, QAfterSortBy> thenByShopMapIconKind() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shopMapIconKind', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterSortBy> thenByShopMapIconKindDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'shopMapIconKind', Sort.desc);
+    });
+  }
+
   QueryBuilder<Shop, Shop, QAfterSortBy> thenByShopName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'shopName', Sort.asc);
@@ -1043,6 +1207,14 @@ extension ShopQueryWhereDistinct on QueryBuilder<Shop, Shop, QDistinct> {
     });
   }
 
+  QueryBuilder<Shop, Shop, QDistinct> distinctByShopMapIconKind(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'shopMapIconKind',
+          caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Shop, Shop, QDistinct> distinctByShopName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1091,6 +1263,12 @@ extension ShopQueryProperty on QueryBuilder<Shop, Shop, QQueryProperty> {
   QueryBuilder<Shop, double, QQueryOperations> shopLongitudeProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'shopLongitude');
+    });
+  }
+
+  QueryBuilder<Shop, String, QQueryOperations> shopMapIconKindProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'shopMapIconKind');
     });
   }
 

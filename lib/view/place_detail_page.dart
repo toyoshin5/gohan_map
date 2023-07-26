@@ -102,9 +102,18 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   ),
                 ),
             ]),
-            Text(
-              selectedShop?.shopAddress ?? '',
-              style: const TextStyle(fontSize: 12),
+            Row(
+              children: [
+                const Icon(
+                  Icons.place,
+                  color: Colors.blue,
+                ),
+                const Padding(padding: EdgeInsets.only(right: 5)),
+                Text(
+                  selectedShop?.shopAddress ?? '',
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ],
             ),
             SizedBox(
               height: 30,
