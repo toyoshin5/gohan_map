@@ -218,6 +218,8 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
 
   //店名からHotPepperの店舗一覧を取得,検索バーに入力するたびに呼び出す
   Future<List<HotPepperShop>?> _getHpShopListFromName(String name) async {
+    //全角空白を半角空白に変換
+    name = name.replaceAll(RegExp(r'　'), ' ');
     const String apiKey = String.fromEnvironment("HOTPEPPER_API_KEY");
     final String apiUrl = 'http://webservice.recruit.co.jp/hotpepper/shop/v1?key=$apiKey&keyword=$name&format=json';
     try {
