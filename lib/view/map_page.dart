@@ -207,12 +207,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   //1つのピンを、地図に描画するための配列pinsに追加する関数
   void _addPinToMap(LatLng latLng, Shop? shop) {
     const markerSize = 40.0;
+    const imgRatio = 345 / 512;
     final shopMapPin = findPinByKind(shop?.shopMapIconKind);
 
     pins.add(
       Marker(
-        width: markerSize,
+        width: markerSize * imgRatio,
         height: markerSize,
+        anchorPos: AnchorPos.align(AnchorAlign.top),
         point: latLng,
         builder: (context) {
           return AnimatedContainer(
@@ -222,7 +224,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 tapFlgs[shop?.id] == true ? 1.3 : 1,
                 tapFlgs[shop?.id] == true ? 1.3 : 1,
                 1),
-            transformAlignment: Alignment.center,
+            transformAlignment: Alignment.bottomCenter,
             child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
