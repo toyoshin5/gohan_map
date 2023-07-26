@@ -74,6 +74,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     height: 30,
                     width: 30,
                     child: IconButton(
+                      padding: const EdgeInsets.all(0),
                       icon: const Icon(
                         Icons.cancel_outlined,
                         size: 32,
@@ -387,7 +388,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context);
+      //最初に戻る
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
     setState(() {
       isValidating = false;
@@ -395,19 +397,14 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   }
 
   Future<void> _deleteShop() async {
-    showCupertinoDialog(
+    showCupertinoModalPopup(
       context: context,
       builder: (context) {
-        return CupertinoAlertDialog(
+        return CupertinoActionSheet(
           title: const Text('店情報を削除しますか？'),
+          message: const Text("店に関する全ての投稿も削除されます。"),
           actions: [
-            CupertinoDialogAction(
-              child: const Text('キャンセル'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            CupertinoDialogAction(
+            CupertinoActionSheetAction(
               child: const Text(
                 '削除',
                 style: TextStyle(
@@ -424,6 +421,12 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               },
             ),
           ],
+          cancelButton: CupertinoActionSheetAction(
+            child: const Text('キャンセル'),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          )
         );
       },
     );

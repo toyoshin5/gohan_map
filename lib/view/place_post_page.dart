@@ -66,7 +66,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 20, right: 20),
+              margin: const EdgeInsets.only(bottom: 20),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -90,6 +90,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                           height: 30,
                           width: 30,
                           child: IconButton(
+                            padding: const EdgeInsets.all(0),
                             icon: const Icon(
                               Icons.cancel_outlined,
                               size: 32,
