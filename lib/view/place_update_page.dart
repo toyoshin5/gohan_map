@@ -346,7 +346,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context);
+      //最初に戻る
+      Navigator.of(context).popUntil((route) => route.isFirst);
     }
     setState(() {
       isValidating = false;
