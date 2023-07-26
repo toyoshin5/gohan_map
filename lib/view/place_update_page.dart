@@ -71,6 +71,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     height: 30,
                     width: 30,
                     child: IconButton(
+                      padding: const EdgeInsets.all(0),
                       icon: const Icon(
                         Icons.cancel_outlined,
                         size: 32,

@@ -87,14 +87,20 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                           size: 20, color: Color.fromARGB(255, 103, 103, 103))),
                 ],
               ),
-              IconButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                icon: const Icon(
-                  Icons.cancel_outlined,
+              SizedBox(
+                  height: 30,
+                  width: 30,
+                  child: IconButton(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 12, 12), //44px確保
+                    icon: const Icon(
+                      Icons.cancel_outlined,
+                      size: 32,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context); //前の画面に戻る
+                    },
+                  ),
                 ),
-              )
             ]),
             Text(
               selectedShop?.shopAddress ?? '',
