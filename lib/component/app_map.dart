@@ -14,13 +14,13 @@ import 'package:geolocator/geolocator.dart';
 class AppMap extends StatefulWidget {
   final void Function(TapPosition?, LatLng) onLongPress;
   final List<Marker>? pins;
-  final MapController? mapController;
+  final MapController mapController;
 
   const AppMap({
     Key? key,
     required this.onLongPress,
     this.pins,
-    this.mapController,
+    required this.mapController,
   }) : super(key: key);
 
   @override
@@ -44,7 +44,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     super.initState();
     init();
     //アニメーションの定義
-    plMarkerController = AnimationController(vsync: this, duration: const Duration(seconds: 5));
+    plMarkerController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 5));
     const shrinkSize = 0.8;
     currentIconAni = TweenSequence<double>([
       TweenSequenceItem(
@@ -97,7 +98,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 return Text('Error reading heading: ${snapshot.error}');
               }
               //シミュレーターの場合は無視
-              if (snapshot.connectionState == ConnectionState.waiting && kReleaseMode == true) {
+              if (snapshot.connectionState == ConnectionState.waiting &&
+                  kReleaseMode == true) {
                 return const Center(
                   child: CircularProgressIndicator(),
                 );
@@ -131,14 +133,16 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     attributions: [
                       TextSourceAttribution(
                         'OpenStreetMap contributors',
-                        onTap: () => launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+                        onTap: () => launchUrl(
+                            Uri.parse('https://openstreetmap.org/copyright')),
                       ),
                     ],
                   ),
                 ],
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                    urlTemplate:
+                        'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
                   ),
                   if (widget.pins != null)
                     MarkerLayer(
@@ -178,7 +182,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 });
                 _animatedMapMove(currentPosition!, 15);
               },
-              child: Icon((isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
+              child: Icon(
+                  (isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
             ),
           ),
         ),
@@ -190,7 +195,9 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     await checkGPSPermission();
 
     // ユーザの現在位置を取得し続ける
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position position) {
+    positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position position) {
       var latLng = LatLng(position.latitude, position.longitude);
       setState(() {
         currentPosition = latLng;
@@ -215,7 +222,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
 
     // 永久に拒否されている場合はエラーを返す
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
   }
 
@@ -235,7 +243,10 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
             child: Container(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26, spreadRadius: 3)],
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 10, color: Colors.black26, spreadRadius: 3)
+                ],
               ),
               child: CircleAvatar(
                   radius: 24,
@@ -263,23 +274,35 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         height: markerSize / 2 * math.sqrt(3),
         point: currentPosition!,
         builder: (context) {
-          return Transform.translate(offset: const Offset(0, -16), child: Transform.rotate(angle: (direction * (math.pi / 180)), origin: const Offset(0, 16), child: AppDirectionLight()));
+          return Transform.translate(
+              offset: const Offset(0, -16),
+              child: Transform.rotate(
+                  angle: (direction * (math.pi / 180)),
+                  origin: const Offset(0, 16),
+                  child: AppDirectionLight()));
         });
   }
 
   void _animatedMapMove(LatLng destLocation, double destZoom) {
-    if (widget.mapController == null) {
-      return;
-    }
-    final latTween = Tween<double>(begin: widget.mapController!.center.latitude, end: destLocation.latitude);
-    final lngTween = Tween<double>(begin: widget.mapController!.center.longitude, end: destLocation.longitude);
-    final zoomTween = Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
-    final rotateTween = Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
-    final controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final latTween = Tween<double>(
+        begin: widget.mapController.center.latitude,
+        end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: widget.mapController.center.longitude,
+        end: destLocation.longitude);
+    final zoomTween =
+        Tween<double>(begin: widget.mapController.zoom, end: destZoom);
+    final rotateTween =
+        Tween<double>(begin: widget.mapController.rotation, end: 0.0);
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
     controller.addListener(() {
-      widget.mapController!.move(LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)), zoomTween.evaluate(animation));
-      widget.mapController!.rotate(rotateTween.evaluate(animation));
+      widget.mapController.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
+      widget.mapController.rotate(rotateTween.evaluate(animation));
     });
     animation.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
@@ -292,8 +315,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
   }
 
   //緯度でソート(南のピンが上に来るようにする)
-  List<Marker>? sortByLat(List<Marker>? pins){
-    if(widget.pins == null){
+  List<Marker>? sortByLat(List<Marker>? pins) {
+    if (widget.pins == null) {
       return null;
     }
     widget.pins!.sort((a, b) => b.point.latitude.compareTo(a.point.latitude));

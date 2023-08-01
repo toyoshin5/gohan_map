@@ -11,6 +11,7 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/model/hotpepper_shop.dart';
+import 'package:gohan_map/model/overpass_shop.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/mapPins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
@@ -165,7 +166,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder: (context) {
-                return const PlaceSearchPage(); //飲食店を検索する画面
+                return PlaceSearchPage(
+                  mapController: mapController,
+                ); //飲食店を検索する画面
               },
             ).then(
               (value) {
@@ -173,8 +176,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 //int型ならそのまま、Id型ならばnullにしたい
                 int? id = (value is int) ? value : null;
                 //valueの型がHotPepper→検索から新規作成
-                HotPepperShop? hpShop =
-                    (value is HotPepperShop) ? value : null;
+                OverPassShop? overpassShop =
+                    (value is OverPassShop) ? value : null;
 
                 //検索画面で追加済みの店を選択した場合、選択した場所の詳細画面を表示する。
                 if (id != null) {
@@ -206,14 +209,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 }
 
                 //検索画面で新規店舗を選択した場合、新規作成画面を表示する。
-                if(hpShop != null && hpShop.latlng != null){
+                if (overpassShop != null) {
                   setState(() {
                     //ピンを配置する
-                    _addPinToMap(hpShop.latlng!, null);
+                    _addPinToMap(overpassShop.latlng, null);
                   });
                   //mapをスクロールする
                   final deviceHeight = MediaQuery.of(context).size.height;
-                  _moveToPin(hpShop.latlng!, deviceHeight * 0.2);
+                  _moveToPin(overpassShop.latlng, deviceHeight * 0.2);
                   showModalBottomSheet(
                     barrierColor: Colors.black.withOpacity(0),
                     isDismissible: true,
@@ -222,9 +225,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     backgroundColor: Colors.transparent,
                     builder: (context) {
                       return PlaceCreatePage(
-                        latlng: hpShop.latlng!,
-                        initShopName: hpShop.name,
-                        initAddress: hpShop.address,
+                        latlng: overpassShop.latlng,
+                        initShopName: overpassShop.name,
+                        initAddress:
+                            null, // OpenStreetMapの住所が不正確な場合があるため、緯度経度からリバースジオコーディングする
                       );
                     },
                   ).then((value) {
