@@ -223,8 +223,17 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
       isSearchLoading = true;
     });
 
-    final String apiUrl =
-        'https://lz4.overpass-api.de/api/interpreter?data=[out:json];node(${southLat},${westLon},${northLat},${eastLon})["amenity"~"^(fast_food|cafe|restaurant|food_court|bar)\$"]["name"~"${name}"];out;';
+    final String apiUrl = """
+https://lz4.overpass-api.de/api/interpreter?data=
+[out:json][timeout:25];
+(
+node(${southLat},${westLon},${northLat},${eastLon})["amenity"~"^(fast_food|cafe|restaurant|food_court|bar)\$"]["name"~"${name}",i];
+node(${southLat},${westLon},${northLat},${eastLon})["amenity"~"^(fast_food|cafe|restaurant|food_court|bar)\$"]["name:en"~"${name}",i];
+);
+out;
+"""
+        .replaceAll(RegExp("\n"), "");
+    print(apiUrl);
     List<OverPassShop> result = [];
     try {
       final response = await client.get(Uri.parse(apiUrl));
