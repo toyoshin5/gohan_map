@@ -31,6 +31,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   String searchText = "";
   List<Shop> shopList = [];
   List<OverPassShop>? overpassShopList;
+  bool isSearchLoading = false;
   Timer? _debounce;
   http.Client client = http.Client(); // HTTPクライアントを格納する
 
@@ -144,42 +145,46 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
             const SizedBox(
               height: 8,
             ),
-            //新規飲食店検索結果一覧
-            for (OverPassShop overpassShop in overpassShopList ?? [])
-              Card(
-                //影付きの角丸四角形
-                elevation: 0,
-                color: AppColors.backgroundWhiteColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: ListTile(
-                  title: Text(overpassShop.name),
-                  subtitle: overpassShop.address != null
-                      ? Text(overpassShop.address!)
-                      : null,
-                  titleTextStyle: const TextStyle(
-                      fontSize: 18,
-                      color: AppColors.blackTextColor,
-                      overflow: TextOverflow.ellipsis),
-                  subtitleTextStyle:
-                      const TextStyle(overflow: TextOverflow.ellipsis),
-                  onTap: () {
-                    Navigator.pop(context, overpassShop);
-                  },
-                ),
-              ),
-            //検索結果なし
-            if (((overpassShopList?.isEmpty) ?? false) && shopList.isEmpty)
-              const Center(
-                child: Text(
-                  '検索結果がありません',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
+            if (isSearchLoading)
+              Center(child: CircularProgressIndicator())
+            else ...[
+              //新規飲食店検索結果一覧
+              for (OverPassShop overpassShop in overpassShopList ?? [])
+                Card(
+                  //影付きの角丸四角形
+                  elevation: 0,
+                  color: AppColors.backgroundWhiteColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: ListTile(
+                    title: Text(overpassShop.name),
+                    subtitle: overpassShop.address != null
+                        ? Text(overpassShop.address!)
+                        : null,
+                    titleTextStyle: const TextStyle(
+                        fontSize: 18,
+                        color: AppColors.blackTextColor,
+                        overflow: TextOverflow.ellipsis),
+                    subtitleTextStyle:
+                        const TextStyle(overflow: TextOverflow.ellipsis),
+                    onTap: () {
+                      Navigator.pop(context, overpassShop);
+                    },
                   ),
                 ),
-              ),
+              //検索結果なし
+              if (((overpassShopList?.isEmpty) ?? false) && shopList.isEmpty)
+                const Center(
+                  child: Text(
+                    '検索結果がありません',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
+                    ),
+                  ),
+                ),
+            ]
           ],
         ),
       ),
@@ -214,11 +219,14 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
     final eastLon = widget.mapController.bounds!.east;
     final northLat = widget.mapController.bounds!.north;
     final southLat = widget.mapController.bounds!.south;
+    setState(() {
+      isSearchLoading = true;
+    });
 
     final String apiUrl =
-        'https://lz4.overpass-api.de/api/interpreter?data=[out:json];node(${southLat},${westLon},${northLat},${eastLon})["amenity"~"fast_food|cafe|restaurant"]["name"~"${name}"];out;';
+        'https://lz4.overpass-api.de/api/interpreter?data=[out:json];node(${southLat},${westLon},${northLat},${eastLon})["amenity"~"^(fast_food|cafe|restaurant|food_court|bar)\$"]["name"~"${name}"];out;';
+    List<OverPassShop> result = [];
     try {
-      print(apiUrl);
       final response = await client.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
@@ -229,16 +237,17 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
             final overpassResponseShop = OverPassShop.fromJson(shop);
             shops.add(overpassResponseShop);
           }
-          return shops;
-        } else {
-          return [];
+
+          result = shops;
         }
-      } else {
-        return [];
       }
     } catch (e) {
       print(e);
-      return [];
     }
+
+    setState(() {
+      isSearchLoading = false;
+    });
+    return result;
   }
 }

@@ -34,7 +34,6 @@ class OverPassShop {
         (addrSuburb ?? "") +
         (addrNeighbourhood ?? "");
     addr = addr != "" ? addr : null;
-    print(addr);
 
     return OverPassShop(
         id: id, latlng: latlng, amenity: amenity, name: name, address: addr);
