@@ -8,12 +8,13 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
 import 'package:gohan_map/model/hotpepper_shop.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
-import 'package:isar/isar.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../component/app_search_bar.dart';
 
 import 'package:http/http.dart' as http;
+
+import 'package:async/async.dart';
 
 class PlaceSearchPage extends StatefulWidget {
   //StatefulWidgetは状態を持つWidget。検索結果を表示するために必要。
@@ -54,22 +55,14 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                   searchText = text;
                 });
                 _searchShops(text);
-                _getHpShopListFromName(text).then((list) {
-                  setState(() {
-                    hpShopList = list;
-                  });
-                });
+                _searchHPShop(text);
               },
               onSubmitted: (text) {
                 setState(() {
                   searchText = text;
                 });
                 _searchShops(text);
-                _getHpShopListFromName(text).then((list) {
-                  setState(() {
-                    hpShopList = list;
-                  });
-                });
+                _searchHPShop(text);
               },
             ),
             const SizedBox(
@@ -109,14 +102,14 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                   },
                 ),
               ),
-            if ((hpShopList?.isNotEmpty??true) && shopList.isNotEmpty&&searchText.isNotEmpty) ...[
+            if ((hpShopList?.isNotEmpty ?? true) && shopList.isNotEmpty && searchText.isNotEmpty) ...[
               const Divider(
                 height: 32,
                 color: Colors.black54,
               ),
             ],
             //新規飲食店
-            if ((hpShopList?.isNotEmpty??true) &&searchText.isNotEmpty) ...[
+            if ((hpShopList?.isNotEmpty ?? true) && searchText.isNotEmpty) ...[
               Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Text(
@@ -132,10 +125,10 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
               ),
             ],
             //検索結果が多すぎる場合
-            if (hpShopList==null&&searchText.isNotEmpty)
+            if (hpShopList == null && searchText.isNotEmpty)
               const Center(
                 child: Text(
-                  '検索結果が多すぎます',
+                  "検索中..",
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey,
@@ -226,37 +219,48 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
   }
 
   http.Client client = http.Client(); // HTTPクライアントを格納する
+  CancelableOperation? _cancelableOperation;
 
   //店名からHotPepperの店舗一覧を取得,検索バーに入力するたびに呼び出す
-  Future<List<HotPepperShop>?> _getHpShopListFromName(String name) async {
+  Future<void> _searchHPShop(String name) async {
     //全角空白を半角空白に変換
     name = name.replaceAll(RegExp(r'　'), ' ');
     const String apiKey = String.fromEnvironment("HOTPEPPER_API_KEY");
-    final String apiUrl = 'http://webservice.recruit.co.jp/hotpepper/shop/v1?key=$apiKey&keyword=$name&format=json';
+    final String apiUrl = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=$apiKey&keyword=$name&format=json';
     try {
-      final response = await client.get(Uri.parse(apiUrl));
-
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        if (responseData['results']['shop'] != null) {
-          final List<HotPepperShop> shops = [];
-          for (var shop in responseData['results']['shop']) {
-            shops.add(HotPepperShop(hpID: shop['id'], name: shop['name'], address: shop['address']));
+      _cancelableOperation?.cancel();
+      _cancelableOperation = CancelableOperation.fromFuture(
+        client.get(Uri.parse(apiUrl)),
+      ).then((response) {
+        if (response.statusCode == 200) {
+          final responseData = json.decode(response.body);
+          if (responseData['results']['shop'] != null) {
+            final List<HotPepperShop> shops = [];
+            for (var shop in responseData['results']['shop']) {
+              shops.add(HotPepperShop(hpID: shop['id'], name: shop['name'], address: shop['address']));
+            }
+            setState(() {
+              hpShopList = shops;
+            });
+          } else {
+            setState(() {
+              hpShopList = [];
+            });
           }
-          return shops;
         } else {
-          final String errorMsg = responseData['results']['error'][0]['message'];
-          if (errorMsg == "条件を絞り込んでください。") {
-            return null; //検索結果が多すぎ
-          }
-          return [];
+          setState(() {
+            hpShopList = [];
+          });
         }
-      } else {
-        return [];
-      }
+      });
     } catch (e) {
-      return [];
+      setState(() {
+        hpShopList = [];
+      });
     }
+    setState(() {
+      hpShopList = null;
+    });
   }
 
   //HotPepperのIdから緯度経度を取得,項目タップ時に呼び出す
@@ -264,6 +268,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
     const String apiKey = String.fromEnvironment("HOTPEPPER_API_KEY");
     final String apiUrl = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=$apiKey&id=$id&format=json';
     try {
+      _cancelableOperation?.cancel();
       final response = await client.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {
         final responseData = json.decode(response.body);
