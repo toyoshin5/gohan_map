@@ -1,24 +1,27 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
-import 'dart:ffi';
+import 'dart:math';
 
-import 'package:flutter/Cupertino.dart';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
+
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
 import 'package:gohan_map/model/hotpepper_shop.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
-import 'package:latlong2/latlong.dart';
 
 import '../component/app_search_bar.dart';
 
-import 'package:http/http.dart' as http;
-
-import 'package:async/async.dart';
-
 class PlaceSearchPage extends StatefulWidget {
   //StatefulWidgetは状態を持つWidget。検索結果を表示するために必要。
-  const PlaceSearchPage({Key? key}) : super(key: key);
+  final LatLng mapCenter;
+  const PlaceSearchPage({
+    Key? key,
+    required this.mapCenter,
+  }) : super(key: key);
 
   @override
   State<PlaceSearchPage> createState() => _PlaceSearchPageState();
@@ -149,31 +152,9 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                   titleTextStyle: const TextStyle(fontSize: 18, color: AppColors.blackTextColor, overflow: TextOverflow.ellipsis),
                   subtitle: Text(hpShop.address),
                   subtitleTextStyle: const TextStyle(overflow: TextOverflow.ellipsis),
-                  onTap: () => _getLatlngFromHpId(hpShop.hpID).then((latlng) {
-                    if (latlng != null) {
-                      hpShop.latlng = latlng;
-                      Navigator.pop(context, hpShop);
-                    } else {
-                      //Cupertinoアラートを表示
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return CupertinoAlertDialog(
-                            title: const Text('エラー'),
-                            content: const Text('飲食店の詳細情報を取得できませんでした。'),
-                            actions: [
-                              CupertinoDialogAction(
-                                child: const Text('OK'),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    }
-                  }),
+                  onTap: () {
+                    Navigator.pop(context, hpShop);
+                  },
                 ),
               ),
             //クレジット
@@ -190,7 +171,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                 ),
               ),
             //検索結果なし
-            if (((hpShopList?.isEmpty)??false) && shopList.isEmpty)
+            if (((hpShopList?.isEmpty) ?? false) && shopList.isEmpty)
               const Center(
                 child: Text(
                   '検索結果がありません',
@@ -235,10 +216,12 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
         if (response.statusCode == 200) {
           final responseData = json.decode(response.body);
           if (responseData['results']['shop'] != null) {
-            final List<HotPepperShop> shops = [];
+            List<HotPepperShop> shops = [];
             for (var shop in responseData['results']['shop']) {
-              shops.add(HotPepperShop(hpID: shop['id'], name: shop['name'], address: shop['address']));
+              shops.add(HotPepperShop(hpID: shop['id'], name: shop['name'], address: shop['address'], latlng: LatLng(shop['lat'], shop['lng'])));
             }
+            //距離順に並び替え
+            shops = _sortByDist(shops, widget.mapCenter);
             setState(() {
               hpShopList = shops;
             });
@@ -263,28 +246,34 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
     });
   }
 
-  //HotPepperのIdから緯度経度を取得,項目タップ時に呼び出す
-  Future<LatLng?> _getLatlngFromHpId(String id) async {
-    const String apiKey = String.fromEnvironment("HOTPEPPER_API_KEY");
-    final String apiUrl = 'http://webservice.recruit.co.jp/hotpepper/gourmet/v1/?key=$apiKey&id=$id&format=json';
-    try {
-      _cancelableOperation?.cancel();
-      final response = await client.get(Uri.parse(apiUrl));
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final double? lat = responseData['results']['shop'][0]['lat'];
-        final double? lng = responseData['results']['shop'][0]['lng'];
-        if (lat != null && lng != null) {
-          final LatLng latlng = LatLng(lat, lng);
-          return latlng;
-        } else {
-          return null;
-        }
-      } else {
-        return null;
-      }
-    } catch (e) {
-      return null;
-    }
+  //HotPepperAPIから取得した店舗を距離順に並び替える関数
+  List<HotPepperShop> _sortByDist(List<HotPepperShop> shops, LatLng point) {
+    shops.sort((a, b) {
+      double distA = _calculateDistance(a.latlng, point);
+      double distB = _calculateDistance(b.latlng, point);
+      return distA.compareTo(distB);
+    });
+    return shops;
   }
+
+  //2点間の緯度経度の直線を計算する関数
+  double _calculateDistance(LatLng a, LatLng b) {
+    double earthRadius = 6371000; //m
+    double latDiff = _degreesToRadians(b.latitude - a.latitude);
+    double lonDiff = _degreesToRadians(b.longitude - a.longitude);
+
+    double aLat = _degreesToRadians(a.latitude);
+    double bLat = _degreesToRadians(b.latitude);
+
+    double haversine = pow(sin(latDiff / 2), 2) + cos(aLat) * cos(bLat) * pow(sin(lonDiff / 2), 2);
+    double distance = 2 * earthRadius * asin(sqrt(haversine));
+    return distance;
+  }
+
+  //度数法から弧度法に変換
+  double _degreesToRadians(double degrees) {
+    return degrees * (pi / 180);
+  }
+
+
 }

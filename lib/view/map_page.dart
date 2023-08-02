@@ -165,7 +165,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder: (context) {
-                return const PlaceSearchPage(); //飲食店を検索する画面
+                final mapCenter = mapController.center;
+                return PlaceSearchPage(mapCenter: mapCenter); //飲食店を検索する画面
               },
             ).then(
               (value) {
