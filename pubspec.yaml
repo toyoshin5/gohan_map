@@ -53,6 +53,7 @@ dependencies:
   flutter_compass: ^0.7.0
   flutter_native_splash: ^2.3.1
   flutter_haptic: ^0.0.3
+  shared_preferences: ^2.2.0
 
 dev_dependencies:
   flutter_test:

@@ -7,7 +7,9 @@ import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_direction_light.dart';
+import 'package:gohan_map/view/change_map_page.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -29,6 +31,8 @@ class AppMap extends StatefulWidget {
 
 class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
   LatLng? currentPosition;
+  //SharedPreferencesから現在適応中のmaptile読み込む
+  late String currentTileURL;
   late StreamSubscription<Position> positionStream;
   bool isCurrentLocation = true;
 
@@ -43,6 +47,12 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     init();
+    //MapTileの読み込み
+    SharedPreferences.getInstance().then((pref) {
+      setState(() {
+        currentTileURL = pref.getString("currentTileURL") ?? "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
+      });
+    });
     //アニメーションの定義
     plMarkerController = AnimationController(vsync: this, duration: const Duration(seconds: 5));
     const shrinkSize = 0.8;
@@ -138,7 +148,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 ],
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                    urlTemplate: currentTileURL,
                   ),
                   if (widget.pins != null)
                     MarkerLayer(
@@ -155,33 +165,77 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 ],
               );
             }),
-        //現在地に戻るボタン
+        //右下のボタン
         Positioned(
           bottom: 120,
           right: 20,
-          child: SizedBox(
-            width: 44,
-            height: 44,
-            child: ElevatedButton(
-              //角丸で白
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(0),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
+          child: Column(
+            children: [
+              //現在地に戻るボタン
+              SizedBox(
+                width: 44,
+                height: 44,
+                child: ElevatedButton(
+                  //角丸で白
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(0),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.blueTextColor,
+                  ),
+                  onPressed: () {
+                    Future.delayed(const Duration(milliseconds: 600)).then((_) {
+                      setState(() {
+                        isCurrentLocation = true;
+                      });
+                    });
+                    _animatedMapMove(currentPosition!, 15);
+                  },
+                  child: Icon((isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
                 ),
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.blueTextColor,
               ),
-              onPressed: () {
-                Future.delayed(const Duration(milliseconds: 600)).then((_) {
-                  setState(() {
-                    isCurrentLocation = true;
-                  });
-                });
-                _animatedMapMove(currentPosition!, 15);
-              },
-              child: Icon((isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
-            ),
+              const SizedBox(
+                height: 8,
+              ),
+              //地図を切り替えるボタン
+              SizedBox(
+                width: 44,
+                height: 44,
+                child: ElevatedButton(
+                  //角丸で白
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(0),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.blueTextColor,
+                  ),
+                  onPressed: () {
+                    showModalBottomSheet(
+                      barrierColor: Colors.black.withOpacity(0),
+                      context: context,
+                      isDismissible: true,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) {
+                        return ChangeMapPage(currentTileURL: currentTileURL);
+                      },
+                    ).then((value) {
+                      //MapTileの読み込み
+                      SharedPreferences.getInstance().then((pref) {
+                        setState(() {
+                          currentTileURL = pref.getString("currentTileURL") ?? "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
+                        });
+                      });
+                    });
+                  },
+                  child: const Icon(Icons.map_rounded),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -294,8 +348,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
   }
 
   //緯度でソート(南のピンが上に来るようにする)
-  List<Marker>? sortByLat(List<Marker>? pins){
-    if(widget.pins == null){
+  List<Marker>? sortByLat(List<Marker>? pins) {
+    if (widget.pins == null) {
       return null;
     }
     widget.pins!.sort((a, b) => b.point.latitude.compareTo(a.point.latitude));
