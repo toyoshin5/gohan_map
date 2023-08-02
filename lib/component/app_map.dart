@@ -118,7 +118,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   enableMultiFingerGestureRace: true,
                   onLongPress: widget.onLongPress,
                   onPositionChanged: (position, hasGesture) {
-                    if (hasGesture && isCurrentLocation) {
+                    if (isCurrentLocation = true) {
                       setState(() {
                         isCurrentLocation = false;
                       });
@@ -173,8 +173,10 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 foregroundColor: AppColors.blueTextColor,
               ),
               onPressed: () {
-                setState(() {
-                  isCurrentLocation = true;
+                Future.delayed(const Duration(milliseconds: 600)).then((_) {
+                  setState(() {
+                    isCurrentLocation = true;
+                  });
                 });
                 _animatedMapMove(currentPosition!, 15);
               },
