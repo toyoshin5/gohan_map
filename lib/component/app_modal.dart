@@ -16,12 +16,14 @@ class AppModal extends StatefulWidget {
   final double maxChildSize; //最大の大きさが画面の高さの何倍か
   final bool showKnob; //つまみを表示するか
   final bool avoidKeyboardFlg; //キーボードを避けるかどうか
+  final Color backgroundColor;
   const AppModal({
     this.initialChildSize = 0.4,
     this.minChildSize = 0.2,
     this.maxChildSize = 0.9,
     this.showKnob = true,
     this.avoidKeyboardFlg = false,
+    this.backgroundColor = AppColors.backgroundModalColor,
     required this.child,
     Key? key,
   }) : super(key: key);
@@ -31,14 +33,13 @@ class AppModal extends StatefulWidget {
 }
 
 class _AppModalState extends State<AppModal> {
-  final DraggableScrollableController controller = DraggableScrollableController();
+  final DraggableScrollableController controller =
+      DraggableScrollableController();
 
   @override
   Widget build(BuildContext context) {
     //modalの高さをNavigationBarに合わせる
     var ratio = 0.0;
-    var displayHeight = MediaQuery.of(context).size.height;
-    var navigationBarHeight = 22;
 
     // if (maxChildSize == 1) {
     //   ratio = (displayHeight - navigationBarHeight) / displayHeight;
@@ -62,11 +63,7 @@ class _AppModalState extends State<AppModal> {
             child: Container(
               //モーダルの中身
               decoration: BoxDecoration(
-                color: AppColors.backgroundModalColor,
-                border: Border.all(
-                  color: AppColors.backgroundGrayColor,
-                  width: 1,
-                ),
+                color: widget.backgroundColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
@@ -81,7 +78,12 @@ class _AppModalState extends State<AppModal> {
                 child: BackdropFilter(
                   //ぼかすためのウィジェット
                   filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                  child: _ChildScrollView(draggableController: controller, scrollController: scrollController, avoidKeyboard: widget.avoidKeyboardFlg, showKnob: widget.showKnob, child: widget.child),
+                  child: _ChildScrollView(
+                      draggableController: controller,
+                      scrollController: scrollController,
+                      avoidKeyboard: widget.avoidKeyboardFlg,
+                      showKnob: widget.showKnob,
+                      child: widget.child),
                 ),
               ),
             ),
@@ -148,7 +150,8 @@ class _ChildScrollViewState extends State<_ChildScrollView> {
         // フォーカスが外れた場合の処理
         widget.scrollController
             .animateTo(
-          widget.scrollController.position.maxScrollExtent - _avoidKeyboardPadding,
+          widget.scrollController.position.maxScrollExtent -
+              _avoidKeyboardPadding,
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
         )
