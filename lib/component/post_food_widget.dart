@@ -122,10 +122,10 @@ class _ImgSectionState extends State<_ImgSection> {
                               setState(() {
                                 isSelecting = true;
                               });
-                              await takePhoto();
                               if (mounted) {
                                 Navigator.pop(context);
                               }
+                              await takePhoto();
                             },
                             child: const Text('カメラで撮影'),
                           ),
@@ -134,10 +134,10 @@ class _ImgSectionState extends State<_ImgSection> {
                               setState(() {
                                 isSelecting = true;
                               });
-                              await pickImage();
                               if (mounted) {
                                 Navigator.pop(context);
                               }
+                              await pickImage();
                             },
                             child: const Text('アルバムから選択'),
                           ),

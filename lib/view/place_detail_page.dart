@@ -266,6 +266,15 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                                             fontSize: 14,
                                             color: Colors.black38),
                                       ),
+                                      if (timeline.umai)
+                                        const Padding(
+                                          padding: EdgeInsets.only(left: 12),
+                                          child: Icon(
+                                            Icons.thumb_up,
+                                            size: 18,
+                                            color: Color(0xFF2196F3),
+                                          ),
+                                        ),
                                     ],
                                   ),
                                   PullDownButton(
