@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
@@ -354,8 +355,8 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                     ],
                   )),
               if (timeline.image != null && timeline.image!.isNotEmpty)
-                Image.memory(
-                  base64Decode(timeline.image!),
+                Image.file(
+                  File(timeline.image),
                   fit: BoxFit.fitWidth,
                 ),
               const Divider(

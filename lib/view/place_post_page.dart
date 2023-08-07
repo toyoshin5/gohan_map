@@ -39,10 +39,12 @@ class _PlacePostPageState extends State<PlacePostPage> {
     Future(() async {
       if (widget.timeline != null) {
         // 編集画面
-        image = await base64ImageToFile(widget.timeline?.image);
-        isUmai = widget.timeline?.umai ?? false;
-        date = widget.timeline?.date ?? DateTime.now();
-        comment = widget.timeline?.comment ?? "";
+        image = widget.timeline!.image != null
+            ? File(widget.timeline!.image!)
+            : null;
+        isUmai = widget.timeline!.umai;
+        date = widget.timeline!.date;
+        comment = widget.timeline!.comment;
       }
       setState(() {
         // reload
@@ -222,9 +224,9 @@ class _PlacePostPageState extends State<PlacePostPage> {
 
   //DBに店を新規登録
   Future<void> _addToDB() async {
-    final base64Img = await fileToBase64(image);
+    String? imagePath = await saveImageFile(image);
     final timeline = Timeline()
-      ..image = base64Img
+      ..image = imagePath
       ..comment = comment
       ..umai = isUmai
       ..createdAt = DateTime.now()
@@ -243,10 +245,10 @@ class _PlacePostPageState extends State<PlacePostPage> {
 
   //DBに店を新規登録
   Future<void> _updateTimeline() async {
-    final base64Img = await fileToBase64(image);
+    String? imagePath = await saveImageFile(image);
     final timeline = Timeline()
       ..id = widget.timeline!.id
-      ..image = base64Img
+      ..image = imagePath
       ..comment = comment
       ..umai = isUmai
       ..createdAt = widget.timeline!.createdAt

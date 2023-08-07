@@ -342,9 +342,10 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       ..updatedAt = DateTime.now();
     final shopId = await IsarUtils.createShop(shop);
     if (initialPostFlg) {
-      final base64Img = await fileToBase64(image);
+      String? imagePath = await saveImageFile(image);
+
       final timeline = Timeline()
-        ..image = base64Img
+        ..image = imagePath
         ..comment = comment
         ..umai = isUmai
         ..createdAt = DateTime.now()
