@@ -8,6 +8,7 @@ import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
 import 'package:gohan_map/utils/common.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:path/path.dart' as p;
 
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
@@ -40,7 +41,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
       if (widget.timeline != null) {
         // 編集画面
         image = widget.timeline!.image != null
-            ? File(widget.timeline!.image!)
+            ? File(p.join(await getLocalPath(), widget.timeline!.image!))
             : null;
         isUmai = widget.timeline!.umai;
         date = widget.timeline!.date;

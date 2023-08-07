@@ -244,7 +244,8 @@ class _ImgSectionState extends State<_ImgSection> {
 
   Future takePhoto() async {
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      final image = await ImagePicker()
+          .pickImage(source: ImageSource.camera, maxWidth: 1200);
       // 画像がnullの場合戻る
       if (image == null) return;
 
@@ -261,7 +262,9 @@ class _ImgSectionState extends State<_ImgSection> {
   // 画像をギャラリーから選ぶ関数
   Future pickImage() async {
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final image = await ImagePicker()
+          .pickImage(source: ImageSource.gallery, maxWidth: 1200);
+
       // 画像がnullの場合戻る
       if (image == null) return;
 
