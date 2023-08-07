@@ -78,8 +78,12 @@ class IsarUtils {
   // timelineの取得
   static Future<List<Timeline>> getTimelinesByShopId(int shopId) async {
     await ensureInitialized();
-    final timelines =
-        await isar!.timelines.where().shopIdEqualTo(shopId).findAll();
+    final timelines = await isar!.timelines
+        .where()
+        .shopIdEqualTo(shopId)
+        .sortByDateDesc()
+        .thenByCreatedAt()
+        .findAll();
     return timelines.toList();
   }
 

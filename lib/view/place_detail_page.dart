@@ -230,7 +230,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
             thickness: 1,
             height: 1,
           ),
-          for (var timeline in (shopTimeline ?? []).reversed)
+          for (var timeline in (shopTimeline ?? []))
             Column(children: [
               Card(
                   shape: RoundedRectangleBorder(
