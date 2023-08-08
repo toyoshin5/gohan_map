@@ -58,15 +58,12 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Text(
-                                selectedShop?.shopName ?? '',
-                                style: const TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                          Flexible(
+                              child: Text(
+                            selectedShop?.shopName ?? '',
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
+                          )),
                           SizedBox(
                             height: 30,
                             width: 30,
@@ -83,6 +80,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                             ),
                           ),
                         ]),
+                    const Padding(padding: EdgeInsets.only(top: 5)),
                     Row(
                       children: [
                         const Icon(
@@ -90,10 +88,12 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                           color: Colors.blue,
                         ),
                         const Padding(padding: EdgeInsets.only(right: 5)),
-                        Text(
-                          selectedShop?.shopAddress ?? '',
-                          style: const TextStyle(fontSize: 12),
-                        ),
+                        Flexible(
+                          child: Text(
+                            selectedShop?.shopAddress ?? '',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        )
                       ],
                     ),
                     Padding(
