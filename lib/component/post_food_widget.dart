@@ -3,14 +3,15 @@ import 'dart:math';
 
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:exif/exif.dart';
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter/services.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 
-//白い枠で囲まれた、投稿内容を入力する部分
-class PostFoodWidget extends StatelessWidget {
+class PostFoodWidget extends StatefulWidget {
   const PostFoodWidget({
     Key? key,
     this.initialImage,
@@ -36,6 +37,23 @@ class PostFoodWidget extends StatelessWidget {
   final Function(String) onCommentChanged;
 
   final Function(bool)? onCommentFocusChanged;
+
+  @override
+  State<PostFoodWidget> createState() => _PostFoodWidgetState();
+}
+
+//白い枠で囲まれた、投稿内容を入力する部分
+class _PostFoodWidgetState extends State<PostFoodWidget> {
+  TextEditingController dateController = TextEditingController();
+
+  @override
+  void initState() {
+    dateController.text = widget.initialDate != null
+        ? widget.initialDate.toString()
+        : DateTime.now().toString();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -49,34 +67,46 @@ class PostFoodWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _ImgSection(
-            initialImage: initialImage,
-            onChanged: onImageChanged,
-          ),
+              initialImage: widget.initialImage,
+              onChanged: widget.onImageChanged,
+              onDateTimeChanged: (DateTime dateTime) {
+                dateController.value =
+                    dateController.value.copyWith(text: dateTime.toString());
+                widget.onDateChanged(dateTime);
+              }),
           UmaiButton(
-            initialIsUmai: initialIsUmai,
-            onChanged: onUmaiChanged,
+            initialIsUmai: widget.initialIsUmai,
+            onChanged: widget.onUmaiChanged,
           ),
           _DateSection(
-            initialDate: initialDate,
-            onChanged: onDateChanged,
+            controller: dateController,
+            onChanged: widget.onDateChanged,
           ),
           _CommentSection(
-            initialComment: initialComment,
-            onChanged: onCommentChanged,
-            onFocusChanged: onCommentFocusChanged,
+            initialComment: widget.initialComment,
+            onChanged: widget.onCommentChanged,
+            onFocusChanged: widget.onCommentFocusChanged,
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    dateController.dispose();
+    super.dispose();
   }
 }
 
 class _ImgSection extends StatefulWidget {
   final File? initialImage;
   final Function(File?) onChanged;
+  final Function(DateTime) onDateTimeChanged;
   const _ImgSection({
     this.initialImage,
     required this.onChanged,
+    required this.onDateTimeChanged,
   });
 
   @override
@@ -122,10 +152,10 @@ class _ImgSectionState extends State<_ImgSection> {
                               setState(() {
                                 isSelecting = true;
                               });
-                              await takePhoto();
                               if (mounted) {
                                 Navigator.pop(context);
                               }
+                              await takePhoto();
                             },
                             child: const Text('カメラで撮影'),
                           ),
@@ -134,10 +164,10 @@ class _ImgSectionState extends State<_ImgSection> {
                               setState(() {
                                 isSelecting = true;
                               });
-                              await pickImage();
                               if (mounted) {
                                 Navigator.pop(context);
                               }
+                              await pickImage();
                             },
                             child: const Text('アルバムから選択'),
                           ),
@@ -214,7 +244,8 @@ class _ImgSectionState extends State<_ImgSection> {
 
   Future takePhoto() async {
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.camera);
+      final image = await ImagePicker()
+          .pickImage(source: ImageSource.camera, maxWidth: 1200);
       // 画像がnullの場合戻る
       if (image == null) return;
 
@@ -231,11 +262,22 @@ class _ImgSectionState extends State<_ImgSection> {
   // 画像をギャラリーから選ぶ関数
   Future pickImage() async {
     try {
-      final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final image = await ImagePicker()
+          .pickImage(source: ImageSource.gallery, maxWidth: 1200);
+
       // 画像がnullの場合戻る
       if (image == null) return;
 
       final imageTemp = File(image.path);
+      // 撮影日を読み取る
+      final tags = await readExifFromBytes(await imageTemp.readAsBytes());
+      if (tags.containsKey("Image DateTime")) {
+        // フォーマットが全デバイスで正しいのかは検討
+        var imageDateTime = DateFormat("yyyy:MM:dd HH:mm:ss")
+            .parse(tags["Image DateTime"].toString());
+        widget.onDateTimeChanged(imageDateTime);
+      }
+
       widget.onChanged(imageTemp);
       setState(() {
         this.image = imageTemp;
@@ -325,11 +367,11 @@ class _UmaiButtonState extends State<UmaiButton> {
 class _DateSection extends StatelessWidget {
   const _DateSection({
     super.key,
-    this.initialDate,
+    required this.controller,
     required this.onChanged,
   });
 
-  final DateTime? initialDate;
+  final TextEditingController controller;
   final Function(DateTime) onChanged;
 
   @override
@@ -350,9 +392,7 @@ class _DateSection extends StatelessWidget {
         dateMask: 'yyyy/MM/dd',
         //icon: Icon(Icons.watch_later_outlined),
         dateLabelText: '訪問日',
-        initialValue: initialDate != null
-            ? initialDate.toString()
-            : DateTime.now().toString(),
+        controller: controller,
         use24HourFormat: true,
         onChanged: (value) {
           onChanged(DateTime.parse(value));

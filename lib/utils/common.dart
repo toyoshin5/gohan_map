@@ -2,6 +2,10 @@ import 'dart:io';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
+import 'package:path/path.dart' as p;
+
+const foodImageFolderName = "food_images";
 
 // 画像をbase64に変換する関数
 Future<String> fileToBase64(File? file) async {
@@ -29,7 +33,37 @@ Future<File?> base64ImageToFile(String? base64Image) async {
   return localFile;
 }
 
-Future<String> get getLocalPath async {
+Future<String> getLocalPath() async {
   final directory = await getApplicationDocumentsDirectory();
   return directory.path;
+}
+
+Future<String?> saveImageFile(File? image) async {
+  if (image == null) return null;
+
+  final name = Uuid().v1() + p.extension(image.path);
+  // localPathはデバック毎に変わるので、DBに保存するパスは相対部分のみ
+  final imagePath = "$foodImageFolderName/$name";
+  final dir = Directory(p.join(await getLocalPath(), foodImageFolderName));
+  if (await dir.exists() == false) {
+    await dir.create();
+  }
+  var imageFile = File(p.join(await getLocalPath(), imagePath));
+  await imageFile.writeAsBytes(await image.readAsBytes());
+
+  return imagePath;
+}
+
+Future deleteImageFile(String? localImagePath) async {
+  if (localImagePath == null) return;
+
+  final dir = Directory(p.join(await getLocalPath(), foodImageFolderName));
+  if (await dir.exists() == false) {
+    await dir.create();
+  }
+
+  var file = File(p.join(await getLocalPath(), localImagePath));
+  if (file.existsSync()) {
+    file.delete();
+  }
 }

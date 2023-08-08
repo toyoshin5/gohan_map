@@ -1,3 +1,4 @@
+import 'package:gohan_map/utils/common.dart';
 import 'package:kana_kit/kana_kit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
@@ -68,9 +69,11 @@ class IsarUtils {
   // shopの削除
   static Future<void> deleteShop(Id id) async {
     await ensureInitialized();
+    // timelineの削除(画像ファイルを削除するため、関数経由する)
+    (await getTimelinesByShopId(id)).forEach((element) {
+      deleteTimeline(element.id);
+    });
     await isar!.writeTxn(() async {
-      // timelineの削除
-      await isar!.timelines.where().shopIdEqualTo(id).deleteAll();
       await isar!.shops.delete(id);
     });
   }
@@ -78,14 +81,24 @@ class IsarUtils {
   // timelineの取得
   static Future<List<Timeline>> getTimelinesByShopId(int shopId) async {
     await ensureInitialized();
-    final timelines =
-        await isar!.timelines.where().shopIdEqualTo(shopId).findAll();
+    final timelines = await isar!.timelines
+        .where()
+        .shopIdEqualTo(shopId)
+        .sortByDateDesc()
+        .thenByCreatedAt()
+        .findAll();
     return timelines.toList();
   }
 
   // timelineの作成・更新
   static Future<void> createTimeline(Timeline timeline) async {
     await ensureInitialized();
+    var beforeTimeline =
+        await isar!.timelines.where().idEqualTo(timeline.id).findFirst();
+    // 編集の場合、既存の画像ファイルを先に削除する
+    if (beforeTimeline != null) {
+      deleteImageFile(beforeTimeline.image);
+    }
     await isar!.writeTxn(() async {
       await isar!.timelines.put(timeline);
     });
@@ -94,6 +107,12 @@ class IsarUtils {
   // timelineの削除
   static Future<void> deleteTimeline(Id id) async {
     ensureInitialized();
+    var beforeTimeline =
+        await isar!.timelines.where().idEqualTo(id).findFirst();
+    // 画像ファイルを先に削除する
+    if (beforeTimeline != null) {
+      deleteImageFile(beforeTimeline.image);
+    }
     await isar!.writeTxn(() async {
       await isar!.timelines.delete(id);
     });
