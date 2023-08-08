@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
@@ -57,6 +56,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   children: [
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Flexible(
                               child: Text(
@@ -102,7 +102,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                       child: Row(children: [
                         Text(
                           selectedShop?.shopStar.toString() ?? "",
-                          style: TextStyle(color: Colors.black38),
+                          style: const TextStyle(color: Colors.black38),
                         ),
                         const Padding(
                           padding: EdgeInsets.only(right: 4),
@@ -172,8 +172,8 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                                   padding: EdgeInsets.only(right: 30)),
                               TextButton(
                                 style: TextButton.styleFrom(
-                                    fixedSize: Size(140, 50),
-                                    backgroundColor: Color(0xFF2196F3),
+                                    fixedSize: const Size(140, 50),
+                                    backgroundColor: const Color(0xFF2196F3),
                                     foregroundColor: Colors.white,
                                     alignment: Alignment.centerLeft,
                                     shape: const StadiumBorder()),
