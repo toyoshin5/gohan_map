@@ -116,6 +116,9 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
                   subtitle: Text(shop.address),
                   subtitleTextStyle:
                       const TextStyle(overflow: TextOverflow.ellipsis),
+                  onTap: () {
+                    Navigator.pop(context, shop);
+                  },
                 ),
               ),
           ],
