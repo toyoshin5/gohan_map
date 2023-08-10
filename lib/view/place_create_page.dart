@@ -48,7 +48,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   @override
   Widget build(BuildContext context) {
     return AppModal(
-      initialChildSize: 0.6,
+      initialChildSize: 0.7,
       avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),

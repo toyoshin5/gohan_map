@@ -50,7 +50,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
   Widget build(BuildContext context) {
     return AppModal(
       showKnob: false,
-      initialChildSize: 0.6,
+      initialChildSize: 0.9,
       child: Padding(
         //余白を作るためのウィジェット
         padding: const EdgeInsets.symmetric(
@@ -123,6 +123,8 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
   }
 
   void _searchRestaurantsByGoogleApi() async {
+    if (searchText == "") return; // 空文字ではリクエストを送らない
+
     setState(() {
       isLoadingPlaceApi = true;
       placeApiRestaurants = [];
