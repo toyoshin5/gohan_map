@@ -24,15 +24,24 @@ class PlaceSearchPage extends StatefulWidget {
   State<PlaceSearchPage> createState() => _PlaceSearchPageState();
 }
 
-class _PlaceSearchPageState extends State<PlaceSearchPage> {
+class _PlaceSearchPageState extends State<PlaceSearchPage>
+    with TickerProviderStateMixin {
   String searchText = "";
   List<Shop> shopList = [];
   bool isLoadingPlaceApi = false;
   List<PlaceApiRestaurantResult> placeApiRestaurants = [];
+  late TabController tabController;
 
   @override
   void initState() {
     super.initState();
+    tabController = TabController(length: 2, vsync: this);
+    // TabBarViewは要素の高さが固定出なければいけないので、使用しない
+    tabController.addListener(() {
+      setState(() {
+        // render
+      });
+    });
     _searchShops("");
   }
 
@@ -65,62 +74,35 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
             const SizedBox(
               height: 32,
             ),
-            const Text("登録済み"),
-            for (var shop in shopList)
-              Card(
-                //影付きの角丸四角形
-                elevation: 0, //影を消す
-                color: AppColors.backgroundWhiteColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), //角丸の大きさ
-                ),
-                child: ListTile(
-                  title: Text(shop.shopName),
-                  titleTextStyle: const TextStyle(
-                      fontSize: 18,
-                      color: AppColors.blackTextColor,
-                      overflow: TextOverflow.ellipsis),
-                  subtitle: Text(shop.shopAddress),
-                  subtitleTextStyle:
-                      const TextStyle(overflow: TextOverflow.ellipsis),
-                  onTap: () {
-                    Navigator.pop(context, shop.id);
-                  },
-                ),
+            Container(
+              color: Colors.white,
+              child: TabBar(
+                tabs: const [
+                  Tab(
+                    text: 'マップ付近の飲食店',
+                  ),
+                  Tab(text: '登録済み'),
+                ],
+                controller: tabController,
+                unselectedLabelColor: Colors.grey,
+                labelColor: Colors.black,
+                indicatorColor: Colors.blue,
+                indicatorSize: TabBarIndicatorSize.tab,
+                dividerColor: Colors.grey,
+                indicatorWeight: 2,
               ),
-            const SizedBox(
-              height: 32,
             ),
-            const Text("マップ付近の飲食店"),
-            if (isLoadingPlaceApi)
-              const Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(vertical: 14),
-                    child: CircularProgressIndicator(),
-                  )),
-            for (var shop in placeApiRestaurants)
-              Card(
-                //影付きの角丸四角形
-                elevation: 0, //影を消す
-                color: AppColors.backgroundWhiteColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8), //角丸の大きさ
-                ),
-                child: ListTile(
-                  title: Text(shop.name),
-                  titleTextStyle: const TextStyle(
-                      fontSize: 18,
-                      color: AppColors.blackTextColor,
-                      overflow: TextOverflow.ellipsis),
-                  subtitle: Text(shop.address),
-                  subtitleTextStyle:
-                      const TextStyle(overflow: TextOverflow.ellipsis),
-                  onTap: () {
-                    Navigator.pop(context, shop);
-                  },
-                ),
-              ),
+            const SizedBox(
+              height: 16,
+            ),
+
+            // マップ付近の飲食店
+            if (tabController.index == 0)
+              NewRestaurantsTabPage(
+                  restaurantList: placeApiRestaurants,
+                  isLoading: isLoadingPlaceApi),
+            // 登録済み
+            if (tabController.index == 1) RegisteredTabPage(shopList: shopList)
           ],
         ),
       ),
@@ -155,5 +137,97 @@ class _PlaceSearchPageState extends State<PlaceSearchPage> {
       isLoadingPlaceApi = false;
       placeApiRestaurants = restaurantsResult;
     });
+  }
+}
+
+class NewRestaurantsTabPage extends StatelessWidget {
+  final List<PlaceApiRestaurantResult> restaurantList;
+  final bool isLoading;
+
+  const NewRestaurantsTabPage(
+      {Key? key, required this.restaurantList, required this.isLoading})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (isLoading)
+          const Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.symmetric(vertical: 14),
+                child: CircularProgressIndicator(),
+              )),
+        if (!isLoading && restaurantList.isEmpty)
+          const Align(
+            alignment: Alignment.center,
+            child: Text("検索結果はありません"),
+          ),
+        for (var shop in restaurantList)
+          Card(
+            //影付きの角丸四角形
+            elevation: 0, //影を消す
+            color: AppColors.backgroundWhiteColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8), //角丸の大きさ
+            ),
+            child: ListTile(
+              title: Text(shop.name),
+              titleTextStyle: const TextStyle(
+                  fontSize: 18,
+                  color: AppColors.blackTextColor,
+                  overflow: TextOverflow.ellipsis),
+              subtitle: Text(shop.address),
+              subtitleTextStyle:
+                  const TextStyle(overflow: TextOverflow.ellipsis),
+              onTap: () {
+                Navigator.pop(context, shop);
+              },
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class RegisteredTabPage extends StatelessWidget {
+  final List<Shop> shopList;
+
+  const RegisteredTabPage({Key? key, required this.shopList}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        if (shopList.isEmpty)
+          const Align(
+            alignment: Alignment.center,
+            child: Text("検索結果はありません"),
+          ),
+        for (var shop in shopList)
+          Card(
+            //影付きの角丸四角形
+            elevation: 0, //影を消す
+            color: AppColors.backgroundWhiteColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8), //角丸の大きさ
+            ),
+            child: ListTile(
+              title: Text(shop.shopName),
+              titleTextStyle: const TextStyle(
+                  fontSize: 18,
+                  color: AppColors.blackTextColor,
+                  overflow: TextOverflow.ellipsis),
+              subtitle: Text(shop.shopAddress),
+              subtitleTextStyle:
+                  const TextStyle(overflow: TextOverflow.ellipsis),
+              onTap: () {
+                Navigator.pop(context, shop.id);
+              },
+            ),
+          ),
+      ],
+    );
   }
 }
