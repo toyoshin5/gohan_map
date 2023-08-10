@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:gohan_map/utils/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
@@ -49,7 +50,7 @@ Future<List<PlaceApiRestaurantResult>> searchRestaurantsByGoogleMapApi(
       result.add(PlaceApiRestaurantResult.fromJson(item));
     }
   } catch (e) {
-    print(e);
+    logger.e(e);
   }
 
   return result;

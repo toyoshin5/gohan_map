@@ -2,12 +2,13 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/utils/logger.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/map_page.dart';
 
 /// アプリが起動したときに呼ばれる
 void main() {
+  logger.i("start application!");
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
   ));

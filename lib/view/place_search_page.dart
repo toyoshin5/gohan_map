@@ -8,6 +8,7 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/utils/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
@@ -132,7 +133,8 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
       LatLng(widget.mapController.center.latitude,
           widget.mapController.center.longitude),
     );
-    print("API呼び出し"); // TODO: ロギングツールの導入を検討
+
+    logger.d("API呼び出し");
     setState(() {
       isLoadingPlaceApi = false;
       placeApiRestaurants = restaurantsResult;
