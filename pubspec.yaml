@@ -57,6 +57,7 @@ dependencies:
   exif: ^3.1.4
   uuid: ^3.0.7
   logger: ^2.0.1
+  bordered_text: ^2.0.0
 
 dev_dependencies:
   flutter_test:

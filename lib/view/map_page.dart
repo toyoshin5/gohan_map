@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -253,6 +254,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         anchorPos: AnchorPos.align(AnchorAlign.top),
         point: latLng,
         builder: (context) {
+          //ピンのデザイン
           return AnimatedContainer(
             duration: const Duration(milliseconds: 200),
             curve: Curves.easeInOut,
@@ -295,12 +297,16 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       Positioned(
                         left: 30,
                         top: 7,
-                        child: Text(
-                          shop.shopName,
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: shopMapPin.textColor),
+                        child: BorderedText(
+                          strokeWidth: 1.5,
+                          strokeColor: AppColors.backgroundWhiteColor,
+                          child: Text(
+                            shop.shopName,
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: shopMapPin.textColor),
+                          ),
                         ),
                       )
                   ],
