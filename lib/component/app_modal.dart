@@ -78,12 +78,25 @@ class _AppModalState extends State<AppModal> {
                 child: BackdropFilter(
                   //ぼかすためのウィジェット
                   filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                  child: _ChildScrollView(
-                      draggableController: controller,
-                      scrollController: scrollController,
-                      avoidKeyboard: widget.avoidKeyboardFlg,
-                      showKnob: widget.showKnob,
-                      child: widget.child),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.backgroundModalColor,
+                      border: Border.all(
+                      color: AppColors.backgroundGrayColor,
+                      width: 1,
+                      ),
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20.0),
+                        topRight: Radius.circular(20.0),
+                      ),
+                    ),
+                    child: _ChildScrollView(
+                        draggableController: controller,
+                        scrollController: scrollController,
+                        avoidKeyboard: widget.avoidKeyboardFlg,
+                        showKnob: widget.showKnob,
+                        child: widget.child),
+                  ),
                 ),
               ),
             ),
