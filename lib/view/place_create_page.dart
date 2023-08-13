@@ -20,10 +20,9 @@ import 'package:gohan_map/component/app_modal.dart';
 //飲食店の登録画面
 class PlaceCreatePage extends StatefulWidget {
   final LatLng latlng;
-  const PlaceCreatePage({
-    Key? key,
-    required this.latlng,
-  }) : super(key: key);
+  final String? initialShopName;
+  const PlaceCreatePage({Key? key, required this.latlng, this.initialShopName})
+      : super(key: key);
 
   @override
   State<PlaceCreatePage> createState() => _PlaceCreatePageState();
@@ -41,9 +40,15 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   bool avoidkeyBoard = false;
 
   @override
+  void initState() {
+    shopName = widget.initialShopName ?? "";
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AppModal(
-      initialChildSize: 0.6,
+      initialChildSize: 0.7,
       avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -55,6 +60,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _ShopNameTextField(
+                  initialShopName: shopName,
                   onChanged: (value) {
                     setState(() {
                       shopName = value;
@@ -385,16 +391,20 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
 
 //店名を入力するWidget
 class _ShopNameTextField extends StatelessWidget {
+  final Function(String) onChanged;
+  final String? initialShopName;
+
   const _ShopNameTextField({
     Key? key,
     required this.onChanged,
+    this.initialShopName,
   }) : super(key: key);
-  final Function(String) onChanged;
+
   @override
   Widget build(BuildContext context) {
     //角丸,白いぬりつぶし,枠線なし
     return Flexible(
-      child: TextField(
+      child: TextFormField(
         decoration: InputDecoration(
           hintText: '店名を入力',
           filled: true,
@@ -413,6 +423,7 @@ class _ShopNameTextField extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
+        initialValue: initialShopName,
         onChanged: onChanged,
       ),
     );

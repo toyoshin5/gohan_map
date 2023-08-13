@@ -10,6 +10,7 @@ import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
+import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/mapPins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
@@ -164,11 +165,20 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
               isScrollControlled: true,
               backgroundColor: Colors.transparent,
               builder: (context) {
-                return const PlaceSearchPage(); //飲食店を検索する画面
+                return PlaceSearchPage(
+                  mapController: mapController,
+                ); //飲食店を検索する画面
               },
             ).then(
-              (id) {
-                //検索画面で場所を選択した場合、選択した場所の詳細画面を表示する。
+              (value) {
+                //valueの型がInt→詳細画面
+                //int型ならそのまま、Id型ならばnullにしたい
+                int? id = (value is int) ? value : null;
+                //valueの型がHotPepper→検索から新規作成
+                PlaceApiRestaurantResult? paResult =
+                    (value is PlaceApiRestaurantResult) ? value : null;
+
+                //検索画面で追加済みの店を選択した場合、選択した場所の詳細画面を表示する。
                 if (id != null) {
                   setState(() {
                     tapFlgs[id] = true;
@@ -196,6 +206,32 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     }
                   });
                 }
+
+                //検索画面で新規店舗を選択した場合、新規作成画面を表示する。
+                if (paResult != null) {
+                  setState(() {
+                    //ピンを配置する
+                    _addPinToMap(paResult.latlng, null);
+                  });
+                  //mapをスクロールする
+                  final deviceHeight = MediaQuery.of(context).size.height;
+                  _moveToPin(paResult.latlng, deviceHeight * 0.2);
+                  showModalBottomSheet(
+                    barrierColor: Colors.black.withOpacity(0),
+                    isDismissible: true,
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) {
+                      return PlaceCreatePage(
+                        latlng: paResult.latlng,
+                        initialShopName: paResult.name,
+                      );
+                    },
+                  ).then((value) {
+                    _loadAllShop();
+                  });
+                }
               },
             );
           },
@@ -206,7 +242,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   //1つのピンを、地図に描画するための配列pinsに追加する関数
   void _addPinToMap(LatLng latLng, Shop? shop) {
-    const markerSize = 40.0;
+    const markerSize = 35.0;
     const imgRatio = 345 / 512;
     final shopMapPin = findPinByKind(shop?.shopMapIconKind);
 
@@ -257,11 +293,12 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         : 'images/pins/pin_default.png'),
                     if (shop != null && shopMapPin != null)
                       Positioned(
-                        left: 35,
+                        left: 30,
                         top: 7,
                         child: Text(
                           shop.shopName,
                           style: TextStyle(
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: shopMapPin.textColor),
                         ),

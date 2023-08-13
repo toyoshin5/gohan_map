@@ -61,7 +61,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
     }
 
     return AppModal(
-      initialChildSize: 0.6,
+      initialChildSize: 0.9,
       avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),

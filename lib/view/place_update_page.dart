@@ -50,7 +50,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   @override
   Widget build(BuildContext context) {
     return AppModal(
-      initialChildSize: 0.8,
+      initialChildSize: 0.9,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
@@ -401,33 +401,33 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
       context: context,
       builder: (context) {
         return CupertinoActionSheet(
-          title: const Text('店情報を削除しますか？'),
-          message: const Text("店に関する全ての投稿も削除されます。"),
-          actions: [
-            CupertinoActionSheetAction(
-              child: const Text(
-                '削除',
-                style: TextStyle(
-                    color: AppColors.redTextColor, fontWeight: FontWeight.bold),
+            title: const Text('店情報を削除しますか？'),
+            message: const Text("店に関する全ての投稿も削除されます。"),
+            actions: [
+              CupertinoActionSheetAction(
+                child: const Text(
+                  '削除',
+                  style: TextStyle(
+                      color: AppColors.redTextColor,
+                      fontWeight: FontWeight.bold),
+                ),
+                onPressed: () async {
+                  await IsarUtils.deleteShop(widget.shop.id);
+                  if (mounted) {
+                    setState(() {
+                      // reload
+                    });
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  }
+                },
               ),
-              onPressed: () async {
-                await IsarUtils.deleteShop(widget.shop.id);
-                if (mounted) {
-                  setState(() {
-                    // reload
-                  });
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
+            ],
+            cancelButton: CupertinoActionSheetAction(
+              child: const Text('キャンセル'),
+              onPressed: () {
+                Navigator.pop(context);
               },
-            ),
-          ],
-          cancelButton: CupertinoActionSheetAction(
-            child: const Text('キャンセル'),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          )
-        );
+            ));
       },
     );
   }

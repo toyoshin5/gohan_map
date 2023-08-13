@@ -48,6 +48,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
   Widget build(BuildContext context) {
     return AppModal(
         backgroundColor: Colors.white,
+        initialChildSize: 0.55,
         child: Column(children: [
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),

@@ -8,6 +8,7 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter/services.dart';
 import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/utils/logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
@@ -255,7 +256,7 @@ class _ImgSectionState extends State<_ImgSection> {
         this.image = imageTemp;
       });
     } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
+      logger.e('Failed to pick image: $e');
     }
   }
 
@@ -283,7 +284,7 @@ class _ImgSectionState extends State<_ImgSection> {
         this.image = imageTemp;
       });
     } on PlatformException catch (e) {
-      print('Failed to pick image: $e');
+      logger.e('Failed to pick image: $e');
     }
   }
 }
