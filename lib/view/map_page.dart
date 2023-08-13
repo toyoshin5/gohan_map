@@ -2,7 +2,6 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:bordered_text/bordered_text.dart';
-import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -34,7 +33,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
   Map<Id, bool> tapFlgs = {};
   List<Shop> shops = [];
   final MapController mapController = MapController();
-
   @override
   void initState() {
     super.initState();
@@ -254,6 +252,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         anchorPos: AnchorPos.align(AnchorAlign.top),
         point: latLng,
         builder: (context) {
+          //ラベルの表示判定に利用する文字長
+          int? textLen = shop?.shopName.replaceAll(RegExp(r'[^\x00-\x7F]'), '  ').length;//ASCII文字:1文字分、日本語:2文字分
           //ピンのデザイン
           return AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -293,7 +293,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     Image.asset(shopMapPin != null
                         ? shopMapPin.pinImagePath
                         : 'images/pins/pin_default.png'),
-                    if (shop != null && shopMapPin != null)
+                    if (shop != null && shopMapPin != null && _isShowShopName(shop, shops,textLen ?? 0))
                       Positioned(
                         left: 30,
                         top: 7,
@@ -317,7 +317,42 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     );
   }
 
-  //DBから飲食店の情報を全て取得してピンを配置する関数
+  //ピンにラベルを表示するかを判定する関数
+  bool _isShowShopName(Shop shop, List<Shop> shops, int textLen) {
+    //例外処理
+    var zoom = 15.0;
+    var rot = 0.0;
+    var rtnFlg = true;
+    try{
+      zoom = mapController.zoom;
+      rot = mapController.rotation;
+    }finally{
+      //1ピクセルあたりの緯度経度
+      var pixelPerLat = pow(2, zoom + 8) / 360;
+      var pixelPerLng =
+          pow(2, zoom + 8) / 360 * cos(shop.shopLatitude * pi / 180);
+      for (var s in shops) {
+        if (s.id != shop.id) {
+          //上下左右20,20,0,100pxの範囲に他のピンがある場合はラベルを表示しない
+          //緯度経度の差を計算
+          final latDiff = s.shopLatitude - shop.shopLatitude;
+          final lngDiff = s.shopLongitude - shop.shopLongitude;
+          //マップの回転を考慮しピクセルの差を計算
+          final pixelHDiff = latDiff * pixelPerLat * cos(rot * pi / 180) - lngDiff * pixelPerLng * sin(rot * pi / 180);
+          final pixelWDiff = latDiff * pixelPerLat * sin(rot * pi / 180) + lngDiff * pixelPerLng * cos(rot * pi / 180);
+          if (pixelHDiff < 10 && pixelHDiff > -10 && pixelWDiff < textLen*5 && pixelWDiff > 0) {
+            rtnFlg = false;
+            break;
+          }
+        }
+      }
+    }
+
+    return rtnFlg;
+  }
+
+
+  //DBから飲食店の情報を全て取得してピンを配置する関数。ラベルの表示するかも判定する。
   Future<void> _loadAllShop() async {
     shops = await IsarUtils.getAllShops();
     pins = [];
@@ -330,6 +365,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       // reload
     });
   }
+
+
 
   //modalから戻ってきたときに実行される関数
   void _onModalPop(dynamic value, int id) {
