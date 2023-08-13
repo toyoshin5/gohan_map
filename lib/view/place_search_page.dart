@@ -1,6 +1,4 @@
-import 'dart:convert';
-import 'dart:io';
-
+import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/collections/shop.dart';
@@ -9,7 +7,6 @@ import 'package:gohan_map/component/app_modal.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/logger.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 import '../component/app_search_bar.dart';
@@ -32,6 +29,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
   bool isLoadingPlaceApi = false;
   List<PlaceApiRestaurantResult> placeApiRestaurants = [];
   late TabController tabController;
+  int segmentIndex = 0; // 0: マップ付近の飲食店, 1: 登録済み
 
   @override
   void initState() {
@@ -73,37 +71,34 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
               },
             ),
             const SizedBox(
-              height: 32,
+              height: 24,
             ),
-            Container(
-              color: Colors.white,
-              child: TabBar(
-                tabs: const [
-                  Tab(
-                    text: 'マップ付近の飲食店',
-                  ),
-                  Tab(text: '登録済み'),
-                ],
-                controller: tabController,
-                unselectedLabelColor: Colors.grey,
-                labelColor: Colors.black,
-                indicatorColor: Colors.blue,
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.grey,
-                indicatorWeight: 2,
+
+            Center(
+              child: CupertinoSlidingSegmentedControl(
+                groupValue: segmentIndex,
+                children: const <int, Widget>{
+                  0: Text("マップ付近の飲食店"),
+                  1: Text("登録済み"),
+                },
+                onValueChanged: (value) {
+                  setState(() {
+                    segmentIndex = value as int;
+                  });
+                },
               ),
             ),
             const SizedBox(
-              height: 16,
+              height: 24,
             ),
 
             // マップ付近の飲食店
-            if (tabController.index == 0)
+            if (segmentIndex == 0)
               NewRestaurantsTabPage(
                   restaurantList: placeApiRestaurants,
                   isLoading: isLoadingPlaceApi),
             // 登録済み
-            if (tabController.index == 1) RegisteredTabPage(shopList: shopList)
+            if (segmentIndex == 1) RegisteredTabPage(shopList: shopList)
           ],
         ),
       ),
