@@ -135,7 +135,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 child: Container(
                   //モーダル風UIの中身
                   decoration: BoxDecoration(
-                    color: AppColors.backgroundModalColor,
+                    color: AppColors.bluredModalColor,
                     border: Border.all(
                       color: AppColors.backgroundGrayColor,
                       width: 1,
