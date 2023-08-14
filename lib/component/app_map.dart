@@ -276,7 +276,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         height: markerSize,
         point: currentPosition!,
         builder: (context) => GestureDetector(
-            onTap: () {
+            onLongPress: () {
               if (currentPosition == null) {
                 return;
               }
