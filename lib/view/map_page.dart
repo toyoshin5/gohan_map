@@ -272,7 +272,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       tapFlgs[shop.id] = true;
                     });
                     final deviceHeight = MediaQuery.of(context).size.height;
-                    _moveToPin(latLng, deviceHeight * 0.1);
+                    _moveToPin(latLng, deviceHeight * 0.2);
                     showModalBottomSheet(
                       barrierColor: Colors.black.withOpacity(0),
                       isDismissible: true,
