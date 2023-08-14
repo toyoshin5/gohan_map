@@ -106,17 +106,11 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
               if (snapshot.hasError) {
                 return Text('Error reading heading: ${snapshot.error}');
               }
-              //シミュレーターの場合は無視
-              if (snapshot.connectionState == ConnectionState.waiting && kReleaseMode == true) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
 
-              double direction = snapshot.data?.heading ?? 0;
+              double? direction = snapshot.data?.heading;
               // 現在位置と方向のマーカーを作成する
               var presetLocationMarker = _buildPresetLocationMarker();
-              var compassMarker = _buildCompassMarker(direction);
+              var compassMarker = (direction!=null)?_buildCompassMarker(direction):null;
 
               return FlutterMap(
                 options: MapOptions(
@@ -157,7 +151,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     ),
                   MarkerLayer(
                     markers: [
-                      compassMarker,
+                      if(compassMarker!=null) compassMarker,
                       presetLocationMarker,
                     ],
                     rotate: false,
