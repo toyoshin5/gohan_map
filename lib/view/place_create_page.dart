@@ -128,9 +128,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
             ),
             AppRatingBar(
               initialRating: rating,
-              onRatingUpdate: (rating) {
+              onRatingUpdate: (val) {
                 setState(() {
-                  rating = rating;
+                  rating = val;
                 });
               },
             ),

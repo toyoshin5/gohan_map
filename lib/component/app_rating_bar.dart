@@ -19,7 +19,7 @@ class AppRatingBar extends StatelessWidget {
     return Center(
       child: RatingBar(
         initialRating: initialRating,
-        minRating: 0,
+        minRating: 1,
         maxRating: 5,
         direction: Axis.horizontal,
         allowHalfRating: true,
