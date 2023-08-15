@@ -10,6 +10,7 @@ class AppColors {
   static const Color textFieldColor = Color(0xffffffff);
   static const Color backgroundWhiteColor = Color(0xffffffff);
   static const Color backgroundGrayColor = Color(0xffd9d9d9);
-  static const Color backgroundModalColor = Color(0x99ffffff);
+  static const Color bluredModalColor = Color(0x99ffffff);
+  static const Color unBluredModalColor = Color(0xFFE1DAD1);
   static const Color pinColor = Color.fromARGB(255, 255, 0, 0);
 }

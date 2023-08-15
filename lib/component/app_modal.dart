@@ -23,7 +23,7 @@ class AppModal extends StatefulWidget {
     this.maxChildSize = 0.9,
     this.showKnob = true,
     this.avoidKeyboardFlg = false,
-    this.backgroundColor = AppColors.backgroundModalColor,
+    this.backgroundColor = AppColors.unBluredModalColor,
     required this.child,
     Key? key,
   }) : super(key: key);
@@ -69,35 +69,24 @@ class _AppModalState extends State<AppModal> {
                   topRight: Radius.circular(20.0),
                 ),
               ),
-              child: ClipRRect(
-                //ぼかす領域を指定するためのウィジェット
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(20.0),
-                  topRight: Radius.circular(20.0),
-                ),
-                child: BackdropFilter(
-                  //ぼかすためのウィジェット
-                  filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: AppColors.backgroundModalColor,
-                      border: Border.all(
-                      color: AppColors.backgroundGrayColor,
-                      width: 1,
-                      ),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20.0),
-                        topRight: Radius.circular(20.0),
-                      ),
-                    ),
-                    child: _ChildScrollView(
-                        draggableController: controller,
-                        scrollController: scrollController,
-                        avoidKeyboard: widget.avoidKeyboardFlg,
-                        showKnob: widget.showKnob,
-                        child: widget.child),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.bluredModalColor,
+                  border: Border.all(
+                  color: AppColors.backgroundGrayColor,
+                  width: 1,
+                  ),
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(20.0),
+                    topRight: Radius.circular(20.0),
                   ),
                 ),
+                child: _ChildScrollView(
+                    draggableController: controller,
+                    scrollController: scrollController,
+                    avoidKeyboard: widget.avoidKeyboardFlg,
+                    showKnob: widget.showKnob,
+                    child: widget.child),
               ),
             ),
           );
