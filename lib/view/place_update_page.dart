@@ -113,31 +113,38 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               height: 250,
               child: Stack(
                 children: [
-                  FlutterMap(
-                    mapController: mapController,
-                    options: MapOptions(
-                      center: defaultLatLng, //東京駅
-                      zoom: 15.0,
-                      maxZoom: 17.0,
-                      minZoom: 3.0,
-                      onPositionChanged: (position, hasGesture) {
-                        if (position.center != null) {
-                          setState(() {
-                            shopLatitude = position.center!.latitude;
-                            shopLongitude = position.center!.longitude;
-                          });
-                        }
-                      },
-                      onTap: (tapPosition, latlng) {
-                        _animatedMapMove(latlng, 15, 500);
-                      },
-                    ),
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: AppColors.backgroundGrayColor,
                       ),
-                    ],
+                    ),
+                    child: FlutterMap(
+                      mapController: mapController,
+                      options: MapOptions(
+                        center: defaultLatLng, //東京駅
+                        zoom: 15.0,
+                        maxZoom: 17.0,
+                        minZoom: 3.0,
+                        onPositionChanged: (position, hasGesture) {
+                          if (position.center != null) {
+                            setState(() {
+                              shopLatitude = position.center!.latitude;
+                              shopLongitude = position.center!.longitude;
+                            });
+                          }
+                        },
+                        onTap: (tapPosition, latlng) {
+                          _animatedMapMove(latlng, 15, 500);
+                        },
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
+                        ),
+                      ],
+                    ),
                   ),
                   //上にimages/pin.pngを重ねる。ただしピンの下端がSizedBoxの中心になるようにする。
                   Align(
