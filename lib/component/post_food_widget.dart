@@ -323,7 +323,7 @@ class _UmaiButtonState extends State<UmaiButton> {
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             side: BorderSide(
-              color: (isOn) ? Colors.pinkAccent : Colors.grey.shade400, //色
+              color: (isOn) ? Color(0xFF2196F3) : Colors.grey.shade400, //色
             ),
             borderRadius: BorderRadius.circular(100),
           ),
@@ -343,15 +343,15 @@ class _UmaiButtonState extends State<UmaiButton> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
-                Icons.star,
-                color: (isOn) ? Colors.pinkAccent : Colors.grey.shade400,
+                Icons.thumb_up,
+                color: (isOn) ? const Color(0xFF2196F3) : Colors.grey.shade400,
                 size: 22,
               ),
               const SizedBox(width: 2),
               Text(
                 'うまい！',
                 style: TextStyle(
-                  color: (isOn) ? Colors.pinkAccent : Colors.grey.shade400,
+                  color: (isOn) ? const Color(0xFF2196F3) : Colors.grey.shade400,
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
                 ),
