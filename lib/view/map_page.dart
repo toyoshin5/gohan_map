@@ -2,8 +2,11 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:bordered_text/bordered_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/collections/shop.dart';
@@ -44,6 +47,18 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           const Duration(milliseconds: 500)); // 高速に画面が切り替わることを避ける
       FlutterNativeSplash.remove();
     });
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      changeTo120fps();
+    });
+  }
+   Future<void> changeTo120fps() async {
+    try {
+      FlutterDisplayMode.setHighRefreshRate();
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 
   @override

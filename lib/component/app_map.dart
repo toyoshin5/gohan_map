@@ -186,13 +186,11 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Flexible(
-                  child: Row(
-                    children: [
-                      Icon(Icons.list_alt_outlined),
-                      Text("すべての投稿",style: TextStyle(fontWeight: FontWeight.bold),), 
-                    ],
-                  ),
+                child: Row(
+                  children: [
+                    Icon(Icons.list_alt_outlined),
+                    Text("すべての投稿",style: TextStyle(fontWeight: FontWeight.bold),), 
+                  ],
                 ),
               ),
             ),
