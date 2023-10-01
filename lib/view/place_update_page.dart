@@ -120,7 +120,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: AppColors.backgroundGrayColor,
+                        color: AppColors.backgroundGreyColor,
                       ),
                     ),
                     child: FutureBuilder(
