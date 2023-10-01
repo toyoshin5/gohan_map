@@ -123,34 +123,23 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         width: double.infinity,
         child: GestureDetector(
           child: AbsorbPointer(
-            child: ClipRRect(
-              //ぼかす領域を指定するためのウィジェット
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
+            child: Container(
+              //モーダル風UIの中身
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                border: Border.all(
+                  color: AppColors.backgroundGreyColor,
+                  width: 1,
+                ),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  topRight: Radius.circular(20.0),
+                ),
               ),
-              child: BackdropFilter(
-                //ぼかすためのウィジェット
-                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                child: Container(
-                  //モーダル風UIの中身
-                  decoration: BoxDecoration(
-                    color: AppColors.bluredModalColor,
-                    border: Border.all(
-                      color: AppColors.backgroundGrayColor,
-                      width: 1,
-                    ),
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20.0),
-                      topRight: Radius.circular(20.0),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
-                    child: AppSearchBar(
-                      onSubmitted: (value) {},
-                    ),
-                  ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
+                child: AppSearchBar(
+                  onSubmitted: (value) {},
                 ),
               ),
             ),

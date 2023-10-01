@@ -73,7 +73,7 @@ class _AppModalState extends State<AppModal> {
                 decoration: BoxDecoration(
                   color: AppColors.bluredModalColor,
                   border: Border.all(
-                  color: AppColors.backgroundGrayColor,
+                  color: AppColors.backgroundGreyColor,
                   width: 1,
                   ),
                   borderRadius: const BorderRadius.only(
