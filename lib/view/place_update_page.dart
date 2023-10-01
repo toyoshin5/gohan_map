@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // 飲食店の更新画面
 class PlaceUpdatePage extends StatefulWidget {
@@ -47,8 +48,11 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   late double shopStar;
   bool isValidating = false;
 
+  
   @override
   Widget build(BuildContext context) {
+    final String? pinImgPath = findPinByKind(shopMapIconKind)?.pinImagePath;
+
     return AppModal(
       initialChildSize: 0.9,
       child: Padding(
@@ -113,32 +117,53 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               height: 250,
               child: Stack(
                 children: [
-                  FlutterMap(
-                    mapController: mapController,
-                    options: MapOptions(
-                      center: defaultLatLng, //東京駅
-                      zoom: 15.0,
-                      maxZoom: 17.0,
-                      minZoom: 3.0,
-                      onPositionChanged: (position, hasGesture) {
-                        if (position.center != null) {
-                          setState(() {
-                            shopLatitude = position.center!.latitude;
-                            shopLongitude = position.center!.longitude;
-                          });
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: AppColors.backgroundGrayColor,
+                      ),
+                    ),
+                    child: FutureBuilder(
+                      future: SharedPreferences.getInstance(),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          final pref = snapshot.data as SharedPreferences;
+                          final currentTileURL = pref.getString("currentTileURL");
+                          return FlutterMap(
+                            mapController: mapController,
+                            options: MapOptions(
+                              center: defaultLatLng, //東京駅
+                              zoom: 15.0,
+                              maxZoom: 17.0,
+                              minZoom: 3.0,
+                              onPositionChanged: (position, hasGesture) {
+                                if (position.center != null) {
+                                  setState(() {
+                                    shopLatitude = position.center!.latitude;
+                                    shopLongitude = position.center!.longitude;
+                                  });
+                                }
+                              },
+                              onTap: (tapPosition, latlng) {
+                                _animatedMapMove(latlng, 15, 500);
+                              },
+                            ),
+                            children: [
+                              TileLayer(
+                                urlTemplate:
+                                    currentTileURL,
+                              ),
+                            ],
+                          );
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
                         }
                       },
-                      onTap: (tapPosition, latlng) {
-                        _animatedMapMove(latlng, 15, 500);
-                      },
                     ),
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            'https://api.maptiler.com/maps/jp-mierune-streets/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr',
-                      ),
-                    ],
                   ),
+                     
                   //上にimages/pin.pngを重ねる。ただしピンの下端がSizedBoxの中心になるようにする。
                   Align(
                     alignment: Alignment.center,
@@ -148,7 +173,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                         SizedBox(
                           height: 35,
                           width: 35,
-                          child: Image.asset("images/pins/pin_default.png"),
+                          child: Image.asset(pinImgPath ?? "images/pin.png"),
                         ),
                         const SizedBox(height: 35),
                       ],
