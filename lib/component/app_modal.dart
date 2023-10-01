@@ -70,13 +70,9 @@ class _AppModalState extends State<AppModal> {
                 ),
               ),
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.bluredModalColor,
-                  border: Border.all(
-                  color: AppColors.backgroundGreyColor,
-                  width: 1,
-                  ),
-                  borderRadius: const BorderRadius.only(
+                  borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(20.0),
                     topRight: Radius.circular(20.0),
                   ),
