@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/post_card_widget.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/view/place_post_page.dart';
 
 import '../utils/common.dart';
 
@@ -54,47 +55,69 @@ class _AllPostPageState extends State<AllPostPage> {
                     return Container();
                   } else {
                     return Column(children: [
-                      for (Timeline timeline in (shopTimeline ?? [])) ...[
-                        PostCardWidget(
-                          timeline: timeline,
-                          snapshot: snapshot,
-                          onEditTapped: () {
-                            showModalBottomSheet(
-                              //モーダルを表示する関数
-                              barrierColor:
-                                  Colors.black.withOpacity(0), //背景をどれぐらい暗くするか
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              isScrollControlled: true, //スクロールで閉じたりするか
-                              builder: (context) {
-                                return Container();
-                                // return PlacePostPage(
-                                //   shop: !,
-                                //   timeline: timeline,
-                                // ); //ご飯投稿
-                              },
-                            ).then((value) {
-                              IsarUtils.getAllTimelines()
-                                  .then((timeline) {
-                                setState(() {
-                                  shopTimeline = timeline;
-                                });
-                              });
-                            });
-                          },
-                          onDeleteTapped: () {
-                            IsarUtils.deleteTimeline(timeline.id);
-                            setState(() {
-                              shopTimeline!.remove(timeline);
-                            });
-                          },
-                        ),
-                        const Divider(
-                          thickness: 1,
-                          height: 1,
-                        ),
+                      for (Timeline timeline in (shopTimeline ?? [])) 
+                        FutureBuilder(
+                        future: IsarUtils.getShopById(timeline.shopId),
+                        builder: (context, snapshot2) {
+                          return Column(
+                            children: [
+                              Container(
+                                color: Colors.white,
+                                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                                width: double.infinity,
+                                child: Text(
+                                  snapshot2.data?.shopName ?? "",
+                                  style: const TextStyle(
+                                      fontSize: 14, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              PostCardWidget(
+                                timeline: timeline,
+                                snapshot: snapshot,
+                                onEditTapped: () {
+                                  showModalBottomSheet(
+                                    //モーダルを表示する関数
+                                    barrierColor: Colors.black
+                                        .withOpacity(0), //背景をどれぐらい暗くするか
+                                    backgroundColor: Colors.transparent,
+                                    context: context,
+                                    isScrollControlled: true, //スクロールで閉じたりするか
+                                    builder: (context) {
+                                      if (snapshot2.data != null) {
+                                        return PlacePostPage(
+                                        shop: snapshot2.data!,
+                                        timeline: timeline,
+                                      ); //ご飯投稿
+                                      } else {
+                                        return Container();
+                                      }
+                                    },
+                                  ).then((value) {
+                                    IsarUtils.getAllTimelines()
+                                        .then((timeline) {
+                                      setState(() {
+                                        shopTimeline = timeline;
+                                      });
+                                    });
+                                  });
+                                },
+                                onDeleteTapped: () {
+                                  IsarUtils.deleteTimeline(timeline.id);
+                                  setState(() {
+                                    shopTimeline!.remove(timeline);
+                                  });
+                                },
+                              ),
+                              const Divider(
+                                thickness: 1,
+                                height: 1,
+                              ),
+                            ],
+                          );
+                        }),
+                        
                       ],
-                    ]);
+                    );
                   }
                 }),
           ),
