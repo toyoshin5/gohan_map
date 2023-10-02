@@ -13,13 +13,13 @@ class PostCardWidget extends StatelessWidget {
   const PostCardWidget({
     super.key,
     required this.timeline,
-    required this.snapshot,
+    required this.imageData,
     required this.onEditTapped,
     required this.onDeleteTapped,
   });
 
   final Timeline timeline;
-  final AsyncSnapshot<String> snapshot;
+  final String imageData;
   final VoidCallback onEditTapped;
   final VoidCallback onDeleteTapped;
 
@@ -60,19 +60,19 @@ class PostCardWidget extends StatelessWidget {
                                   size: 18,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 4),
                               Text(
                                       DateFormat('yyyy')
                                           .format(timeline.date),
                                       style: const TextStyle(
-                                          fontSize: 12, color: Colors.black),
+                                          fontSize: 12, color: Colors.black,height: 1.5),
                                     ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 2),
                               Text(
                                       DateFormat('MM/dd')
                                           .format(timeline.date),
                                       style: const TextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                                          fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black,height: 1.0),
                                     ),  
                               if (timeline.umai)
                                 Padding(
@@ -140,14 +140,14 @@ class PostCardWidget extends StatelessWidget {
                 maxHeight: min(MediaQuery.of(context).size.width, 400)
               ),
               child: Image.file(
-                        File(p.join(snapshot.data!, timeline.image!)),
+                        File(p.join(imageData, timeline.image!)),
                         fit: BoxFit.contain,
                       ),
             ),
           ),
         if (timeline.comment != "")
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
             child: SizedBox(
               width: double.infinity,
               child: Text(
