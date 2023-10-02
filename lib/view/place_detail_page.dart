@@ -236,8 +236,8 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   return Container();
                 } else {
                   return Column(children: [
-                    for (Timeline timeline in (shopTimeline ?? []))
-                      PostCard(
+                    for (Timeline timeline in (shopTimeline ?? []))...[
+                      PostCardWidget(
                         timeline: timeline,
                         selectedShop: selectedShop,
                         snapshot: snapshot,
@@ -273,15 +273,15 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                             shopTimeline!.remove(timeline);
                           });
                         },
-                      )
+                      ),
+                      const Divider(
+                        thickness: 1,
+                        height: 1,
+                      ),
+                    ],
                   ]);
                 }
               }),
-          const Divider(
-            color: AppColors.backgroundGreyColor,
-            thickness: 3,
-            height: 3,
-          ),
         ]));
   }
 }
