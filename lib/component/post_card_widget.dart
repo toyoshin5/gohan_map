@@ -134,7 +134,7 @@ class PostCardWidget extends StatelessWidget {
           //縦長の場合は正方形にする
           Container(
             width: double.infinity,
-            color: Colors.grey[300],
+            color: Colors.grey[200],
             child: ConstrainedBox(
               constraints: BoxConstraints(
                 maxHeight: min(MediaQuery.of(context).size.width, 400)

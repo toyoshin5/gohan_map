@@ -42,8 +42,7 @@ class IsarUtils {
   // shopの全取得
   static Future<List<Shop>> getAllShops() async {
     await ensureInitialized();
-    final shops = await isar!.shops.where().findAll();
-    return shops.toList();
+    final shops = await isar!.shops.where().findAll();    return shops.toList();
   }
 
   // shopを条件で絞り込み検索

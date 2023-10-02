@@ -239,7 +239,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context);
+      Navigator.pop(context,"update");
       return;
     }
   }
@@ -261,7 +261,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context);
+      Navigator.pop(context,"update");
       return;
     }
   }

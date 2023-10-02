@@ -93,6 +93,9 @@ class _AllPostPageState extends State<AllPostPage> {
                                       }
                                     },
                                   ).then((value) {
+                                    if (value == null) {
+                                      return;
+                                    }
                                     IsarUtils.getAllTimelines()
                                         .then((timeline) {
                                       setState(() {
