@@ -239,7 +239,6 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                     for (Timeline timeline in (shopTimeline ?? []))...[
                       PostCardWidget(
                         timeline: timeline,
-                        selectedShop: selectedShop,
                         snapshot: snapshot,
                         onEditTapped: () {
                           if (selectedShop == null) {

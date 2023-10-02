@@ -11,7 +11,7 @@ void main() {
   logger.i("start application!");
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
-    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarColor: Colors.white,
   ));
   // スプラッシュ画面をロードが終わるまで表示する
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();

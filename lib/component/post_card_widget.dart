@@ -4,7 +4,6 @@ import 'dart:math';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
-import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_down_button/pull_down_button.dart';
@@ -14,14 +13,12 @@ class PostCardWidget extends StatelessWidget {
   const PostCardWidget({
     super.key,
     required this.timeline,
-    required this.selectedShop,
     required this.snapshot,
     required this.onEditTapped,
     required this.onDeleteTapped,
   });
 
   final Timeline timeline;
-  final Shop? selectedShop;
   final AsyncSnapshot<String> snapshot;
   final VoidCallback onEditTapped;
   final VoidCallback onDeleteTapped;
@@ -135,7 +132,7 @@ class PostCardWidget extends StatelessWidget {
         //縦長の場合は正方形にする
         Container(
           width: double.infinity,
-          color: Colors.grey[200],
+          color: Colors.grey[300],
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxHeight: min(MediaQuery.of(context).size.width, 400)
