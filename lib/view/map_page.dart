@@ -245,7 +245,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   //1つのピンを、地図に描画するための配列pinsに追加する関数
   void _addPinToMap(LatLng latLng, Shop? shop) {
-    const markerSize = 35.0;
+    const markerSize = 40.0;
     const imgRatio = 345 / 512;
     final shopMapPin = findPinByKind(shop?.shopMapIconKind);
 
@@ -299,10 +299,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         : 'images/pins/pin_default.png'),
                     if (shop != null && shopMapPin != null && _isShowShopName(shop, shops,textLen ?? 0))
                       Positioned(
-                        left: 30,
+                        left: 33,
                         top: 7,
                         child: BorderedText(
-                          strokeWidth: 1.5,
+                          strokeWidth: 2,
                           strokeColor: AppColors.backgroundWhiteColor,
                           child: Text(
                             shop.shopName,

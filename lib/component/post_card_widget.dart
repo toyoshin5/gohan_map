@@ -45,22 +45,12 @@ class PostCardWidget extends StatelessWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              Container(
-                                //角丸
-                                //円
-                                    height: 24,
-                                    width: 24,
-                                    decoration: const BoxDecoration(
-                                      color: Colors.black,
-                                      shape: BoxShape.circle,
-                                    ),
-                                child: const Icon(
-                                  Icons.access_time,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
+                              const Icon(
+                                Icons.access_time,
+                                color: Colors.black,
+                                size: 24,
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: 2),
                               Text(
                                       DateFormat('yyyy')
                                           .format(timeline.date),
@@ -73,7 +63,8 @@ class PostCardWidget extends StatelessWidget {
                                           .format(timeline.date),
                                       style: const TextStyle(
                                           fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black,height: 1.0),
-                                    ),  
+                                    ),
+                                
                               if (timeline.umai)
                                 Padding(
                                   padding: const EdgeInsets.only(left: 12),

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -185,10 +184,10 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                         builder: (context) => const AllPostPage()));
               },
               child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+                padding: EdgeInsets.symmetric(horizontal: 12),
                 child: Row(
                   children: [
-                    Icon(Icons.list_alt_outlined),
+                    Icon(Icons.format_list_bulleted),
                     Text("すべての投稿",style: TextStyle(fontWeight: FontWeight.bold),), 
                   ],
                 ),

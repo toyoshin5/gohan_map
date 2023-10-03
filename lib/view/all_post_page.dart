@@ -20,7 +20,7 @@ class AllPostPage extends StatefulWidget {
 
 class _AllPostPageState extends State<AllPostPage> {
   List<Timeline>? shopTimeline;
-  int segmentIndex = 0;
+  int segmentIndex = 1;
   @override
   void initState() {
     super.initState();
@@ -39,6 +39,7 @@ class _AllPostPageState extends State<AllPostPage> {
       shopTimelineWithImg =
           shopTimeline!.where((element) => element.image != null).toList();
     }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -90,8 +91,13 @@ class _AllPostPageState extends State<AllPostPage> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.done) {
                       return Container();
-                      //TODO: 投稿がないときの表示
                     } else {
+                      if((shopTimeline ?? []).isEmpty){
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          child: const Text("投稿がありません"),
+                        );
+                      }
                       return Column(
                         children: [
                           for (Timeline timeline in (shopTimeline ?? []))
@@ -112,6 +118,7 @@ class _AllPostPageState extends State<AllPostPage> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
+                                      if(snapshot2.data != null)
                                       PostCardWidget(
                                         timeline: timeline,
                                         imageData: snapshot.data!,
@@ -169,9 +176,15 @@ class _AllPostPageState extends State<AllPostPage> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState != ConnectionState.done) {
                       return Container();
-                      //TODO: 画像がないときの表示
                     } else {
                       //画像がある投稿のみを表示
+                      if (shopTimelineWithImg == null ||
+                          shopTimelineWithImg.isEmpty) {
+                        return Container(
+                          padding: const EdgeInsets.all(16),
+                          child: const Text("投稿がありません"),
+                        );
+                      }
                       return GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
