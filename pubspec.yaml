@@ -58,6 +58,7 @@ dependencies:
   uuid: ^3.0.7
   logger: ^2.0.1
   bordered_text: ^2.0.0
+  flutter_overboard: ^3.1.1
 
 dev_dependencies:
   flutter_test:
