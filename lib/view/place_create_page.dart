@@ -227,7 +227,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   _onTapComfirm(context);
                 },
                 child: const Text(
-                  '決定',
+                  '店舗を登録',
                   style: TextStyle(
                       color: AppColors.blueTextColor,
                       fontWeight: FontWeight.bold),

@@ -78,7 +78,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
               child: CupertinoSlidingSegmentedControl(
                 groupValue: segmentIndex,
                 children: const <int, Widget>{
-                  0: Text("マップ付近の飲食店"),
+                  0: Text("マップ付近の店舗を登録"),
                   1: Text("登録済み"),
                 },
                 onValueChanged: (value) {

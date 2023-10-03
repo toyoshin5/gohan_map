@@ -156,7 +156,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                   onTapComfirm(context);
                 },
                 child: const Text(
-                  '決定',
+                  '投稿',
                   style: TextStyle(
                       color: AppColors.blueTextColor,
                       fontWeight: FontWeight.bold),
