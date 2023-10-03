@@ -9,7 +9,7 @@ import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
 import 'package:gohan_map/utils/common.dart';
-import 'package:gohan_map/utils/mapPins.dart';
+import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -339,7 +339,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   Future<void> _addToDB(bool initialPostFlg) async {
     final shop = Shop()
       ..shopName = shopName
-      ..shopAddress = address //TODO
+      ..shopAddress = address 
       ..shopLatitude = widget.latlng.latitude
       ..shopLongitude = widget.latlng.longitude
       ..shopStar = rating

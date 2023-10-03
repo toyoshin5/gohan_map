@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
 class AppDirectionLight extends StatelessWidget {
+  const AppDirectionLight({super.key});
+
   @override
   Widget build(BuildContext context) {
     return CustomPaint(

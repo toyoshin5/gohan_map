@@ -29,10 +29,6 @@ class _ChangeMapPageState extends State<ChangeMapPage> {
     maptiles.add(const MapTile(
         name: "Bright", url: "https://tile.openstreetmap.jp/{z}/{x}/{y}.png"));
     maptiles.add(const MapTile(
-        name: "MapTiler Streets",
-        url:
-            "https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr"));
-    maptiles.add(const MapTile(
         name: "Toner",
         url:
             "https://tile.openstreetmap.jp/styles/maptiler-toner-ja/{z}/{x}/{y}.png"));
@@ -51,9 +47,21 @@ class _ChangeMapPageState extends State<ChangeMapPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "地図デザインを変更",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              children: [
+                const Text(
+                  "地図デザインを変更",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                TextButton(onPressed: () async {
+                   SharedPreferences pref =
+                    await SharedPreferences.getInstance();
+                    await pref.setString("currentTileURL","https://api.maptiler.com/maps/jp-mierune-streets/256/{z}/{x}/{y}@2x.png?key=j4Xnfvwl9nEzUVlzCdBr");
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                }, child: const Text("xxxxxxx",style: TextStyle(color: Colors.transparent),))
+              ],
             ),
             const SizedBox(
               height: 8,

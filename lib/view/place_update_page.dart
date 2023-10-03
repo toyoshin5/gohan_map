@@ -7,7 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
-import 'package:gohan_map/utils/mapPins.dart';
+import 'package:gohan_map/utils/map_pins.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:gohan_map/colors/app_colors.dart';

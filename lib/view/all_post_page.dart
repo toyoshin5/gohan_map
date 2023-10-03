@@ -2,12 +2,13 @@ import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+
 import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/post_card_widget.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/view/place_post_page.dart';
 import 'package:gohan_map/view/post_detail_page.dart';
-import 'package:path/path.dart' as p;
 
 import '../utils/common.dart';
 
@@ -188,7 +189,7 @@ class _AllPostPageState extends State<AllPostPage> {
                       return GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
-                        itemCount: shopTimelineWithImg?.length ?? 0,
+                        itemCount: shopTimelineWithImg.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,

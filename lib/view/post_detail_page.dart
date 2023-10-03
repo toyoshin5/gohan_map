@@ -40,7 +40,7 @@ class _PostDetailPageState extends State<PostDetailPage> {
                 16, 12, 16, 0),
             width: double.infinity,
             child: Text(
-              widget.shopName ?? "",
+              widget.shopName,
               style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold),

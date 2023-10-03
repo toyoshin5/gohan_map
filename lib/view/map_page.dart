@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:bordered_text/bordered_text.dart';
 import 'package:flutter/foundation.dart';
@@ -15,7 +14,7 @@ import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
-import 'package:gohan_map/utils/mapPins.dart';
+import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';

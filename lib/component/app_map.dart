@@ -349,7 +349,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         height: markerSize / 2 * math.sqrt(3),
         point: currentPosition!,
         builder: (context) {
-          return Transform.translate(offset: const Offset(0, -16), child: Transform.rotate(angle: (direction * (math.pi / 180)), origin: const Offset(0, 16), child: AppDirectionLight()));
+          return Transform.translate(offset: const Offset(0, -16), child: Transform.rotate(angle: (direction * (math.pi / 180)), origin: const Offset(0, 16), child: const AppDirectionLight()));
         });
   }
 
