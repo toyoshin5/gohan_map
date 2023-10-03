@@ -206,7 +206,14 @@ class _AllPostPageState extends State<AllPostPage> {
                                   context,
                                   CupertinoPageRoute(
                                       builder: (context) =>
-                                          PostDetailPage(timeline: shopTimelineWithImg![index],imageData: snapshot.data, shopName: shop.shopName,),),);
+                                          PostDetailPage(timeline: shopTimelineWithImg![index],imageData: snapshot.data, shop: shop,),),)
+                                          .then((value) => {
+                                            if(value == "delete"){
+                                              setState(() {
+                                                shopTimeline!.remove(shopTimelineWithImg![index]);
+                                              })
+                                            }
+                                          });
                               }
                             },
                             child: Image.file(

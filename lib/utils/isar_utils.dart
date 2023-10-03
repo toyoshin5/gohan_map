@@ -95,6 +95,17 @@ class IsarUtils {
     return timelines.toList();
   }
 
+  static Future<Timeline?> getTimelineById(int id) async{
+    await ensureInitialized();
+    final timeline = await isar!.timelines
+        .where()
+        .idEqualTo(id)
+        .findFirst();
+    return timeline;
+  }
+
+
+
   // timelineの作成・更新
   static Future<void> createTimeline(Timeline timeline) async {
     await ensureInitialized();
