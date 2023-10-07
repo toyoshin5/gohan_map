@@ -1,5 +1,4 @@
 import 'package:gohan_map/utils/common.dart';
-import 'package:kana_kit/kana_kit.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
 import 'package:flutter/widgets.dart';
@@ -42,15 +41,11 @@ class IsarUtils {
   // shopの全取得
   static Future<List<Shop>> getAllShops() async {
     await ensureInitialized();
-    final shops = await isar!.shops.where().findAll();
-    return shops.toList();
+    final shops = await isar!.shops.where().findAll();    return shops.toList();
   }
 
   // shopを条件で絞り込み検索
   static Future<List<Shop>> searchShops(String text) async {
-    //テキストをローマ字に変換
-    final kanaKit = KanaKit();
-    final romaji = kanaKit.toRomaji(text);
     await ensureInitialized();
     final shops = await isar!.shops.filter().shopNameContains(text).findAll();
     return shops.toList();
@@ -70,9 +65,9 @@ class IsarUtils {
   static Future<void> deleteShop(Id id) async {
     await ensureInitialized();
     // timelineの削除(画像ファイルを削除するため、関数経由する)
-    (await getTimelinesByShopId(id)).forEach((element) {
+    for (var element in (await getTimelinesByShopId(id))) {
       deleteTimeline(element.id);
-    });
+    }
     await isar!.writeTxn(() async {
       await isar!.shops.delete(id);
     });
@@ -89,6 +84,27 @@ class IsarUtils {
         .findAll();
     return timelines.toList();
   }
+
+    static Future<List<Timeline>> getAllTimelines() async {
+    await ensureInitialized();
+    final timelines = await isar!.timelines
+        .where()
+        .sortByDateDesc()
+        .thenByCreatedAt()
+        .findAll();
+    return timelines.toList();
+  }
+
+  static Future<Timeline?> getTimelineById(int id) async{
+    await ensureInitialized();
+    final timeline = await isar!.timelines
+        .where()
+        .idEqualTo(id)
+        .findFirst();
+    return timeline;
+  }
+
+
 
   // timelineの作成・更新
   static Future<void> createTimeline(Timeline timeline) async {

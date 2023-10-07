@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_direction_light.dart';
+import 'package:gohan_map/view/all_post_page.dart';
 import 'package:gohan_map/view/change_map_page.dart';
 import 'package:gohan_map/view/tutorial_page.dart';
 import 'package:latlong2/latlong.dart';
@@ -164,6 +165,41 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 ],
               );
             }),
+
+        //右上のボタン
+        Positioned(
+          top: 50,
+          right: 20,
+          child: SizedBox(
+            height: 44,
+            child: ElevatedButton(
+              //角丸で白
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.all(0),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                ),
+                backgroundColor: Colors.white,
+                foregroundColor: AppColors.blueTextColor,
+              ),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                        builder: (context) => const AllPostPage()));
+              },
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12),
+                child: Row(
+                  children: [
+                    Icon(Icons.format_list_bulleted),
+                    Text("すべての投稿",style: TextStyle(fontWeight: FontWeight.bold),), 
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
         //右下のボタン
         Positioned(
           bottom: 120,

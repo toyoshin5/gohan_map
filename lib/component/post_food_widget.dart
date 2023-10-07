@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:math';
 
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -122,7 +121,7 @@ class _ImgSectionState extends State<_ImgSection> {
   @override
   void initState() {
     super.initState();
-    this.image = widget.initialImage;
+    image = widget.initialImage;
   }
 
   @override
@@ -310,7 +309,7 @@ class _UmaiButtonState extends State<UmaiButton> {
   @override
   void initState() {
     super.initState();
-    this.isOn = widget.initialIsUmai ?? false;
+    isOn = widget.initialIsUmai ?? false;
   }
 
   @override
@@ -367,7 +366,6 @@ class _UmaiButtonState extends State<UmaiButton> {
 //訪問日入力欄
 class _DateSection extends StatelessWidget {
   const _DateSection({
-    super.key,
     required this.controller,
     required this.onChanged,
   });
@@ -406,7 +404,6 @@ class _DateSection extends StatelessWidget {
 //コメント入力欄
 class _CommentSection extends StatelessWidget {
   const _CommentSection({
-    super.key,
     this.initialComment,
     required this.onChanged,
     this.onFocusChanged,

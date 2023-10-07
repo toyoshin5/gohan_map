@@ -24,7 +24,7 @@ Future<File?> base64ImageToFile(String? base64Image) async {
     return null;
   }
 
-  final path = await getLocalPath;
+  const path = getLocalPath;
   final imagePath = '$path/temporary-image-base64-decode.png';
   File imageFile = File(imagePath);
   Uint8List buffer = base64Decode(base64Image);
@@ -41,7 +41,7 @@ Future<String> getLocalPath() async {
 Future<String?> saveImageFile(File? image) async {
   if (image == null) return null;
 
-  final name = Uuid().v1() + p.extension(image.path);
+  final name = const Uuid().v1() + p.extension(image.path);
   // localPathはデバック毎に変わるので、DBに保存するパスは相対部分のみ
   final imagePath = "$foodImageFolderName/$name";
   final dir = Directory(p.join(await getLocalPath(), foodImageFolderName));

@@ -29,6 +29,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  path: ^1.8.0
   flutter:
     sdk: flutter
 
@@ -59,6 +60,7 @@ dependencies:
   logger: ^2.0.1
   bordered_text: ^2.0.0
   flutter_overboard: ^3.1.1
+  flutter_displaymode: ^0.6.0
 
 dev_dependencies:
   flutter_test:
