@@ -68,59 +68,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           child: AppMap(
             pins: pins,
             mapController: mapController,
-            onLongPress: (_, latLng) {
-              //画面の座標, 緯度経度
-              //振動
-              HapticFeedback.mediumImpact();
-
-              setState(() {
-                //ピンを配置する
-                _addPinToMap(latLng, null);
-              });
-              //mapをスクロールする
-              final deviceHeight = MediaQuery.of(context).size.height;
-              _moveToPin(latLng, deviceHeight * 0.2);
-              showModalBottomSheet(
-                barrierColor: Colors.black.withOpacity(0),
-                isDismissible: true,
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) {
-                  return PlaceCreatePage(
-                    latlng: latLng,
-                  );
-                },
-              ).then((value) {
-                _loadAllShop();
-              });
-            },
           ),
         ),
-        //下の検索ボタン
-        // Center(
-        //   //画像ボタン
-        //   child: Stack(
-        //     children: [
-        //       Image.asset(
-        //         'images/pin_tap.png',
-        //         width: 100,
-        //         height: 100,
-        //       ),
-        //       Positioned.fill(
-        //         child: Material(
-        //           color: Colors.transparent,
-        //           child: InkWell(
-        //             onTap: () {
-        //               // ボタンがタップされたときの処理
-        //               print('Button tapped!');
-        //             },
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         buildDummySearchWidget(),
       ],
     );

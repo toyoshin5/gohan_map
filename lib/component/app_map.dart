@@ -16,13 +16,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:geolocator/geolocator.dart';
 
 class AppMap extends StatefulWidget {
-  final void Function(TapPosition?, LatLng) onLongPress;
   final List<Marker>? pins;
   final MapController? mapController;
 
   const AppMap({
     Key? key,
-    required this.onLongPress,
     this.pins,
     this.mapController,
   }) : super(key: key);
@@ -125,7 +123,6 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   zoom: 15,
                   interactiveFlags: InteractiveFlag.all,
                   enableMultiFingerGestureRace: true,
-                  onLongPress: widget.onLongPress,
                   onPositionChanged: (position, hasGesture) {
                     if (isCurrentLocation = true) {
                       setState(() {
@@ -351,12 +348,6 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         height: markerSize,
         point: currentPosition!,
         builder: (context) => GestureDetector(
-            onLongPress: () {
-              if (currentPosition == null) {
-                return;
-              }
-              widget.onLongPress(null, currentPosition!);
-            },
             child: Container(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
