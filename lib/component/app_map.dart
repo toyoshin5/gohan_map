@@ -9,6 +9,7 @@ import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_direction_light.dart';
 import 'package:gohan_map/view/all_post_page.dart';
 import 'package:gohan_map/view/change_map_page.dart';
+import 'package:gohan_map/view/tutorial_page.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -51,11 +52,13 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     //MapTileの読み込み
     SharedPreferences.getInstance().then((pref) {
       setState(() {
-        currentTileURL = pref.getString("currentTileURL") ?? "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
+        currentTileURL = pref.getString("currentTileURL") ??
+            "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
       });
     });
     //アニメーションの定義
-    plMarkerController = AnimationController(vsync: this, duration: const Duration(seconds: 5));
+    plMarkerController =
+        AnimationController(vsync: this, duration: const Duration(seconds: 5));
     const shrinkSize = 0.8;
     currentIconAni = TweenSequence<double>([
       TweenSequenceItem(
@@ -111,7 +114,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
               double? direction = snapshot.data?.heading;
               // 現在位置と方向のマーカーを作成する
               var presetLocationMarker = _buildPresetLocationMarker();
-              var compassMarker = (direction!=null)?_buildCompassMarker(direction):null;
+              var compassMarker =
+                  (direction != null) ? _buildCompassMarker(direction) : null;
 
               return FlutterMap(
                 options: MapOptions(
@@ -136,7 +140,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     attributions: [
                       TextSourceAttribution(
                         'OpenStreetMap contributors',
-                        onTap: () => launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+                        onTap: () => launchUrl(
+                            Uri.parse('https://openstreetmap.org/copyright')),
                       ),
                     ],
                   ),
@@ -152,7 +157,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     ),
                   MarkerLayer(
                     markers: [
-                      if(compassMarker!=null) compassMarker,
+                      if (compassMarker != null) compassMarker,
                       presetLocationMarker,
                     ],
                     rotate: false,
@@ -201,6 +206,34 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
           right: 20,
           child: Column(
             children: [
+              //ヘルプボタン
+              SizedBox(
+                width: 44,
+                height: 44,
+                child: ElevatedButton(
+                  //角丸で白
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(0),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.blueTextColor,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TutorialPage(),
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.help),
+                ),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
               //現在地に戻るボタン
               SizedBox(
                 width: 44,
@@ -223,7 +256,9 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                     });
                     _animatedMapMove(currentPosition!, 15);
                   },
-                  child: Icon((isCurrentLocation) ? Icons.near_me : Icons.near_me_outlined),
+                  child: Icon((isCurrentLocation)
+                      ? Icons.near_me
+                      : Icons.near_me_outlined),
                 ),
               ),
               const SizedBox(
@@ -257,7 +292,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                       //MapTileの読み込み
                       SharedPreferences.getInstance().then((pref) {
                         setState(() {
-                          currentTileURL = pref.getString("currentTileURL") ?? "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
+                          currentTileURL = pref.getString("currentTileURL") ??
+                              "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
                         });
                       });
                     });
@@ -276,7 +312,9 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     await checkGPSPermission();
 
     // ユーザの現在位置を取得し続ける
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen((Position position) {
+    positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings)
+            .listen((Position position) {
       var latLng = LatLng(position.latitude, position.longitude);
       setState(() {
         currentPosition = latLng;
@@ -301,7 +339,8 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
 
     // 永久に拒否されている場合はエラーを返す
     if (permission == LocationPermission.deniedForever) {
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
   }
 
@@ -321,7 +360,10 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
             child: Container(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
-                boxShadow: [BoxShadow(blurRadius: 10, color: Colors.black26, spreadRadius: 3)],
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 10, color: Colors.black26, spreadRadius: 3)
+                ],
               ),
               child: CircleAvatar(
                   radius: 24,
@@ -349,7 +391,12 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         height: markerSize / 2 * math.sqrt(3),
         point: currentPosition!,
         builder: (context) {
-          return Transform.translate(offset: const Offset(0, -16), child: Transform.rotate(angle: (direction * (math.pi / 180)), origin: const Offset(0, 16), child: const AppDirectionLight()));
+          return Transform.translate(
+              offset: const Offset(0, -16),
+              child: Transform.rotate(
+                  angle: (direction * (math.pi / 180)),
+                  origin: const Offset(0, 16),
+                  child: AppDirectionLight()));
         });
   }
 
@@ -357,14 +404,24 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
     if (widget.mapController == null) {
       return;
     }
-    final latTween = Tween<double>(begin: widget.mapController!.center.latitude, end: destLocation.latitude);
-    final lngTween = Tween<double>(begin: widget.mapController!.center.longitude, end: destLocation.longitude);
-    final zoomTween = Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
-    final rotateTween = Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
-    final controller = AnimationController(duration: const Duration(milliseconds: 500), vsync: this);
-    final Animation<double> animation = CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
+    final latTween = Tween<double>(
+        begin: widget.mapController!.center.latitude,
+        end: destLocation.latitude);
+    final lngTween = Tween<double>(
+        begin: widget.mapController!.center.longitude,
+        end: destLocation.longitude);
+    final zoomTween =
+        Tween<double>(begin: widget.mapController!.zoom, end: destZoom);
+    final rotateTween =
+        Tween<double>(begin: widget.mapController!.rotation, end: 0.0);
+    final controller = AnimationController(
+        duration: const Duration(milliseconds: 500), vsync: this);
+    final Animation<double> animation =
+        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
     controller.addListener(() {
-      widget.mapController!.move(LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)), zoomTween.evaluate(animation));
+      widget.mapController!.move(
+          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+          zoomTween.evaluate(animation));
       widget.mapController!.rotate(rotateTween.evaluate(animation));
     });
     animation.addStatusListener((status) {
