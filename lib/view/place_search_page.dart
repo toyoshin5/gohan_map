@@ -29,7 +29,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
   bool isLoadingPlaceApi = false;
   List<PlaceApiRestaurantResult> placeApiRestaurants = [];
   late TabController tabController;
-  int segmentIndex = 0; // 0: マップ付近の飲食店, 1: 登録済み
+  int segmentIndex = 1; // 0: マップ付近の飲食店, 1: 登録済み
 
   @override
   void initState() {

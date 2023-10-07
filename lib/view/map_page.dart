@@ -1,9 +1,11 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:bordered_text/bordered_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/collections/shop.dart';
@@ -12,7 +14,7 @@ import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
-import 'package:gohan_map/utils/mapPins.dart';
+import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
@@ -44,6 +46,18 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           const Duration(milliseconds: 500)); // 高速に画面が切り替わることを避ける
       FlutterNativeSplash.remove();
     });
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      changeTo120fps();
+    });
+  }
+   Future<void> changeTo120fps() async {
+    try {
+      FlutterDisplayMode.setHighRefreshRate();
+    } on PlatformException catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+    }
   }
 
   @override
@@ -230,7 +244,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   //1つのピンを、地図に描画するための配列pinsに追加する関数
   void _addPinToMap(LatLng latLng, Shop? shop) {
-    const markerSize = 35.0;
+    const markerSize = 40.0;
     const imgRatio = 345 / 512;
     final shopMapPin = findPinByKind(shop?.shopMapIconKind);
 
@@ -284,10 +298,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         : 'images/pins/pin_default.png'),
                     if (shop != null && shopMapPin != null && _isShowShopName(shop, shops,textLen ?? 0))
                       Positioned(
-                        left: 30,
+                        left: 33,
                         top: 7,
                         child: BorderedText(
-                          strokeWidth: 1.5,
+                          strokeWidth: 2,
                           strokeColor: AppColors.backgroundWhiteColor,
                           child: Text(
                             shop.shopName,

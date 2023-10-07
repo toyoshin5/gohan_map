@@ -1,6 +1,4 @@
-import 'dart:ui';
 
-import 'package:flutter/Cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 
@@ -99,7 +97,6 @@ class _AppModalState extends State<AppModal> {
 //スクロールを実行するためにはscrollControllerが必要なのでここでStatefulWidgetを使用
 class _ChildScrollView extends StatefulWidget {
   const _ChildScrollView({
-    super.key,
     required this.draggableController,
     required this.scrollController,
     required this.avoidKeyboard,
