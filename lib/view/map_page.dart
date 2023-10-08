@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:bordered_text/bordered_text.dart';
@@ -47,7 +48,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       FlutterNativeSplash.remove();
     });
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      changeTo120fps();
+      if(Platform.isAndroid){
+        changeTo120fps();
+      }
     });
   }
    Future<void> changeTo120fps() async {
