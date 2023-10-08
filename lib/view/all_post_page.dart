@@ -47,13 +47,6 @@ class _AllPostPageState extends State<AllPostPage> {
           'すべての投稿',
           style: TextStyle(color: Colors.black),
         ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
         //色
         backgroundColor: Colors.white,
       ),

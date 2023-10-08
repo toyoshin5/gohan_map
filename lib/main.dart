@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/utils/logger.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
+import 'package:gohan_map/view/all_post_page.dart';
+import 'package:gohan_map/view/character_page.dart';
 import 'package:gohan_map/view/map_page.dart';
 
 /// アプリが起動したときに呼ばれる
@@ -36,8 +38,68 @@ class MyApp extends StatelessWidget {
         //appBar: AppBar(
         //  title: const Text('Gohan Map'),
         //),
-        body: MapPage(),
+        body: MainPage(),
       ),
+    );
+  }
+}
+
+
+//タブ(BottomNavigationBar)を含んだ画面
+class MainPage extends StatefulWidget {
+  const MainPage({Key? key}) : super(key: key);
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  int _currentIndex = 0;
+  final items = <BottomNavigationBarItem>[
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.map),
+      label: "マップ",
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.list),
+      label: "投稿一覧",
+    ),
+    const BottomNavigationBarItem(
+      icon: Icon(Icons.mood),
+      label: "育成",
+    ),
+  ];
+  final tabs = <Widget>[
+    const MapPage(),
+    const AllPostPage(),
+    const CharacterPage(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: <Widget>[
+          IndexedStack(
+            index: _currentIndex,
+            children: tabs,
+          ),
+        ],
+      ),
+      bottomNavigationBar: _buildBttomNavigator(context),
+    );
+  }
+
+  Widget _buildBttomNavigator(BuildContext context) {
+    return BottomNavigationBar(
+      items: items,
+      currentIndex: _currentIndex,
+      onTap: (index) {
+        if (_currentIndex != index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        }
+      },
     );
   }
 }
