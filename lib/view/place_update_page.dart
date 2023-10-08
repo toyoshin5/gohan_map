@@ -48,7 +48,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   late double shopStar;
   bool isValidating = false;
 
-  
   @override
   Widget build(BuildContext context) {
     final String? pinImgPath = findPinByKind(shopMapIconKind)?.pinImagePath;
@@ -128,7 +127,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           final pref = snapshot.data as SharedPreferences;
-                          final currentTileURL = pref.getString("currentTileURL");
+                          final currentTileURL =
+                              pref.getString("currentTileURL");
                           return FlutterMap(
                             mapController: mapController,
                             options: MapOptions(
@@ -150,8 +150,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                             ),
                             children: [
                               TileLayer(
-                                urlTemplate:
-                                    currentTileURL,
+                                urlTemplate: currentTileURL,
                               ),
                             ],
                           );
@@ -163,7 +162,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                       },
                     ),
                   ),
-                     
+
                   //上にimages/pin.pngを重ねる。ただしピンの下端がSizedBoxの中心になるようにする。
                   Align(
                     alignment: Alignment.center,
@@ -339,6 +338,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
     );
   }
 
+  bool isDeleted = false;
 //決定ボタンを押した時の処理
   Future<void> _onTapComfirm(BuildContext context) async {
     setState(() {
@@ -438,23 +438,30 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                 ),
                 onPressed: () async {
                   await IsarUtils.deleteShop(widget.shop.id);
-                  if (mounted) {
+                  if (context.mounted) {
                     setState(() {
                       // reload
                     });
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    isDeleted = true;
+                    Navigator.of(context, rootNavigator: true)
+                        .pop(context); //rootNavigator: trueを指定しないと、モーダルが閉じない
                   }
                 },
-              ),
+              )
             ],
             cancelButton: CupertinoActionSheetAction(
               child: const Text('キャンセル'),
               onPressed: () {
-                Navigator.pop(context);
+                isDeleted = false;
+                Navigator.of(context, rootNavigator: true).pop(context);
               },
             ));
       },
-    );
+    ).then((value) {
+      if (isDeleted){
+        Navigator.of(context).popUntil((route) => route.isFirst);
+      }
+    });
   }
 
   void _animatedMapMove(LatLng destLocation, double destZoom, int millsec) {
