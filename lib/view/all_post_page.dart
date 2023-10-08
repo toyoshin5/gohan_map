@@ -16,15 +16,24 @@ class AllPostPage extends StatefulWidget {
   const AllPostPage({super.key});
 
   @override
-  State<AllPostPage> createState() => _AllPostPageState();
+  State<AllPostPage> createState() => AllPostPageState();
 }
 
-class _AllPostPageState extends State<AllPostPage> {
+class AllPostPageState extends State<AllPostPage> {
   List<Timeline>? shopTimeline;
   int segmentIndex = 1;
   @override
   void initState() {
     super.initState();
+    () async {
+      final timelines = await IsarUtils.getAllTimelines();
+      setState(() {
+        shopTimeline = timelines;
+      });
+    }();
+  }
+
+  void reload(){
     () async {
       final timelines = await IsarUtils.getAllTimelines();
       setState(() {
@@ -46,13 +55,6 @@ class _AllPostPageState extends State<AllPostPage> {
         title: const Text(
           'すべての投稿',
           style: TextStyle(color: Colors.black),
-        ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
         ),
         //色
         backgroundColor: Colors.white,

@@ -27,10 +27,10 @@ import 'package:latlong2/latlong.dart';
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
   @override
-  State<MapPage> createState() => _MapPageState();
+  State<MapPage> createState() => MapPageState();
 }
 
-class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
+class MapPageState extends State<MapPage> with TickerProviderStateMixin {
   // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
   List<Marker> pins = [];
   Map<Id, bool> tapFlgs = {};
@@ -48,12 +48,23 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       FlutterNativeSplash.remove();
     });
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      if(Platform.isAndroid){
+      if (Platform.isAndroid) {
         changeTo120fps();
       }
     });
   }
-   Future<void> changeTo120fps() async {
+
+  void reload() {
+    Future(() async {
+      await _loadAllShop(); //DBから飲食店の情報を取得してピンを配置
+
+      await Future.delayed(
+          const Duration(milliseconds: 500)); // 高速に画面が切り替わることを避ける
+      FlutterNativeSplash.remove();
+    });
+  }
+
+  Future<void> changeTo120fps() async {
     try {
       FlutterDisplayMode.setHighRefreshRate();
     } on PlatformException catch (e) {
@@ -208,7 +219,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         point: latLng,
         builder: (context) {
           //ラベルの表示判定に利用する文字長
-          int? textLen = shop?.shopName.replaceAll(RegExp(r'[^\x00-\x7F]'), '  ').length;//ASCII文字:1文字分、日本語:2文字分
+          int? textLen = shop?.shopName
+              .replaceAll(RegExp(r'[^\x00-\x7F]'), '  ')
+              .length; //ASCII文字:1文字分、日本語:2文字分
           //ピンのデザイン
           return AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -248,7 +261,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     Image.asset(shopMapPin != null
                         ? shopMapPin.pinImagePath
                         : 'images/pins/pin_default.png'),
-                    if (shop != null && shopMapPin != null && _isShowShopName(shop, shops,textLen ?? 0))
+                    if (shop != null &&
+                        shopMapPin != null &&
+                        _isShowShopName(shop, shops, textLen ?? 0))
                       Positioned(
                         left: 33,
                         top: 7,
@@ -278,10 +293,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     var zoom = 15.0;
     var rot = 0.0;
     var rtnFlg = true;
-    try{
+    try {
       zoom = mapController.zoom;
       rot = mapController.rotation;
-    }finally{
+    } finally {
       //1ピクセルあたりの緯度経度
       var pixelPerLat = pow(2, zoom + 8) / 360;
       var pixelPerLng =
@@ -293,9 +308,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           final latDiff = s.shopLatitude - shop.shopLatitude;
           final lngDiff = s.shopLongitude - shop.shopLongitude;
           //マップの回転を考慮しピクセルの差を計算
-          final pixelHDiff = latDiff * pixelPerLat * cos(rot * pi / 180) - lngDiff * pixelPerLng * sin(rot * pi / 180);
-          final pixelWDiff = latDiff * pixelPerLat * sin(rot * pi / 180) + lngDiff * pixelPerLng * cos(rot * pi / 180);
-          if (pixelHDiff < 10 && pixelHDiff > -10 && pixelWDiff < textLen*5 && pixelWDiff > 0) {
+          final pixelHDiff = latDiff * pixelPerLat * cos(rot * pi / 180) -
+              lngDiff * pixelPerLng * sin(rot * pi / 180);
+          final pixelWDiff = latDiff * pixelPerLat * sin(rot * pi / 180) +
+              lngDiff * pixelPerLng * cos(rot * pi / 180);
+          if (pixelHDiff < 10 &&
+              pixelHDiff > -10 &&
+              pixelWDiff < textLen * 5 &&
+              pixelWDiff > 0) {
             rtnFlg = false;
             break;
           }
@@ -305,7 +325,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     return rtnFlg;
   }
-
 
   //DBから飲食店の情報を全て取得してピンを配置する関数。ラベルの表示するかも判定する。
   Future<void> _loadAllShop() async {
@@ -320,8 +339,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       // reload
     });
   }
-
-
 
   //modalから戻ってきたときに実行される関数
   void _onModalPop(dynamic value, int id) {
