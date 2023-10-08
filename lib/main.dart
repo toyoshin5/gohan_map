@@ -139,6 +139,8 @@ class _MainPageState extends State<MainPage> {
       characterPageState?.reload();
     }
     //タブの最初の画面に戻る
-    _navigatorKeys[tabItem]?.currentState?.popUntil((route) => route.isFirst);
+    _navigatorKeys[TabItem.allpost]?.currentState?.popUntil((route) => route.isFirst);
+    _navigatorKeys[TabItem.map]?.currentState?.popUntil((route) => route.isFirst);
+    _navigatorKeys[TabItem.character]?.currentState?.popUntil((route) => route.isFirst);
   }
 }
