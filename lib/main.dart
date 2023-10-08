@@ -5,6 +5,9 @@ import 'package:gohan_map/bottom_navigation.dart';
 import 'package:gohan_map/tab_navigator.dart';
 import 'package:gohan_map/utils/logger.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
+import 'package:gohan_map/view/all_post_page.dart';
+import 'package:gohan_map/view/character_page.dart';
+import 'package:gohan_map/view/map_page.dart';
 
 /// アプリが起動したときに呼ばれる
 void main() {
@@ -64,8 +67,17 @@ class _MainPageState extends State<MainPage> {
     TabItem.character: GlobalKey<NavigatorState>(),
   };
 
+  //globalKeyは、ウィジェットの状態を保存するためのもの
+  final Map<TabItem, GlobalKey<State>> _globalKeys = {
+    TabItem.map: GlobalKey<State>(),
+    TabItem.allpost: GlobalKey<State>(),
+    TabItem.character: GlobalKey<State>(),
+  };
+
+  final allpostKey = GlobalKey<AllPostPageState>();
+
   @override
- Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: <Widget>[
@@ -94,26 +106,39 @@ class _MainPageState extends State<MainPage> {
     TabItem tabItem,
     String root,
   ) {
-    return Offstage(//Offstageは、子要素を非表示にするウィジェット
+    return Offstage(
+      //Offstageは、子要素を非表示にするウィジェット
       offstage: _currentTab != tabItem,
       child: TabNavigator(
         navigationKey: _navigatorKeys[tabItem]!,
         tabItem: tabItem,
         routerName: root,
+        globalKey: _globalKeys[tabItem]!,
       ),
     );
   }
 
   //タブが選択されたときに呼ばれる。tabItemは選択されたタブ
   void onSelect(TabItem tabItem) {
-    //選択されたタブが現在のタブと同じなら、そのタブの最初の画面に戻る
-    if (_currentTab == tabItem) {
+    setState(() {
+      _currentTab = tabItem;
+    });
+    //選択されたタブをリロードする
+    if (tabItem == TabItem.allpost) {
+      AllPostPageState? allpostPageState =
+            _globalKeys[tabItem]!.currentState as AllPostPageState?;
+      allpostPageState?.reload();
       _navigatorKeys[tabItem]?.currentState?.popUntil((route) => route.isFirst);
-    } else {
-      setState(() {
-        _currentTab = tabItem;
-      });
+    }else if(tabItem == TabItem.map){
+      MapPageState? mapPageState =
+           _globalKeys[tabItem]!.currentState as MapPageState?;
+      mapPageState?.reload();
+    }else if (tabItem == TabItem.character) {
+      CharacterPageState? characterPageState =
+           _globalKeys[tabItem]!.currentState as CharacterPageState?;
+      characterPageState?.reload();
     }
+    //タブの最初の画面に戻る
+    _navigatorKeys[tabItem]?.currentState?.popUntil((route) => route.isFirst);
   }
-
 }

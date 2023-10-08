@@ -12,16 +12,18 @@ class TabNavigator extends StatelessWidget {
     required this.tabItem,
     required this.routerName,
     required this.navigationKey,
+    required this.globalKey,
   }) : super(key: key);
 
   final TabItem tabItem;
   final String routerName;
   final GlobalKey<NavigatorState> navigationKey;
+  final GlobalKey<State> globalKey;
 
   Map<String, Widget Function(BuildContext)> _routerBuilder(BuildContext context) => {
-    '/map': (context) => const MapPage(),
-    '/allpost': (context) => const AllPostPage(),
-    '/character': (context) => const CharacterPage(),
+    '/map': (context) => MapPage(key: globalKey,),
+    '/allpost': (context) => AllPostPage(key: globalKey,),
+    '/character': (context) => CharacterPage(key : globalKey,),
   };
 
   @override
