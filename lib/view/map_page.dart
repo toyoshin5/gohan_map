@@ -240,7 +240,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     final deviceHeight = MediaQuery.of(context).size.height;
                     _moveToPin(latLng, deviceHeight * 0.2);
                     HapticFeedback.heavyImpact();
-                    //500ms後にモーダルを表示する
+                    //300ms後にモーダルを表示する
                     Future.delayed(const Duration(milliseconds: 300), () {
                       setState(() {
                         tapFlgs[shop.id] = true;
