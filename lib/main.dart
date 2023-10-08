@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:gohan_map/bottom_navigation.dart';
+import 'package:gohan_map/tab_navigator.dart';
 import 'package:gohan_map/utils/logger.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
-import 'package:gohan_map/view/all_post_page.dart';
-import 'package:gohan_map/view/character_page.dart';
-import 'package:gohan_map/view/map_page.dart';
 
 /// アプリが起動したときに呼ばれる
 void main() {
@@ -44,8 +43,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
+enum TabItem {
+  map,
+  allpost,
+  character,
+}
 
-//タブ(BottomNavigationBar)を含んだ画面
+//タブバー(BottomNavigationBar)を含んだ全体の画面
 class MainPage extends StatefulWidget {
   const MainPage({Key? key}) : super(key: key);
   @override
@@ -53,53 +57,63 @@ class MainPage extends StatefulWidget {
 }
 
 class _MainPageState extends State<MainPage> {
-  int _currentIndex = 0;
-  final items = <BottomNavigationBarItem>[
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.map),
-      label: "マップ",
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.list),
-      label: "投稿一覧",
-    ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.mood),
-      label: "育成",
-    ),
-  ];
-  final tabs = <Widget>[
-    const MapPage(),
-    const AllPostPage(),
-    const CharacterPage(),
-  ];
+  TabItem _currentTab = TabItem.map;
+  final Map<TabItem, GlobalKey<NavigatorState>> _navigatorKeys = {
+    TabItem.map: GlobalKey<NavigatorState>(),
+    TabItem.allpost: GlobalKey<NavigatorState>(),
+    TabItem.character: GlobalKey<NavigatorState>(),
+  };
 
   @override
-  Widget build(BuildContext context) {
+ Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: <Widget>[
-          IndexedStack(
-            index: _currentIndex,
-            children: tabs,
+          _buildTabItem(
+            TabItem.map,
+            '/map',
+          ),
+          _buildTabItem(
+            TabItem.allpost,
+            '/allpost',
+          ),
+          _buildTabItem(
+            TabItem.character,
+            '/character',
           ),
         ],
       ),
-      bottomNavigationBar: _buildBttomNavigator(context),
+      bottomNavigationBar: BottomNavigation(
+        currentTab: _currentTab,
+        onSelect: onSelect,
+      ),
     );
   }
 
-  Widget _buildBttomNavigator(BuildContext context) {
-    return BottomNavigationBar(
-      items: items,
-      currentIndex: _currentIndex,
-      onTap: (index) {
-        if (_currentIndex != index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        }
-      },
+  Widget _buildTabItem(
+    TabItem tabItem,
+    String root,
+  ) {
+    return Offstage(//Offstageは、子要素を非表示にするウィジェット
+      offstage: _currentTab != tabItem,
+      child: TabNavigator(
+        navigationKey: _navigatorKeys[tabItem]!,
+        tabItem: tabItem,
+        routerName: root,
+      ),
     );
   }
+
+  //タブが選択されたときに呼ばれる。tabItemは選択されたタブ
+  void onSelect(TabItem tabItem) {
+    //選択されたタブが現在のタブと同じなら、そのタブの最初の画面に戻る
+    if (_currentTab == tabItem) {
+      _navigatorKeys[tabItem]?.currentState?.popUntil((route) => route.isFirst);
+    } else {
+      setState(() {
+        _currentTab = tabItem;
+      });
+    }
+  }
+
 }

@@ -162,41 +162,6 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 ],
               );
             }),
-
-        //右上のボタン
-        Positioned(
-          top: 50,
-          right: 20,
-          child: SizedBox(
-            height: 44,
-            child: ElevatedButton(
-              //角丸で白
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(0),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.blueTextColor,
-              ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => const AllPostPage()));
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    Icon(Icons.format_list_bulleted),
-                    Text("すべての投稿",style: TextStyle(fontWeight: FontWeight.bold),), 
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
         //右下のボタン
         Positioned(
           bottom: 120,
