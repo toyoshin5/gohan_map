@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
@@ -60,12 +61,58 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
     return AppModal(
         backgroundColor: Colors.white,
         initialChildSize: 0.55,
+        showKnob: false,
         child: Column(children: [
+          Stack(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxHeight: min(MediaQuery.of(context).size.width, 140)),
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(20),
+                    ),
+                    child: Image.asset(
+                      "images/header.jpg",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                  right: 12,
+                  top: 12,
+                  child: SizedBox(
+                    height: 30,
+                    width: 30,
+                    child: IconButton(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 12, 12), //44px確保
+                      icon: Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.grey[300],
+
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context); //前の画面に戻る
+                      },
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(
+            height: 12,
+          ),
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    //画像を100pxの高さで表示
+
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,21 +123,6 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.bold),
                           )),
-                          SizedBox(
-                            height: 30,
-                            width: 30,
-                            child: IconButton(
-                              padding: const EdgeInsets.fromLTRB(
-                                  0, 0, 12, 12), //44px確保
-                              icon: const Icon(
-                                Icons.cancel_outlined,
-                                size: 32,
-                              ),
-                              onPressed: () {
-                                Navigator.pop(context); //前の画面に戻る
-                              },
-                            ),
-                          ),
                         ]),
                     const Padding(padding: EdgeInsets.only(top: 5)),
                     Row(

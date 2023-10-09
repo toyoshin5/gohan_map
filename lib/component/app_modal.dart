@@ -61,27 +61,21 @@ class _AppModalState extends State<AppModal> {
             child: Container(
               //モーダルの中身
               decoration: BoxDecoration(
+                boxShadow:const  [
+                  BoxShadow(blurRadius: 5, color: Colors.grey, spreadRadius: 0.5)
+                ],
                 color: widget.backgroundColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
               ),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.bluredModalColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0),
-                  ),
-                ),
-                child: _ChildScrollView(
-                    draggableController: controller,
-                    scrollController: scrollController,
-                    avoidKeyboard: widget.avoidKeyboardFlg,
-                    showKnob: widget.showKnob,
-                    child: widget.child),
-              ),
+              child: _ChildScrollView(
+                  draggableController: controller,
+                  scrollController: scrollController,
+                  avoidKeyboard: widget.avoidKeyboardFlg,
+                  showKnob: widget.showKnob,
+                  child: widget.child),
             ),
           );
         },
