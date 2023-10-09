@@ -49,6 +49,9 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
     for (Timeline p in timelines) {
       stars.add(p.star);
     }
+    if (stars.isEmpty) {
+      return 0.0;
+    }
     return stars.reduce((a, b) => a + b) / stars.length;
   }
 
@@ -105,6 +108,8 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         )
                       ],
                     ),
+                    if (shopTimeline?.isNotEmpty ?? false)
+                    //星の数
                     Padding(
                       padding:
                           const EdgeInsets.only(top: 8, bottom: 8, left: 2),
@@ -282,6 +287,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                           IsarUtils.deleteTimeline(timeline.id);
                           setState(() {
                             shopTimeline!.remove(timeline);
+                            aveStar = calcAveStar(shopTimeline!);
                           });
                         },
                       ),
