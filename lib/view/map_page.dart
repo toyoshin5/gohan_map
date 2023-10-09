@@ -236,12 +236,16 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 onTap: () {
                   //ピンをタップしたときの処理
                   if (shop != null) {
-                    setState(() {
-                      tapFlgs[shop.id] = true;
-                    });
+                    //マップを自動スクロールする
                     final deviceHeight = MediaQuery.of(context).size.height;
                     _moveToPin(latLng, deviceHeight * 0.2);
-                    showModalBottomSheet(
+                    HapticFeedback.heavyImpact();
+                    //300ms後にモーダルを表示する
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      setState(() {
+                        tapFlgs[shop.id] = true;
+                      });
+                      showModalBottomSheet(
                       barrierColor: Colors.black.withOpacity(0),
                       isDismissible: true,
                       isScrollControlled: true,
@@ -253,6 +257,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         ); //飲食店の詳細画面
                       },
                     ).then((value) => _onModalPop(value, shop.id));
+                    });
                   }
                 },
                 child: Stack(
