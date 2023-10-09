@@ -35,7 +35,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
     shopLatitude = widget.shop.shopLatitude;
     shopLongitude = widget.shop.shopLongitude;
     shopMapIconKind = widget.shop.shopMapIconKind;
-    shopStar = widget.shop.shopStar;
   }
 
   MapController mapController = MapController();
@@ -45,7 +44,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   late double shopLatitude;
   late double shopLongitude;
   late String shopMapIconKind;
-  late double shopStar;
   bool isValidating = false;
 
   @override
@@ -210,24 +208,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                 ],
               ),
             ),
-            //評価
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
-              child: Text(
-                "評価",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            AppRatingBar(
-                onRatingUpdate: (value) {
-                  setState(() {
-                    shopStar = value;
-                  });
-                },
-                initialRating: shopStar),
             // ピンの種類
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
@@ -403,9 +383,10 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
       ..id = widget.shop.id
       ..shopName = shopName
       ..shopAddress = shopAddress
+      ..googleMapURL = null
+      ..googlePlaceId = widget.shop.googlePlaceId
       ..shopLatitude = shopLatitude
       ..shopLongitude = shopLongitude
-      ..shopStar = shopStar
       ..shopMapIconKind = shopMapIconKind
       ..createdAt = widget.shop.createdAt
       ..updatedAt = DateTime.now();

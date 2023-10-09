@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:gohan_map/collections/timeline.dart';
+import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:path/path.dart' as p;
@@ -64,25 +65,27 @@ class PostCardWidget extends StatelessWidget {
                                       style: const TextStyle(
                                           fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black,height: 1.0),
                                     ),
-                                
-                              if (timeline.umai)
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 12),
-                                  child: Container(
-                                    //円
-                                    height: 24,
-                                    width: 24,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF2196F3),
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: const Icon(
-                                      Icons.thumb_up,
-                                      size: 14,
-                                      color: Colors.white,
-                                    ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 8, bottom: 8, left: 2),
+                                child: Row(children: [
+                                  Text(
+                                    timeline.star.toString(),
+                                    style: const TextStyle(color: Colors.black38),
                                   ),
-                                ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(right: 4),
+                                  ),
+                                  IgnorePointer(
+                                    ignoring: true,
+                                    child: AppRatingBar(
+                                      initialRating: timeline.star,
+                                      onRatingUpdate: (rating) {},
+                                      itemSize: 20,
+                                    ),
+                                  )
+                                ]),
+                              ),
                             ],
                           ),
                           PullDownButton(

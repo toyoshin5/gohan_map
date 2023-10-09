@@ -7,6 +7,7 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter/services.dart';
 import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/utils/logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -16,8 +17,8 @@ class PostFoodWidget extends StatefulWidget {
     Key? key,
     this.initialImage,
     required this.onImageChanged,
-    this.initialIsUmai,
-    required this.onUmaiChanged,
+    this.initialStar,
+    required this.onStarChanged,
     this.initialDate,
     required this.onDateChanged,
     this.initialComment,
@@ -27,8 +28,8 @@ class PostFoodWidget extends StatefulWidget {
   final File? initialImage;
   final Function(File?) onImageChanged;
 
-  final bool? initialIsUmai;
-  final Function(bool) onUmaiChanged;
+  final double? initialStar;
+  final Function(double) onStarChanged;
 
   final DateTime? initialDate;
   final Function(DateTime) onDateChanged;
@@ -74,9 +75,9 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
                     dateController.value.copyWith(text: dateTime.toString());
                 widget.onDateChanged(dateTime);
               }),
-          UmaiButton(
-            initialIsUmai: widget.initialIsUmai,
-            onChanged: widget.onUmaiChanged,
+          _StarSection(
+            initialStar: widget.initialStar,
+            onChanged: widget.onStarChanged,
           ),
           _DateSection(
             controller: dateController,
@@ -289,77 +290,18 @@ class _ImgSectionState extends State<_ImgSection> {
 }
 
 //うまいボタン
-class UmaiButton extends StatefulWidget {
-  const UmaiButton({
-    super.key,
-    this.initialIsUmai,
+class _StarSection extends StatelessWidget {
+  const _StarSection({
+    this.initialStar,
     required this.onChanged,
   });
 
-  final bool? initialIsUmai;
-  final Function(bool) onChanged;
-
-  @override
-  State<UmaiButton> createState() => _UmaiButtonState();
-}
-
-class _UmaiButtonState extends State<UmaiButton> {
-  bool isOn = false;
-
-  @override
-  void initState() {
-    super.initState();
-    isOn = widget.initialIsUmai ?? false;
-  }
+  final double? initialStar;
+  final Function(double) onChanged;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 12),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          elevation: (isOn) ? 0 : 2,
-          backgroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            side: BorderSide(
-              color: (isOn) ? Color(0xFF2196F3) : Colors.grey.shade400, //色
-            ),
-            borderRadius: BorderRadius.circular(100),
-          ),
-          padding: EdgeInsets.zero,
-        ),
-        onPressed: () {
-          setState(() {
-            isOn = !isOn;
-            widget.onChanged(isOn);
-          });
-        },
-        child: Container(
-          //角丸四角形
-          height: 32,
-          padding: const EdgeInsets.symmetric(horizontal: 8),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.thumb_up,
-                color: (isOn) ? const Color(0xFF2196F3) : Colors.grey.shade400,
-                size: 22,
-              ),
-              const SizedBox(width: 2),
-              Text(
-                'うまい！',
-                style: TextStyle(
-                  color: (isOn) ? const Color(0xFF2196F3) : Colors.grey.shade400,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
+    return AppRatingBar(initialRating: initialStar ?? 4.0,onRatingUpdate: onChanged);
   }
 }
 

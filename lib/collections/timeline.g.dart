@@ -37,18 +37,23 @@ const TimelineSchema = CollectionSchema(
       name: r'image',
       type: IsarType.string,
     ),
-    r'shopId': PropertySchema(
+    r'isPublic': PropertySchema(
       id: 4,
+      name: r'isPublic',
+      type: IsarType.bool,
+    ),
+    r'shopId': PropertySchema(
+      id: 5,
       name: r'shopId',
       type: IsarType.long,
     ),
-    r'umai': PropertySchema(
-      id: 5,
-      name: r'umai',
-      type: IsarType.bool,
+    r'star': PropertySchema(
+      id: 6,
+      name: r'star',
+      type: IsarType.double,
     ),
     r'updatedAt': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'updatedAt',
       type: IsarType.dateTime,
     )
@@ -107,9 +112,10 @@ void _timelineSerialize(
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeDateTime(offsets[2], object.date);
   writer.writeString(offsets[3], object.image);
-  writer.writeLong(offsets[4], object.shopId);
-  writer.writeBool(offsets[5], object.umai);
-  writer.writeDateTime(offsets[6], object.updatedAt);
+  writer.writeBool(offsets[4], object.isPublic);
+  writer.writeLong(offsets[5], object.shopId);
+  writer.writeDouble(offsets[6], object.star);
+  writer.writeDateTime(offsets[7], object.updatedAt);
 }
 
 Timeline _timelineDeserialize(
@@ -124,9 +130,10 @@ Timeline _timelineDeserialize(
   object.date = reader.readDateTime(offsets[2]);
   object.id = id;
   object.image = reader.readStringOrNull(offsets[3]);
-  object.shopId = reader.readLong(offsets[4]);
-  object.umai = reader.readBool(offsets[5]);
-  object.updatedAt = reader.readDateTime(offsets[6]);
+  object.isPublic = reader.readBool(offsets[4]);
+  object.shopId = reader.readLong(offsets[5]);
+  object.star = reader.readDouble(offsets[6]);
+  object.updatedAt = reader.readDateTime(offsets[7]);
   return object;
 }
 
@@ -146,10 +153,12 @@ P _timelineDeserializeProp<P>(
     case 3:
       return (reader.readStringOrNull(offset)) as P;
     case 4:
-      return (reader.readLong(offset)) as P;
-    case 5:
       return (reader.readBool(offset)) as P;
+    case 5:
+      return (reader.readLong(offset)) as P;
     case 6:
+      return (reader.readDouble(offset)) as P;
+    case 7:
       return (reader.readDateTime(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -777,6 +786,16 @@ extension TimelineQueryFilter
     });
   }
 
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> isPublicEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isPublic',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Timeline, Timeline, QAfterFilterCondition> shopIdEqualTo(
       int value) {
     return QueryBuilder.apply(this, (query) {
@@ -830,12 +849,64 @@ extension TimelineQueryFilter
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> umaiEqualTo(
-      bool value) {
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> starEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'umai',
+        property: r'star',
         value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> starGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'star',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> starLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'star',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> starBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'star',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -949,6 +1020,18 @@ extension TimelineQuerySortBy on QueryBuilder<Timeline, Timeline, QSortBy> {
     });
   }
 
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByIsPublic() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPublic', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByIsPublicDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPublic', Sort.desc);
+    });
+  }
+
   QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByShopId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'shopId', Sort.asc);
@@ -961,15 +1044,15 @@ extension TimelineQuerySortBy on QueryBuilder<Timeline, Timeline, QSortBy> {
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByUmai() {
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByStar() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'umai', Sort.asc);
+      return query.addSortBy(r'star', Sort.asc);
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByUmaiDesc() {
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByStarDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'umai', Sort.desc);
+      return query.addSortBy(r'star', Sort.desc);
     });
   }
 
@@ -1048,6 +1131,18 @@ extension TimelineQuerySortThenBy
     });
   }
 
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByIsPublic() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPublic', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByIsPublicDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPublic', Sort.desc);
+    });
+  }
+
   QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByShopId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'shopId', Sort.asc);
@@ -1060,15 +1155,15 @@ extension TimelineQuerySortThenBy
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByUmai() {
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByStar() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'umai', Sort.asc);
+      return query.addSortBy(r'star', Sort.asc);
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByUmaiDesc() {
+  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByStarDesc() {
     return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'umai', Sort.desc);
+      return query.addSortBy(r'star', Sort.desc);
     });
   }
 
@@ -1113,15 +1208,21 @@ extension TimelineQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Timeline, Timeline, QDistinct> distinctByIsPublic() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isPublic');
+    });
+  }
+
   QueryBuilder<Timeline, Timeline, QDistinct> distinctByShopId() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'shopId');
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QDistinct> distinctByUmai() {
+  QueryBuilder<Timeline, Timeline, QDistinct> distinctByStar() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'umai');
+      return query.addDistinctBy(r'star');
     });
   }
 
@@ -1164,15 +1265,21 @@ extension TimelineQueryProperty
     });
   }
 
+  QueryBuilder<Timeline, bool, QQueryOperations> isPublicProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isPublic');
+    });
+  }
+
   QueryBuilder<Timeline, int, QQueryOperations> shopIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'shopId');
     });
   }
 
-  QueryBuilder<Timeline, bool, QQueryOperations> umaiProperty() {
+  QueryBuilder<Timeline, double, QQueryOperations> starProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'umai');
+      return query.addPropertyName(r'star');
     });
   }
 

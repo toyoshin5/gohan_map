@@ -1,4 +1,3 @@
-
 import 'package:isar/isar.dart';
 
 part 'shop.g.dart';
@@ -7,12 +6,13 @@ part 'shop.g.dart';
 class Shop {
   Id id = Isar.autoIncrement;
 
+  late String googlePlaceId;
+  String? googleMapURL;
   late String shopName;
   late String shopAddress;
   late String shopMapIconKind;
   late double shopLatitude;
   late double shopLongitude;
-  late double shopStar;
   late DateTime createdAt;
   late DateTime updatedAt;
 }
