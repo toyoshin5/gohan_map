@@ -27,9 +27,9 @@ class PlacePostPage extends StatefulWidget {
 
 class _PlacePostPageState extends State<PlacePostPage> {
   File? image;
-  bool isUmai = false;
   DateTime date = DateTime.now();
   String comment = '';
+  double star = 4.0;
   bool avoidkeyBoard = false;
   bool isLoading = true;
 
@@ -43,9 +43,9 @@ class _PlacePostPageState extends State<PlacePostPage> {
         image = widget.timeline!.image != null
             ? File(p.join(await getLocalPath(), widget.timeline!.image!))
             : null;
-        isUmai = widget.timeline!.umai;
         date = widget.timeline!.date;
         comment = widget.timeline!.comment;
+        star = widget.timeline!.star;
       }
       setState(() {
         // reload
@@ -115,10 +115,10 @@ class _PlacePostPageState extends State<PlacePostPage> {
                   this.image = image;
                 });
               },
-              initialIsUmai: isUmai,
-              onUmaiChanged: (isUmai) {
+              initialStar: star,
+              onStarChanged: (star) {
                 setState(() {
-                  this.isUmai = isUmai;
+                  this.star = star;
                 });
               },
               initialDate: date,
@@ -229,7 +229,8 @@ class _PlacePostPageState extends State<PlacePostPage> {
     final timeline = Timeline()
       ..image = imagePath
       ..comment = comment
-      ..umai = isUmai
+      ..star = star
+      ..isPublic = false
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now()
       ..shopId = widget.shop.id
@@ -239,7 +240,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context,"update");
+      Navigator.pop(context, "update");
       return;
     }
   }
@@ -251,7 +252,8 @@ class _PlacePostPageState extends State<PlacePostPage> {
       ..id = widget.timeline!.id
       ..image = imagePath
       ..comment = comment
-      ..umai = isUmai
+      ..star = star
+      ..isPublic = false
       ..createdAt = widget.timeline!.createdAt
       ..updatedAt = DateTime.now()
       ..shopId = widget.shop.id
@@ -261,7 +263,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context,"update");
+      Navigator.pop(context, "update");
       return;
     }
   }

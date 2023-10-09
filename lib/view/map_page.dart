@@ -190,7 +190,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     builder: (context) {
                       return PlaceCreatePage(
                         latlng: paResult.latlng,
-                        initialShopName: paResult.name,
+                        initialShopName: paResult.name, placeId: paResult.placeId,
                       );
                     },
                   ).then((value) {

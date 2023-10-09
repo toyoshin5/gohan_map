@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
@@ -10,7 +9,6 @@ import 'package:gohan_map/view/place_post_page.dart';
 import 'package:gohan_map/view/place_update_page.dart';
 
 import 'package:isar/isar.dart';
-
 
 import '../component/app_rating_bar.dart';
 import '../utils/isar_utils.dart';
@@ -27,6 +25,7 @@ class PlaceDetailPage extends StatefulWidget {
 class _PlaceDetailPageState extends State<PlaceDetailPage> {
   Shop? selectedShop;
   List<Timeline>? shopTimeline;
+  double aveStar = 0.0;
   @override
   void initState() {
     super.initState();
@@ -35,11 +34,22 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
       if (shop == null) return;
 
       final timelines = await IsarUtils.getTimelinesByShopId(shop.id);
+
       setState(() {
         selectedShop = shop;
         shopTimeline = timelines;
+        //平均
+        aveStar = calcAveStar(timelines);
       });
     }();
+  }
+
+  double calcAveStar(List<Timeline> timelines) {
+    List<double> stars = [];
+    for (Timeline p in timelines) {
+      stars.add(p.star);
+    }
+    return stars.reduce((a, b) => a + b) / stars.length;
   }
 
   @override
@@ -100,7 +110,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                           const EdgeInsets.only(top: 8, bottom: 8, left: 2),
                       child: Row(children: [
                         Text(
-                          selectedShop?.shopStar.toString() ?? "",
+                          ((aveStar*100).floor()/100.0).toString(),
                           style: const TextStyle(color: Colors.black38),
                         ),
                         const Padding(
@@ -109,7 +119,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         IgnorePointer(
                           ignoring: true,
                           child: AppRatingBar(
-                            initialRating: selectedShop?.shopStar ?? 0,
+                            initialRating: aveStar-0.24,//星の数の表示が正しくない不具合を対処
                             onRatingUpdate: (rating) {},
                             itemSize: 20,
                           ),
@@ -198,6 +208,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                                         .then((timeline) {
                                       setState(() {
                                         shopTimeline = timeline;
+                                        aveStar = calcAveStar(timeline);
                                       });
                                     });
                                   });
@@ -236,7 +247,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   return Container();
                 } else {
                   return Column(children: [
-                    for (Timeline timeline in (shopTimeline ?? []))...[
+                    for (Timeline timeline in (shopTimeline ?? [])) ...[
                       PostCardWidget(
                         timeline: timeline,
                         imageData: snapshot.data!,
@@ -262,6 +273,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                                 .then((timeline) {
                               setState(() {
                                 shopTimeline = timeline;
+                                aveStar = calcAveStar(timeline);
                               });
                             });
                           });
@@ -284,4 +296,3 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
         ]));
   }
 }
-

@@ -6,7 +6,6 @@ import 'package:flutter/Material.dart';
 import 'package:flutter_haptic/haptic.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
-import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
 import 'package:gohan_map/utils/common.dart';
 import 'package:gohan_map/utils/map_pins.dart';
@@ -21,7 +20,8 @@ import 'package:gohan_map/component/app_modal.dart';
 class PlaceCreatePage extends StatefulWidget {
   final LatLng latlng;
   final String? initialShopName;
-  const PlaceCreatePage({Key? key, required this.latlng, this.initialShopName})
+  final String placeId;
+  const PlaceCreatePage({Key? key, required this.latlng, this.initialShopName,required this.placeId})
       : super(key: key);
 
   @override
@@ -31,10 +31,9 @@ class PlaceCreatePage extends StatefulWidget {
 class _PlaceCreatePageState extends State<PlaceCreatePage> {
   String shopName = '';
   String address = '';
-  double rating = 3;
   String shopMapIconKind = "default";
   File? image;
-  bool isUmai = false;
+  double star = 4.0;
   DateTime date = DateTime.now();
   String comment = '';
   bool avoidkeyBoard = false;
@@ -115,25 +114,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 }
               },
             ),
-            //評価
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
-              child: Text(
-                '店の評価',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            AppRatingBar(
-              initialRating: rating,
-              onRatingUpdate: (val) {
-                setState(() {
-                  rating = val;
-                });
-              },
-            ),
             // ピンの種類
             const Padding(
               padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
@@ -189,9 +169,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   this.image = image;
                 });
               },
-              onUmaiChanged: (isUmai) {
+              onStarChanged: (star) {
                 setState(() {
-                  this.isUmai = isUmai;
+                  this.star = star;
                 });
               },
               onDateChanged: (date) {
@@ -339,10 +319,11 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   Future<void> _addToDB(bool initialPostFlg) async {
     final shop = Shop()
       ..shopName = shopName
-      ..shopAddress = address 
+      ..shopAddress = address
+      ..googleMapURL = null
+      ..googlePlaceId = widget.placeId
       ..shopLatitude = widget.latlng.latitude
       ..shopLongitude = widget.latlng.longitude
-      ..shopStar = rating
       ..shopMapIconKind = shopMapIconKind
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now();
@@ -352,8 +333,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
 
       final timeline = Timeline()
         ..image = imagePath
+        ..isPublic = false
         ..comment = comment
-        ..umai = isUmai
+        ..star = star
         ..createdAt = DateTime.now()
         ..updatedAt = DateTime.now()
         ..shopId = shopId
