@@ -125,8 +125,9 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           final pref = snapshot.data as SharedPreferences;
-                          final currentTileURL =
-                              pref.getString("currentTileURL");
+                          final String currentTileURL =
+                              pref.getString("currentTileURL") ??
+            "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
                           return FlutterMap(
                             mapController: mapController,
                             options: MapOptions(
