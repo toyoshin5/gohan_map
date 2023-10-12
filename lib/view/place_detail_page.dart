@@ -273,7 +273,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                             ])),
                   ])),
           const Divider(
-            color: AppColors.backgroundGreyColor,
+            color: AppColors.greyColor,
             thickness: 1,
             height: 1,
           ),

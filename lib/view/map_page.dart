@@ -105,7 +105,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
               decoration: BoxDecoration(
                 color: Colors.grey.shade200,
                 border: Border.all(
-                  color: AppColors.backgroundGreyColor,
+                  color: AppColors.greyColor,
                   width: 1,
                 ),
                 borderRadius: const BorderRadius.only(
@@ -274,7 +274,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         top: 7,
                         child: BorderedText(
                           strokeWidth: 2,
-                          strokeColor: AppColors.backgroundWhiteColor,
+                          strokeColor: AppColors.whiteColor,
                           child: Text(
                             shop.shopName,
                             style: TextStyle(

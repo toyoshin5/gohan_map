@@ -150,7 +150,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
                   onTapComfirm(context);
@@ -158,7 +158,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                 child: const Text(
                   '投稿',
                   style: TextStyle(
-                      color: AppColors.blueTextColor,
+                      color: AppColors.primaryColor,
                       fontWeight: FontWeight.bold),
                 ),
               ),
@@ -174,7 +174,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
                   Navigator.pop(context);

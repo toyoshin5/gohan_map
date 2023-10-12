@@ -180,7 +180,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     backgroundColor: Colors.white,
-                    foregroundColor: AppColors.blueTextColor,
+                    foregroundColor: AppColors.primaryColor,
                   ),
                   onPressed: () {
                     Navigator.push(
@@ -208,7 +208,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     backgroundColor: Colors.white,
-                    foregroundColor: AppColors.blueTextColor,
+                    foregroundColor: AppColors.primaryColor,
                   ),
                   onPressed: () {
                     Future.delayed(const Duration(milliseconds: 600)).then((_) {
@@ -238,7 +238,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                       borderRadius: BorderRadius.all(Radius.circular(10)),
                     ),
                     backgroundColor: Colors.white,
-                    foregroundColor: AppColors.blueTextColor,
+                    foregroundColor: AppColors.primaryColor,
                   ),
                   onPressed: () {
                     showModalBottomSheet(

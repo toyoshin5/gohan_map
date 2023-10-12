@@ -167,7 +167,7 @@ class NewRestaurantsTabPage extends StatelessWidget {
           Card(
             //影付きの角丸四角形
             elevation: 0, //影を消す
-            color: AppColors.backgroundWhiteColor,
+            color: AppColors.whiteColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8), //角丸の大きさ
             ),
@@ -208,7 +208,7 @@ class RegisteredTabPage extends StatelessWidget {
           Card(
             //影付きの角丸四角形
             elevation: 0, //影を消す
-            color: AppColors.backgroundWhiteColor,
+            color: AppColors.whiteColor,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8), //角丸の大きさ
             ),

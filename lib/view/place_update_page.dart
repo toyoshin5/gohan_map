@@ -117,7 +117,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                   Container(
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: AppColors.backgroundGreyColor,
+                        color: AppColors.greyColor,
                       ),
                     ),
                     child: FutureBuilder(
@@ -193,14 +193,14 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               foregroundColor: AppColors.blackTextColor,
-                              backgroundColor: AppColors.backgroundWhiteColor,
+                              backgroundColor: AppColors.whiteColor,
                             ),
                             onPressed: () {
                               _animatedMapMove(defaultLatLng, 15, 500);
                             },
                             child: const Icon(
                               Icons.replay_outlined,
-                              color: AppColors.blueTextColor,
+                              color: AppColors.primaryColor,
                             ),
                           ),
                         ),
@@ -258,7 +258,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: (isValidating)
                     ? null
@@ -276,13 +276,13 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                         width: 14,
                         child: const CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.blueTextColor),
+                              AppColors.primaryColor),
                         ),
                       ),
                     const Text(
                       '決定',
                       style: TextStyle(
-                          color: AppColors.blueTextColor,
+                          color: AppColors.primaryColor,
                           fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -300,7 +300,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
                   _deleteShop();

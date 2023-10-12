@@ -21,7 +21,7 @@ class AppModal extends StatefulWidget {
     this.maxChildSize = 0.9,
     this.showKnob = true,
     this.avoidKeyboardFlg = false,
-    this.backgroundColor = AppColors.unBluredModalColor,
+    this.backgroundColor = AppColors.whiteColor,
     required this.child,
     Key? key,
   }) : super(key: key);

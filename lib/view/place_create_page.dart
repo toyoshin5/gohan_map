@@ -201,7 +201,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
                   _onTapComfirm(context);
@@ -209,7 +209,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 child: const Text(
                   '店舗を登録',
                   style: TextStyle(
-                      color: AppColors.blueTextColor,
+                      color: AppColors.primaryColor,
                       fontWeight: FontWeight.bold),
                 ),
               ),
@@ -225,7 +225,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
                   Navigator.pop(context);

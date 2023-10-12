@@ -61,7 +61,7 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: AppColors.backgroundWhiteColor,
+        color: AppColors.whiteColor,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -187,7 +187,7 @@ class _ImgSectionState extends State<_ImgSection> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
@@ -233,7 +233,7 @@ class _ImgSectionState extends State<_ImgSection> {
                   },
                   icon: const Icon(
                     Icons.cancel,
-                    color: AppColors.backgroundWhiteColor,
+                    color: AppColors.whiteColor,
                   ),
                 ),
               ),
@@ -371,13 +371,13 @@ class _CommentSection extends StatelessWidget {
               const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(
-              color: AppColors.textFieldColor,
+              color: AppColors.whiteColor,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(
-              color: AppColors.textFieldColor,
+              color: AppColors.whiteColor,
             ),
             borderRadius: BorderRadius.circular(8),
           ),
