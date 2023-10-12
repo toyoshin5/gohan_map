@@ -103,7 +103,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
             child: Container(
               //モーダル風UIの中身
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
+                color: AppColors.whiteColor,
                 border: Border.all(
                   color: AppColors.greyColor,
                   width: 1,
@@ -112,11 +112,37 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
+                boxShadow:
+                    const [BoxShadow(blurRadius: 16, color: Colors.grey)],
               ),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
-                child: AppSearchBar(
-                  onSubmitted: (value) {},
+                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 27),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            border: Border.all(
+                              color: AppColors.greyColor,
+                              width: 1,
+                            ),
+                        ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            color: AppColors.primaryColor
+                        ),
+                        child: Icon(Icons.search, color: AppColors.whiteColor,),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 12),
+                        child: Text("お店の 検索 / 登録",style: TextStyle(color: Colors.black45,),),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
