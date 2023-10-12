@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         body: MainPage(),
       ),
       theme: ThemeData(
-    textTheme: (Platform.isAndroid)?GoogleFonts.dotGothic16TextTheme(
+    textTheme: (Platform.isAndroid)?GoogleFonts.mPlus1TextTheme(
       Theme.of(context).textTheme
     ):null,
   ),
