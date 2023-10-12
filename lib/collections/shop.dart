@@ -11,6 +11,7 @@ class Shop {
   late String shopName;
   late String shopAddress;
   late String shopMapIconKind;
+  late bool wantToGoFlg;
   late double shopLatitude;
   late double shopLongitude;
   late DateTime createdAt;

@@ -204,7 +204,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
             title: const Text('投稿の入力がありません'),
             actions: [
               CupertinoDialogAction(
-                child: const Text('Close'),
+                child: const Text('閉じる'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -216,14 +216,33 @@ class _PlacePostPageState extends State<PlacePostPage> {
       return;
     }
 
-    if (widget.timeline != null) {
-      _updateTimeline();
-    } else {
-      _addToDB();
-    }
+    
+    Future(() async {
+      //wantToGoフラグがTrueの場合はFalseに変更
+      if (widget.shop.wantToGoFlg) {
+        final shop = Shop()
+          ..id = widget.shop.id
+          ..shopName = widget.shop.shopName
+          ..shopAddress = widget.shop.shopAddress
+          ..googleMapURL = widget.shop.googleMapURL
+          ..googlePlaceId = widget.shop.googlePlaceId
+          ..shopLatitude = widget.shop.shopLatitude
+          ..shopLongitude = widget.shop.shopLongitude
+          ..shopMapIconKind = widget.shop.shopMapIconKind
+          ..wantToGoFlg = false
+          ..createdAt = widget.shop.createdAt
+          ..updatedAt = DateTime.now();
+        await IsarUtils.createShop(shop);
+      }
+      if (widget.timeline != null) {
+        _updateTimeline();
+      } else {
+        _addToDB();
+      }
+    });
   }
 
-  //DBに店を新規登録
+  //DBに投稿を追加
   Future<void> _addToDB() async {
     String? imagePath = await saveImageFile(image);
     final timeline = Timeline()
@@ -240,12 +259,12 @@ class _PlacePostPageState extends State<PlacePostPage> {
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context, "update");
+      Navigator.pop(context);
       return;
     }
   }
 
-  //DBに店を新規登録
+  //DBの投稿を更新
   Future<void> _updateTimeline() async {
     String? imagePath = await saveImageFile(image);
     final timeline = Timeline()
@@ -263,7 +282,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
     if (context.mounted) {
       //振動
       Haptic.onSuccess();
-      Navigator.pop(context, "update");
+      Navigator.pop(context);
       return;
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -9,6 +11,7 @@ import 'package:gohan_map/view/all_post_page.dart';
 import 'package:gohan_map/view/character_page.dart';
 import 'package:gohan_map/view/map_page.dart';
 import 'package:gohan_map/view/swipeui_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// アプリが起動したときに呼ばれる
 void main() {
@@ -33,16 +36,19 @@ class MyApp extends StatelessWidget {
     //セーフエリア外の高さを保存しておく
     SafeAreaUtil.unSafeAreaBottomHeight = MediaQuery.of(context).padding.bottom;
     SafeAreaUtil.unSafeAreaTopHeight = MediaQuery.of(context).padding.top;
-    return const MaterialApp(
+    return MaterialApp(
       title: 'Gohan Map',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
+      home: const Scaffold(
         resizeToAvoidBottomInset: false,
-        //appBar: AppBar(
-        //  title: const Text('Gohan Map'),
-        //),
+
         body: MainPage(),
       ),
+      theme: ThemeData(
+    textTheme: (Platform.isAndroid)?GoogleFonts.mPlus1TextTheme(
+      Theme.of(context).textTheme
+    ):null,
+  ),
     );
   }
 }
