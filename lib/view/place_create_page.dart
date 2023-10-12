@@ -1,16 +1,13 @@
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
-import 'package:flutter_haptic/haptic.dart';
+
 import 'package:gohan_map/collections/shop.dart';
-import 'package:gohan_map/collections/timeline.dart';
-import 'package:gohan_map/component/post_food_widget.dart';
-import 'package:gohan_map/utils/common.dart';
+
 import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -21,7 +18,13 @@ class PlaceCreatePage extends StatefulWidget {
   final LatLng latlng;
   final String? initialShopName;
   final String placeId;
-  const PlaceCreatePage({Key? key, required this.latlng, this.initialShopName,required this.placeId})
+  final String address;
+  const PlaceCreatePage(
+      {Key? key,
+      required this.latlng,
+      this.initialShopName,
+      required this.placeId,
+      required this.address})
       : super(key: key);
 
   @override
@@ -29,8 +32,6 @@ class PlaceCreatePage extends StatefulWidget {
 }
 
 class _PlaceCreatePageState extends State<PlaceCreatePage> {
-  String shopName = '';
-  String address = '';
   String shopMapIconKind = "default";
   File? image;
   double star = 4.0;
@@ -40,7 +41,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
 
   @override
   void initState() {
-    shopName = widget.initialShopName ?? "";
     super.initState();
   }
 
@@ -55,33 +55,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             //飲食店名
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _ShopNameTextField(
-                  initialShopName: shopName,
-                  onChanged: (value) {
-                    setState(() {
-                      shopName = value;
-                    });
-                  },
-                ),
-                const SizedBox(width: 24),
-                SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: IconButton(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 12, 12), //44px確保
-                    icon: const Icon(
-                      Icons.cancel_outlined,
-                      size: 32,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context); //前の画面に戻る
-                    },
-                  ),
-                ),
-              ],
+            Text(
+              widget.initialShopName ?? '名称未設定',
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             //住所
             const Padding(
@@ -103,16 +79,9 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                 ],
               ),
             ),
-            FutureBuilder(
-              future: _getAddressFromLatLng(widget.latlng),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  address = snapshot.data.toString();
-                  return Text(snapshot.data.toString());
-                } else {
-                  return const Text('住所を取得中...');
-                }
-              },
+            Text(
+              widget.address,
+              style: const TextStyle(fontSize: 16),
             ),
             // ピンの種類
             const Padding(
@@ -152,62 +121,52 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
               },
               value: shopMapIconKind,
             ),
-            //最初の投稿
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
-              child: Text(
-                '最初の投稿',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            PostFoodWidget(
-              onImageChanged: (image) {
-                setState(() {
-                  this.image = image;
-                });
-              },
-              onStarChanged: (star) {
-                setState(() {
-                  this.star = star;
-                });
-              },
-              onDateChanged: (date) {
-                setState(() {
-                  this.date = date;
-                });
-              },
-              onCommentChanged: (comment) {
-                setState(() {
-                  this.comment = comment;
-                });
-              },
-              onCommentFocusChanged: (isFocus) {
-                setState(() {
-                  avoidkeyBoard = isFocus;
-                });
-              },
-            ),
-            //決定ボタン
+            //登録ボタン
             Container(
               width: double.infinity,
               height: 50,
-              margin: const EdgeInsets.symmetric(vertical: 16),
+              margin: const EdgeInsets.only(top: 12),
               child: TextButton(
                 style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.whiteColor,
+                  backgroundColor: AppColors.primaryColor,
                 ),
                 onPressed: () {
-                  _onTapComfirm(context);
+                  _onTapComfirm(context,false);
                 },
                 child: const Text(
                   '店舗を登録',
+                  style: TextStyle(
+                      color: AppColors.whiteColor,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+             //行きたいボタン
+            Container(
+              width: double.infinity,
+              height: 50,
+              margin: const EdgeInsets.only(top: 12),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
+                  foregroundColor: AppColors.blackTextColor,
+                  backgroundColor: AppColors.whiteColor,
+                ),
+                onPressed: () {
+                  _onTapComfirm(context,true);
+                },
+                child: const Text(
+                  '行ってみたい店舗として登録',
                   style: TextStyle(
                       color: AppColors.primaryColor,
                       fontWeight: FontWeight.bold),
@@ -245,169 +204,117 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   }
 
   //決定ボタンを押した時の処理
-  void _onTapComfirm(BuildContext context) {
-    //バリデーション
-    if (shopName.isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('店名を入力してください'),
-            content: const Text('店を登録するためには、店名の入力が必要です。'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    } else if (address.isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('住所を取得できません'),
-            content: const Text('インターネットへの接続状況をご確認ください。'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    } else if (image == null && comment.isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('最初の投稿がありません'),
-            content: const Text('最初の投稿なしで登録しますか？'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('キャンセル'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              CupertinoDialogAction(
-                child: const Text('店だけ登録'),
-                onPressed: () async {
-                  _addToDB(false);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-    _addToDB(true);
+  void _onTapComfirm(BuildContext context,bool wantToGoFlg) {
+    _addToDB(wantToGoFlg);
   }
 
-  //DBに店を登録(initalPostFlg: 最初の投稿をするかどうか)
-  Future<void> _addToDB(bool initialPostFlg) async {
+  //DBに店を登録
+  Future<void> _addToDB(bool wantToGoFlg) async {
     final shop = Shop()
-      ..shopName = shopName
-      ..shopAddress = address
+      ..shopName = widget.initialShopName ?? '名称未設定'
+      ..shopAddress = widget.address
       ..googleMapURL = null
       ..googlePlaceId = widget.placeId
       ..shopLatitude = widget.latlng.latitude
       ..shopLongitude = widget.latlng.longitude
       ..shopMapIconKind = shopMapIconKind
+      ..wantToGoFlg = wantToGoFlg
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now();
-    final shopId = await IsarUtils.createShop(shop);
-    if (initialPostFlg) {
-      String? imagePath = await saveImageFile(image);
-
-      final timeline = Timeline()
-        ..image = imagePath
-        ..isPublic = false
-        ..comment = comment
-        ..star = star
-        ..createdAt = DateTime.now()
-        ..updatedAt = DateTime.now()
-        ..shopId = shopId
-        ..date = date;
-      await IsarUtils.createTimeline(timeline);
-      if (context.mounted) {
-        //振動
-        Haptic.onSuccess();
+    IsarUtils.createShop(shop).then((shopId) {
+      if (wantToGoFlg){
         Navigator.pop(context);
         return;
       }
-    }
-    if (context.mounted) {
-      //振動
-      Haptic.onSuccess();
-      Navigator.pop(context);
-    }
+      showCupertinoDialog(
+        context: context,
+        builder: (context) {
+          return CupertinoAlertDialog(
+            title: const Text('食事の記録を行いますか?'),
+            content: const Text('早速このお店での食事の記録を残すことができます'),
+            actions: [
+              CupertinoDialogAction(
+                child: const Text('後で行う'),
+                onPressed: () async {
+                  Navigator.pop(context, false);
+                },
+              ),
+              CupertinoDialogAction(
+                child: const Text(
+                  '記録する',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                onPressed: () async {
+                  Navigator.pop(context, true);
+                },
+              ),
+            ],
+          );
+        },
+      ).then((isInitialPost) {
+        if (isInitialPost) {
+          Navigator.pop(context, shopId);
+        } else {
+          Navigator.pop(context);
+        }
+      });
+
+    });
   }
 
-  //緯度経度から住所を取得する
-  Future<String> _getAddressFromLatLng(LatLng latLng) async {
-    const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
-    final String apiUrl =
-        'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final address = responseData['Feature'][0]['Property']['Address'];
-      return address;
-    } else {
-      return '住所を取得できませんでした';
-    }
-  }
+  // //緯度経度から住所を取得する
+  // Future<String> _getAddressFromLatLng(LatLng latLng) async {
+  //   const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
+  //   final String apiUrl =
+  //       'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
+  //   final response = await http.get(Uri.parse(apiUrl));
+  //   if (response.statusCode == 200) {
+  //     final responseData = json.decode(response.body);
+  //     final address = responseData['Feature'][0]['Property']['Address'];
+  //     return address;
+  //   } else {
+  //     return '住所を取得できませんでした';
+  //   }
+  // }
 }
 
-//店名を入力するWidget
-class _ShopNameTextField extends StatelessWidget {
-  final Function(String) onChanged;
-  final String? initialShopName;
+// //店名を入力するWidget
+// class _ShopNameTextField extends StatelessWidget {
+//   final Function(String) onChanged;
+//   final String? initialShopName;
 
-  const _ShopNameTextField({
-    Key? key,
-    required this.onChanged,
-    this.initialShopName,
-  }) : super(key: key);
+//   const _ShopNameTextField({
+//     Key? key,
+//     required this.onChanged,
+//     this.initialShopName,
+//   }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    //角丸,白いぬりつぶし,枠線なし
-    return Flexible(
-      child: TextFormField(
-        decoration: InputDecoration(
-          hintText: '店名を入力',
-          filled: true,
-          fillColor: AppColors.whiteColor,
-          contentPadding: const EdgeInsets.all(16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: AppColors.whiteColor,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: AppColors.whiteColor,
-            ),
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        initialValue: initialShopName,
-        onChanged: onChanged,
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     //角丸,白いぬりつぶし,枠線なし
+//     return Flexible(
+//       child: TextFormField(
+//         decoration: InputDecoration(
+//           hintText: '店名を入力',
+//           filled: true,
+//           fillColor: AppColors.whiteColor,
+//           contentPadding: const EdgeInsets.all(16),
+//           enabledBorder: OutlineInputBorder(
+//             borderSide: const BorderSide(
+//               color: AppColors.whiteColor,
+//             ),
+//             borderRadius: BorderRadius.circular(12),
+//           ),
+//           focusedBorder: OutlineInputBorder(
+//             borderSide: const BorderSide(
+//               color: AppColors.whiteColor,
+//             ),
+//             borderRadius: BorderRadius.circular(12),
+//           ),
+//         ),
+//         initialValue: initialShopName,
+//         onChanged: onChanged,
+//       ),
+//     );
+//   }
+// }

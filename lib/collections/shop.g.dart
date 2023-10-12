@@ -61,6 +61,11 @@ const ShopSchema = CollectionSchema(
       id: 8,
       name: r'updatedAt',
       type: IsarType.dateTime,
+    ),
+    r'wantToGoFlg': PropertySchema(
+      id: 9,
+      name: r'wantToGoFlg',
+      type: IsarType.bool,
     )
   },
   estimateSize: _shopEstimateSize,
@@ -111,6 +116,7 @@ void _shopSerialize(
   writer.writeString(offsets[6], object.shopMapIconKind);
   writer.writeString(offsets[7], object.shopName);
   writer.writeDateTime(offsets[8], object.updatedAt);
+  writer.writeBool(offsets[9], object.wantToGoFlg);
 }
 
 Shop _shopDeserialize(
@@ -130,6 +136,7 @@ Shop _shopDeserialize(
   object.shopMapIconKind = reader.readString(offsets[6]);
   object.shopName = reader.readString(offsets[7]);
   object.updatedAt = reader.readDateTime(offsets[8]);
+  object.wantToGoFlg = reader.readBool(offsets[9]);
   return object;
 }
 
@@ -158,6 +165,8 @@ P _shopDeserializeProp<P>(
       return (reader.readString(offset)) as P;
     case 8:
       return (reader.readDateTime(offset)) as P;
+    case 9:
+      return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -1197,6 +1206,16 @@ extension ShopQueryFilter on QueryBuilder<Shop, Shop, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Shop, Shop, QAfterFilterCondition> wantToGoFlgEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'wantToGoFlg',
+        value: value,
+      ));
+    });
+  }
 }
 
 extension ShopQueryObject on QueryBuilder<Shop, Shop, QFilterCondition> {}
@@ -1309,6 +1328,18 @@ extension ShopQuerySortBy on QueryBuilder<Shop, Shop, QSortBy> {
   QueryBuilder<Shop, Shop, QAfterSortBy> sortByUpdatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'updatedAt', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterSortBy> sortByWantToGoFlg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wantToGoFlg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterSortBy> sortByWantToGoFlgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wantToGoFlg', Sort.desc);
     });
   }
 }
@@ -1433,6 +1464,18 @@ extension ShopQuerySortThenBy on QueryBuilder<Shop, Shop, QSortThenBy> {
       return query.addSortBy(r'updatedAt', Sort.desc);
     });
   }
+
+  QueryBuilder<Shop, Shop, QAfterSortBy> thenByWantToGoFlg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wantToGoFlg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Shop, Shop, QAfterSortBy> thenByWantToGoFlgDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'wantToGoFlg', Sort.desc);
+    });
+  }
 }
 
 extension ShopQueryWhereDistinct on QueryBuilder<Shop, Shop, QDistinct> {
@@ -1496,6 +1539,12 @@ extension ShopQueryWhereDistinct on QueryBuilder<Shop, Shop, QDistinct> {
       return query.addDistinctBy(r'updatedAt');
     });
   }
+
+  QueryBuilder<Shop, Shop, QDistinct> distinctByWantToGoFlg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'wantToGoFlg');
+    });
+  }
 }
 
 extension ShopQueryProperty on QueryBuilder<Shop, Shop, QQueryProperty> {
@@ -1556,6 +1605,12 @@ extension ShopQueryProperty on QueryBuilder<Shop, Shop, QQueryProperty> {
   QueryBuilder<Shop, DateTime, QQueryOperations> updatedAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'updatedAt');
+    });
+  }
+
+  QueryBuilder<Shop, bool, QQueryOperations> wantToGoFlgProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'wantToGoFlg');
     });
   }
 }

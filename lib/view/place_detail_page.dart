@@ -82,25 +82,24 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                 ),
               ),
               Positioned(
-                  right: 12,
-                  top: 12,
-                  child: SizedBox(
-                    height: 30,
-                    width: 30,
-                    child: IconButton(
-                      padding: const EdgeInsets.fromLTRB(0, 0, 12, 12), //44px確保
-                      icon: Icon(
-                        Icons.cancel_outlined,
-                        color: Colors.grey[300],
-
-                        size: 32,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context); //前の画面に戻る
-                      },
+                right: 12,
+                top: 12,
+                child: SizedBox(
+                  height: 30,
+                  width: 30,
+                  child: IconButton(
+                    padding: const EdgeInsets.fromLTRB(0, 0, 12, 12), //44px確保
+                    icon: Icon(
+                      Icons.cancel_outlined,
+                      color: Colors.grey[300],
+                      size: 32,
                     ),
+                    onPressed: () {
+                      Navigator.pop(context); //前の画面に戻る
+                    },
                   ),
                 ),
+              ),
             ],
           ),
           const SizedBox(
@@ -141,28 +140,29 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                       ],
                     ),
                     if (shopTimeline?.isNotEmpty ?? false)
-                    //星の数
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(top: 8, bottom: 8, left: 2),
-                      child: Row(children: [
-                        Text(
-                          ((aveStar*100).floor()/100.0).toString(),
-                          style: const TextStyle(color: Colors.black38),
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.only(right: 4),
-                        ),
-                        IgnorePointer(
-                          ignoring: true,
-                          child: AppRatingBar(
-                            initialRating: aveStar-0.24,//星の数の表示が正しくない不具合を対処
-                            onRatingUpdate: (rating) {},
-                            itemSize: 20,
+                      //星の数
+                      Padding(
+                        padding:
+                            const EdgeInsets.only(top: 8, bottom: 8, left: 2),
+                        child: Row(children: [
+                          Text(
+                            ((aveStar * 100).floor() / 100.0).toString(),
+                            style: const TextStyle(color: Colors.black38),
                           ),
-                        )
-                      ]),
-                    ),
+                          const Padding(
+                            padding: EdgeInsets.only(right: 4),
+                          ),
+                          IgnorePointer(
+                            ignoring: true,
+                            child: AppRatingBar(
+                              initialRating:
+                                  aveStar - 0.24, //星の数の表示が正しくない不具合を対処
+                              onRatingUpdate: (rating) {},
+                              itemSize: 20,
+                            ),
+                          )
+                        ]),
+                      ),
                     Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Row(
@@ -240,11 +240,15 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                                       ); //ご飯投稿
                                     },
                                   ).then((value) {
-                                    IsarUtils.getTimelinesByShopId(
-                                            selectedShop!.id)
-                                        .then((timeline) {
+                                    Future(() async {
+                                      final timeline =
+                                          await IsarUtils.getTimelinesByShopId(
+                                              selectedShop!.id);
+                                      final shop = await IsarUtils.getShopById(
+                                          selectedShop!.id);
                                       setState(() {
                                         shopTimeline = timeline;
+                                        selectedShop = shop;
                                         aveStar = calcAveStar(timeline);
                                       });
                                     });
