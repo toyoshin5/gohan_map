@@ -13,6 +13,7 @@ import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
+import 'package:gohan_map/icon/app_icon_icons.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/map_pins.dart';
@@ -102,25 +103,21 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
           child: AbsorbPointer(
             child: Container(
               //モーダル風UIの中身
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: AppColors.whiteColor,
-                border: Border.all(
-                  color: AppColors.greyColor,
-                  width: 1,
-                ),
-                borderRadius: const BorderRadius.only(
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
                 boxShadow:
-                    const [BoxShadow(blurRadius: 16, color: Colors.grey)],
+                    [BoxShadow(blurRadius: 16, color: Colors.grey)],
               ),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 27),
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
                             border: Border.all(
                               color: AppColors.greyColor,
                               width: 1,
@@ -131,15 +128,15 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       Container(
                         height: 50,
                         width: 50,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                             borderRadius: BorderRadius.all(Radius.circular(10)),
                             color: AppColors.primaryColor
                         ),
-                        child: Icon(Icons.search, color: AppColors.whiteColor,),
+                        child: const Icon(AppIcons.search, color: AppColors.whiteColor,),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 12),
-                        child: Text("お店の 検索 / 登録",style: TextStyle(color: Colors.black45,),),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 12),
+                        child: Text("お店の 検索 / 登録",style: TextStyle(color: Colors.black38,),),
                       ),
                     ],
                   ),

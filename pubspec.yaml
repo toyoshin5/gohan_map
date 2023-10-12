@@ -89,6 +89,7 @@ flutter:
   assets:
     - images/
     - images/pins/
+    - icon/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
@@ -104,6 +105,10 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   # fonts:
+  fonts:
+    - family: AppIcon #アイコンセットのタイトル
+      fonts:
+        - asset: icon/AppIcon.ttf #設置したファイル
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
