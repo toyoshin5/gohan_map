@@ -13,6 +13,7 @@ import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
 import 'package:gohan_map/component/app_search_bar.dart';
+import 'package:gohan_map/icon/app_icon_icons.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/map_pins.dart';
@@ -103,21 +104,43 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
           child: AbsorbPointer(
             child: Container(
               //モーダル風UIの中身
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                border: Border.all(
-                  color: AppColors.greyColor,
-                  width: 1,
-                ),
-                borderRadius: const BorderRadius.only(
+              decoration: const BoxDecoration(
+                color: AppColors.whiteColor,
+                borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
+                boxShadow:
+                    [BoxShadow(blurRadius: 16, color: Colors.grey)],
               ),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
-                child: AppSearchBar(
-                  onSubmitted: (value) {},
+                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 27),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            border: Border.all(
+                              color: AppColors.greyColor,
+                              width: 1,
+                            ),
+                        ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            color: AppColors.primaryColor
+                        ),
+                        child: const Icon(AppIcons.search, color: AppColors.whiteColor,),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 12),
+                        child: Text("お店の 検索 / 登録",style: TextStyle(color: Colors.black38,),),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),

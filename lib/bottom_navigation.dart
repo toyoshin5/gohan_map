@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:gohan_map/colors/app_colors.dart';
+import 'package:gohan_map/icon/app_icon_icons.dart';
 import 'package:gohan_map/main.dart';
 
 const tabTitle = <TabItem, String>{
   TabItem.map: 'マップ',
-  TabItem.allpost: '投稿一覧',
-  TabItem.character: '育成',
+  TabItem.swipe: 'スワイプ',
+  TabItem.character: 'キャラクター',
 };
 const tabIcon = <TabItem, IconData>{
-  TabItem.map: Icons.map,
-  TabItem.allpost: Icons.list,
-  TabItem.character: Icons.mood,
+  TabItem.map: AppIcons.map_marked_alt,
+  TabItem.swipe: Icons.thumbs_up_down,
+  TabItem.character: AppIcons.paw,
 };
 
 class BottomNavigation extends StatelessWidget {
@@ -24,26 +26,35 @@ class BottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      items: <BottomNavigationBarItem>[
-        bottomItem(
-          context,
-          tabItem: TabItem.map,
+    return Container(
+      decoration: BoxDecoration(boxShadow: [
+        BoxShadow(
+          color: Colors.black.withOpacity(0.05),
+          blurRadius: 10,
+          spreadRadius: 10,
         ),
-        bottomItem(
-          context,
-          tabItem: TabItem.allpost,
-        ),
-        bottomItem(
-          context,
-          tabItem: TabItem.character,
-        ),
-      ],
-      type: BottomNavigationBarType.fixed,
-      selectedFontSize: 12,
-      onTap: (index) {
-        onSelect(TabItem.values[index]);
-      },
+      ]),
+      child: BottomNavigationBar(
+        items: <BottomNavigationBarItem>[
+          bottomItem(
+            context,
+            tabItem: TabItem.map,
+          ),
+          bottomItem(
+            context,
+            tabItem: TabItem.swipe,
+          ),
+          bottomItem(
+            context,
+            tabItem: TabItem.character,
+          ),
+        ],
+        type: BottomNavigationBarType.fixed,
+        selectedFontSize: 12,
+        onTap: (index) {
+          onSelect(TabItem.values[index]);
+        },
+      ),
     );
   }
 
@@ -51,10 +62,13 @@ class BottomNavigation extends StatelessWidget {
     BuildContext context, {
     required TabItem tabItem,
   }) {
-    final color = currentTab == tabItem ? Colors.blue : Colors.black26;
+    final color = currentTab == tabItem ? AppColors.tabBarColor : Colors.black26;
     return BottomNavigationBarItem(
-      icon: Column(
+      icon: Column( 
         children: [
+          const SizedBox(
+          height: 8,
+          ),
           Icon(
             tabIcon[tabItem],
             color: color,

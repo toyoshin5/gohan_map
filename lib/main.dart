@@ -10,6 +10,7 @@ import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/all_post_page.dart';
 import 'package:gohan_map/view/character_page.dart';
 import 'package:gohan_map/view/map_page.dart';
+import 'package:gohan_map/view/swipeui_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// アプリが起動したときに呼ばれる
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
 
 enum TabItem {
   map,
-  allpost,
+  swipe,
   character,
 }
 
@@ -69,14 +70,14 @@ class _MainPageState extends State<MainPage> {
   TabItem _currentTab = TabItem.map;
   final Map<TabItem, GlobalKey<NavigatorState>> _navigatorKeys = {
     TabItem.map: GlobalKey<NavigatorState>(),
-    TabItem.allpost: GlobalKey<NavigatorState>(),
+    TabItem.swipe: GlobalKey<NavigatorState>(),
     TabItem.character: GlobalKey<NavigatorState>(),
   };
 
   //globalKeyは、ウィジェットの状態を保存するためのもの
   final Map<TabItem, GlobalKey<State>> _globalKeys = {
     TabItem.map: GlobalKey<State>(),
-    TabItem.allpost: GlobalKey<State>(),
+    TabItem.swipe: GlobalKey<State>(),
     TabItem.character: GlobalKey<State>(),
   };
 
@@ -92,7 +93,7 @@ class _MainPageState extends State<MainPage> {
             '/map',
           ),
           _buildTabItem(
-            TabItem.allpost,
+            TabItem.swipe,
             '/allpost',
           ),
           _buildTabItem(
@@ -130,9 +131,9 @@ class _MainPageState extends State<MainPage> {
       _currentTab = tabItem;
     });
     //選択されたタブをリロードする
-    if (tabItem == TabItem.allpost) {
-      AllPostPageState? allpostPageState =
-            _globalKeys[tabItem]!.currentState as AllPostPageState?;
+    if (tabItem == TabItem.swipe) {
+      SwipeUIPageState? allpostPageState =
+            _globalKeys[tabItem]!.currentState as SwipeUIPageState?;
       allpostPageState?.reload();
       _navigatorKeys[tabItem]?.currentState?.popUntil((route) => route.isFirst);
     }else if(tabItem == TabItem.map){
@@ -145,7 +146,7 @@ class _MainPageState extends State<MainPage> {
       characterPageState?.reload();
     }
     //タブの最初の画面に戻る
-    _navigatorKeys[TabItem.allpost]?.currentState?.popUntil((route) => route.isFirst);
+    //_navigatorKeys[TabItem.swipe]?.currentState?.popUntil((route) => route.isFirst);
     _navigatorKeys[TabItem.map]?.currentState?.popUntil((route) => route.isFirst);
     _navigatorKeys[TabItem.character]?.currentState?.popUntil((route) => route.isFirst);
   }
