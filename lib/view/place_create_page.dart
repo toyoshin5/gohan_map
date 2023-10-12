@@ -262,59 +262,5 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
     });
   }
 
-  // //緯度経度から住所を取得する
-  // Future<String> _getAddressFromLatLng(LatLng latLng) async {
-  //   const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
-  //   final String apiUrl =
-  //       'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
-  //   final response = await http.get(Uri.parse(apiUrl));
-  //   if (response.statusCode == 200) {
-  //     final responseData = json.decode(response.body);
-  //     final address = responseData['Feature'][0]['Property']['Address'];
-  //     return address;
-  //   } else {
-  //     return '住所を取得できませんでした';
-  //   }
-  // }
 }
 
-// //店名を入力するWidget
-// class _ShopNameTextField extends StatelessWidget {
-//   final Function(String) onChanged;
-//   final String? initialShopName;
-
-//   const _ShopNameTextField({
-//     Key? key,
-//     required this.onChanged,
-//     this.initialShopName,
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     //角丸,白いぬりつぶし,枠線なし
-//     return Flexible(
-//       child: TextFormField(
-//         decoration: InputDecoration(
-//           hintText: '店名を入力',
-//           filled: true,
-//           fillColor: AppColors.whiteColor,
-//           contentPadding: const EdgeInsets.all(16),
-//           enabledBorder: OutlineInputBorder(
-//             borderSide: const BorderSide(
-//               color: AppColors.whiteColor,
-//             ),
-//             borderRadius: BorderRadius.circular(12),
-//           ),
-//           focusedBorder: OutlineInputBorder(
-//             borderSide: const BorderSide(
-//               color: AppColors.whiteColor,
-//             ),
-//             borderRadius: BorderRadius.circular(12),
-//           ),
-//         ),
-//         initialValue: initialShopName,
-//         onChanged: onChanged,
-//       ),
-//     );
-//   }
-// }
