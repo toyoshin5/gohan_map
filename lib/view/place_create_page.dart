@@ -390,17 +390,17 @@ class _ShopNameTextField extends StatelessWidget {
         decoration: InputDecoration(
           hintText: '店名を入力',
           filled: true,
-          fillColor: AppColors.textFieldColor,
+          fillColor: AppColors.whiteColor,
           contentPadding: const EdgeInsets.all(16),
           enabledBorder: OutlineInputBorder(
             borderSide: const BorderSide(
-              color: AppColors.textFieldColor,
+              color: AppColors.whiteColor,
             ),
             borderRadius: BorderRadius.circular(12),
           ),
           focusedBorder: OutlineInputBorder(
             borderSide: const BorderSide(
-              color: AppColors.textFieldColor,
+              color: AppColors.whiteColor,
             ),
             borderRadius: BorderRadius.circular(12),
           ),
