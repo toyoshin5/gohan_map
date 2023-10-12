@@ -19,6 +19,7 @@ import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
+import 'package:gohan_map/view/place_post_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
 import 'package:isar/isar.dart';
 import 'package:latlong2/latlong.dart';
@@ -190,11 +191,36 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     builder: (context) {
                       return PlaceCreatePage(
                         latlng: paResult.latlng,
-                        initialShopName: paResult.name, placeId: paResult.placeId,
+                        initialShopName: paResult.name,
+                        placeId: paResult.placeId,
+                        address: paResult.address,
                       );
                     },
-                  ).then((value) {
+                  ).then((shopId) {
                     _loadAllShop();
+                    if (shopId != null) {
+                      //ピンの位置に移動する
+                      IsarUtils.getShopById(shopId).then((shop) {
+                        if (shop != null) {
+                          final latLng =
+                              LatLng(shop.shopLatitude, shop.shopLongitude);
+                          _moveToPin(latLng, deviceHeight * 0.2);
+                          //初回投稿
+                          showModalBottomSheet(
+                            barrierColor: Colors.black.withOpacity(0),
+                            isDismissible: true,
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) {
+                              return PlacePostPage(
+                                shop: shop,
+                              );
+                            },
+                          );
+                        }
+                      });
+                    }
                   });
                 }
               },
@@ -246,17 +272,17 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         tapFlgs[shop.id] = true;
                       });
                       showModalBottomSheet(
-                      barrierColor: Colors.black.withOpacity(0),
-                      isDismissible: true,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (context) {
-                        return PlaceDetailPage(
-                          id: shop.id,
-                        ); //飲食店の詳細画面
-                      },
-                    ).then((value) => _onModalPop(value, shop.id));
+                        barrierColor: Colors.black.withOpacity(0),
+                        isDismissible: true,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        context: context,
+                        builder: (context) {
+                          return PlaceDetailPage(
+                            id: shop.id,
+                          ); //飲食店の詳細画面
+                        },
+                      ).then((value) => _onModalPop(value, shop.id));
                     });
                   }
                 },
