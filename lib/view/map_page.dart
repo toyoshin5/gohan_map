@@ -114,7 +114,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     [BoxShadow(blurRadius: 16, color: Colors.black.withOpacity(0.2))],
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 27),
+                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
