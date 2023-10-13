@@ -9,8 +9,8 @@ class AppColors {
   static const Color redTextColor = Color(0xFFDF3030);
   static const Color searchBarColor = Color(0xFFE2DFDC);
   static const Color whiteColor = Color(0xffffffff);
-  static const Color greyDarkColor = Color(0xffa9a9a9);
-  static const Color greyColor = Color(0xffd9d9d9);
-  static const Color greyLightColor = Color(0xfff5f5f5);
+  static const Color greyDarkColor = Color(0xffa9a9a9);//テキストなど
+  static const Color greyColor = Color(0xffd9d9d9);//枠線など
+  static const Color greyLightColor = Color(0xfff5f5f5);//背景色など
   static const Color pinColor = Color.fromARGB(255, 255, 0, 0);
 }
