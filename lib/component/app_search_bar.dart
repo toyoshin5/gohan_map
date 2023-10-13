@@ -4,11 +4,15 @@ import 'package:gohan_map/colors/app_colors.dart';
 class AppSearchBar extends StatelessWidget {
   final Function(String)? onSubmitted;
   final Function(String)? onChanged;
+  final Function()? onPressClear;
+  final bool showBack;
   final bool autofocus;
   const AppSearchBar({
     Key? key,
     this.onSubmitted,
     this.onChanged,
+    this.onPressClear,
+    this.showBack = true,
     this.autofocus = false,
   }) : super(key: key);
 
@@ -18,28 +22,48 @@ class AppSearchBar extends StatelessWidget {
       color: Colors.transparent,
       child: Container(
         //角丸
-        height: 46,
+        height: 50,
         decoration: BoxDecoration(
-          color: AppColors.searchBarColor,
-          borderRadius: BorderRadius.circular(23),
+          color: AppColors.greyLightColor,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: AppColors.greyColor,
+            width: 1,
+          ),
         ),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Row(
           children: [
-            const Icon(
-              Icons.search,
-              color: AppColors.blackTextColor,
-            ),
-            Expanded(
-              child: TextField(
-                autofocus: autofocus,
-                cursorColor: AppColors.blackTextColor,
-                decoration: const InputDecoration(
-                  hintText: 'Search',
-                  border: InputBorder.none,
+            if (showBack == true)
+              InkWell(
+                child: const Icon(
+                  Icons.arrow_back_ios_new_rounded,
+                  color: AppColors.blackTextColor,
                 ),
-                onSubmitted: onSubmitted,
-                onChanged: onChanged,
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                child: TextField(
+                  autofocus: autofocus,
+                  cursorColor: AppColors.blackTextColor,
+                  decoration: const InputDecoration(
+                    hintText: 'お店の 検索 / 登録',
+                    border: InputBorder.none,
+                  ),
+                  onSubmitted: onSubmitted,
+                  onChanged: onChanged,
+                ),
+              ),
+            ),
+            InkWell(
+              onTap: onPressClear,
+              child: const Icon(
+                Icons.close_rounded,
+                color: AppColors.blackTextColor,
               ),
             ),
           ],
