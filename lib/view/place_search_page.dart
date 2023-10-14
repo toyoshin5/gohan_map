@@ -262,7 +262,6 @@ class SearchResultArea extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 16,
-                              color: Colors.black,
                               height: 1.3,
                             ),
                           ),
