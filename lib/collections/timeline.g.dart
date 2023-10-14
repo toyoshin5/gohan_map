@@ -32,10 +32,10 @@ const TimelineSchema = CollectionSchema(
       name: r'date',
       type: IsarType.dateTime,
     ),
-    r'image': PropertySchema(
+    r'images': PropertySchema(
       id: 3,
-      name: r'image',
-      type: IsarType.string,
+      name: r'images',
+      type: IsarType.stringList,
     ),
     r'isPublic': PropertySchema(
       id: 4,
@@ -93,10 +93,11 @@ int _timelineEstimateSize(
 ) {
   var bytesCount = offsets.last;
   bytesCount += 3 + object.comment.length * 3;
+  bytesCount += 3 + object.images.length * 3;
   {
-    final value = object.image;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
+    for (var i = 0; i < object.images.length; i++) {
+      final value = object.images[i];
+      bytesCount += value.length * 3;
     }
   }
   return bytesCount;
@@ -111,7 +112,7 @@ void _timelineSerialize(
   writer.writeString(offsets[0], object.comment);
   writer.writeDateTime(offsets[1], object.createdAt);
   writer.writeDateTime(offsets[2], object.date);
-  writer.writeString(offsets[3], object.image);
+  writer.writeStringList(offsets[3], object.images);
   writer.writeBool(offsets[4], object.isPublic);
   writer.writeLong(offsets[5], object.shopId);
   writer.writeDouble(offsets[6], object.star);
@@ -129,7 +130,7 @@ Timeline _timelineDeserialize(
   object.createdAt = reader.readDateTime(offsets[1]);
   object.date = reader.readDateTime(offsets[2]);
   object.id = id;
-  object.image = reader.readStringOrNull(offsets[3]);
+  object.images = reader.readStringList(offsets[3]) ?? [];
   object.isPublic = reader.readBool(offsets[4]);
   object.shopId = reader.readLong(offsets[5]);
   object.star = reader.readDouble(offsets[6]);
@@ -151,7 +152,7 @@ P _timelineDeserializeProp<P>(
     case 2:
       return (reader.readDateTime(offset)) as P;
     case 3:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 4:
       return (reader.readBool(offset)) as P;
     case 5:
@@ -640,75 +641,60 @@ extension TimelineQueryFilter
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'image',
-      ));
-    });
-  }
-
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'image',
-      ));
-    });
-  }
-
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageEqualTo(
-    String? value, {
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesElementEqualTo(
+    String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'image',
+        property: r'images',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageGreaterThan(
-    String? value, {
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition>
+      imagesElementGreaterThan(
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
         include: include,
-        property: r'image',
+        property: r'images',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageLessThan(
-    String? value, {
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesElementLessThan(
+    String value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
         include: include,
-        property: r'image',
+        property: r'images',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageBetween(
-    String? lower,
-    String? upper, {
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesElementBetween(
+    String lower,
+    String upper, {
     bool includeLower = true,
     bool includeUpper = true,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
-        property: r'image',
+        property: r'images',
         lower: lower,
         includeLower: includeLower,
         upper: upper,
@@ -718,71 +704,159 @@ extension TimelineQueryFilter
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageStartsWith(
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition>
+      imagesElementStartsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'image',
+        property: r'images',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageEndsWith(
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesElementEndsWith(
     String value, {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'image',
+        property: r'images',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageContains(
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesElementContains(
       String value,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.contains(
-        property: r'image',
+        property: r'images',
         value: value,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageMatches(
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesElementMatches(
       String pattern,
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.matches(
-        property: r'image',
+        property: r'images',
         wildcard: pattern,
         caseSensitive: caseSensitive,
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageIsEmpty() {
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition>
+      imagesElementIsEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'image',
+        property: r'images',
         value: '',
       ));
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imageIsNotEmpty() {
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition>
+      imagesElementIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'image',
+        property: r'images',
         value: '',
       ));
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'images',
+        length,
+        true,
+        length,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'images',
+        0,
+        true,
+        0,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'images',
+        0,
+        false,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'images',
+        0,
+        true,
+        length,
+        include,
+      );
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition>
+      imagesLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'images',
+        length,
+        include,
+        999999,
+        true,
+      );
+    });
+  }
+
+  QueryBuilder<Timeline, Timeline, QAfterFilterCondition> imagesLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.listLength(
+        r'images',
+        lower,
+        includeLower,
+        upper,
+        includeUpper,
+      );
     });
   }
 
@@ -1008,18 +1082,6 @@ extension TimelineQuerySortBy on QueryBuilder<Timeline, Timeline, QSortBy> {
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByImage() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'image', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByImageDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'image', Sort.desc);
-    });
-  }
-
   QueryBuilder<Timeline, Timeline, QAfterSortBy> sortByIsPublic() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isPublic', Sort.asc);
@@ -1119,18 +1181,6 @@ extension TimelineQuerySortThenBy
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByImage() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'image', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByImageDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'image', Sort.desc);
-    });
-  }
-
   QueryBuilder<Timeline, Timeline, QAfterSortBy> thenByIsPublic() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isPublic', Sort.asc);
@@ -1201,10 +1251,9 @@ extension TimelineQueryWhereDistinct
     });
   }
 
-  QueryBuilder<Timeline, Timeline, QDistinct> distinctByImage(
-      {bool caseSensitive = true}) {
+  QueryBuilder<Timeline, Timeline, QDistinct> distinctByImages() {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'image', caseSensitive: caseSensitive);
+      return query.addDistinctBy(r'images');
     });
   }
 
@@ -1259,9 +1308,9 @@ extension TimelineQueryProperty
     });
   }
 
-  QueryBuilder<Timeline, String?, QQueryOperations> imageProperty() {
+  QueryBuilder<Timeline, List<String>, QQueryOperations> imagesProperty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'image');
+      return query.addPropertyName(r'images');
     });
   }
 

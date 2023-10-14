@@ -124,7 +124,7 @@ class PostCardWidget extends StatelessWidget {
             ],
           ),
         ),
-        if (timeline.image != null && timeline.image!.isNotEmpty)
+        if (timeline.images.isNotEmpty)
           //縦長の場合は正方形にする
           Container(
             width: double.infinity,
@@ -134,7 +134,7 @@ class PostCardWidget extends StatelessWidget {
                 maxHeight: min(MediaQuery.of(context).size.width, 400)
               ),
               child: Image.file(
-                        File(p.join(imageData, timeline.image!)),
+                        File(p.join(imageData, timeline.images[0])),
                         fit: BoxFit.contain,
                       ),
             ),
