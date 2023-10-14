@@ -38,6 +38,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
         isRegistered: false,
       ) 
   ];
+  TextEditingController controller = TextEditingController();
   late TabController tabController;
   bool filterRegistered = false; // 0: マップ付近の飲食店, 1: 登録済み
 
@@ -68,10 +69,12 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
           children: [
             //検索バー
             AppSearchBar(
+              controller: controller,
               autofocus: true,
               onPressClear: () {
                 setState(() {
                   searchText = "";
+                  controller.clear();
                 });
               },
               onChanged: (text) {

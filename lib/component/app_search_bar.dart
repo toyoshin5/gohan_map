@@ -7,6 +7,7 @@ class AppSearchBar extends StatelessWidget {
   final Function()? onPressClear;
   final bool showBack;
   final bool autofocus;
+  final TextEditingController? controller;
   const AppSearchBar({
     Key? key,
     this.onSubmitted,
@@ -14,6 +15,7 @@ class AppSearchBar extends StatelessWidget {
     this.onPressClear,
     this.showBack = true,
     this.autofocus = false,
+    this.controller
   }) : super(key: key);
 
   @override
@@ -48,6 +50,7 @@ class AppSearchBar extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0),
                 child: TextField(
+                  controller: controller,
                   autofocus: autofocus,
                   cursorColor: AppColors.blackTextColor,
                   decoration: const InputDecoration(
