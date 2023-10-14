@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:gohan_map/collections/search_history.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
@@ -27,12 +30,13 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
     with TickerProviderStateMixin {
   String searchText = "";
   bool isLoadingPlaceApi = false;
-  bool showHistory = true;
+  bool showHistory = true; //検索履歴を表示するか
   List<SearchHistory> searchHistoryList = [];
   List<RestaurantResult> restaurants = [];
   TextEditingController controller = TextEditingController();
   late TabController tabController;
-  bool filterRegistered = false; // 0: マップ付近の飲食店, 1: 登録済み
+  bool filterRegistered = false; //登録済みのみ表示するか
+  LatLng? currentLatLng; //現在地
 
   @override
   void initState() {
@@ -86,33 +90,34 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
               height: 20,
             ),
 
-            RegisteredFilterButton(onChanged: (value) {
-              setState(() {
-                filterRegistered = value;
-              });
-            }),
-
-            const SizedBox(
-              height: 20,
-            ),
-
+            if (!showHistory) ...[
+              RegisteredFilterButton(onChanged: (value) {
+                setState(() {
+                  filterRegistered = value;
+                });
+              }),
+              const SizedBox(
+                height: 20,
+              ),
+            ],
             //履歴
-            if(showHistory)
-            HistoryArea(
-              searchHistories: searchHistoryList,
-            ),
+            if (showHistory)
+              HistoryArea(
+                searchHistories: searchHistoryList,
+              ),
             // 検索結果
-            if(!showHistory)
-            SearchResultArea(
+            if (!showHistory)
+              SearchResultArea(
                 restaurantList: restaurants,
                 isLoading: isLoadingPlaceApi,
-                filterRegistered: filterRegistered),
+                filterRegistered: filterRegistered,
+                currentLatlng: currentLatLng,
+              ),
           ],
         ),
       ),
     );
   }
-
 
   void _searchRestaurantsByGoogleApi() async {
     if (searchText == "") return; // 空文字ではリクエストを送らない
@@ -121,12 +126,12 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
       isLoadingPlaceApi = true;
       restaurants = [];
     });
+    // 検索結果を取得
     var apiResult = await searchRestaurantsByGoogleMapApi(
       searchText,
       LatLng(widget.mapController.center.latitude,
           widget.mapController.center.longitude),
     );
-
     List<RestaurantResult> restaurantTmp = [];
     for (var restaurant in apiResult) {
       var shop = await IsarUtils.getShopByGooglePlaceId(restaurant.placeId);
@@ -138,7 +143,9 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
             .add(RestaurantResult(apiResult: restaurant, isRegistered: false));
       }
     }
-
+    //現在位置を取得
+    var currentLocation = await Geolocator.getCurrentPosition();
+    currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude);
     logger.d("API呼び出し");
     setState(() {
       isLoadingPlaceApi = false;
@@ -151,12 +158,14 @@ class SearchResultArea extends StatelessWidget {
   final List<RestaurantResult> restaurantList;
   final bool isLoading;
   final bool filterRegistered;
+  final LatLng? currentLatlng;
 
   const SearchResultArea(
       {Key? key,
       required this.restaurantList,
       required this.isLoading,
-      this.filterRegistered = false})
+      this.filterRegistered = false,
+      this.currentLatlng})
       : super(key: key);
 
   @override
@@ -167,8 +176,10 @@ class SearchResultArea extends StatelessWidget {
           const Align(
               alignment: Alignment.center,
               child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
-                child: CircularProgressIndicator(),
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: CircularProgressIndicator(
+                  color: AppColors.primaryColor,
+                ),
               )),
         if (!isLoading && restaurantList.isEmpty)
           const Align(
@@ -188,7 +199,7 @@ class SearchResultArea extends StatelessWidget {
                     ..name = shop.apiResult.name
                     ..address = shop.apiResult.address
                     ..placeId = shop.apiResult.placeId
-                    ..latitude  = shop.apiResult.latlng.latitude
+                    ..latitude = shop.apiResult.latlng.latitude
                     ..longitude = shop.apiResult.latlng.longitude
                     ..updatedAt = DateTime.now()
                     ..createdAt = DateTime.now();
@@ -210,10 +221,10 @@ class SearchResultArea extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Column(
+                    Column(
                       children: [
                         //アイコン
-                        SizedBox(
+                        const SizedBox(
                           //角丸四角形
                           width: 30,
                           height: 34,
@@ -224,8 +235,8 @@ class SearchResultArea extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          "1.0km",
-                          style: TextStyle(fontSize: 8),
+                          _calcDistance(shop.apiResult.latlng),
+                          style: const TextStyle(fontSize: 8),
                         ),
                       ],
                     ),
@@ -271,114 +282,148 @@ class SearchResultArea extends StatelessWidget {
       ],
     );
   }
-}
 
+  //現在地からの距離をテキストで返す
+  String _calcDistance(LatLng latlng) {
+    if (currentLatlng == null) return "";
+    double distance = distanceBetween(
+      currentLatlng!.latitude,
+      currentLatlng!.longitude,
+      latlng.latitude,
+      latlng.longitude,
+    );
+    if (distance < 1000) {
+      return "${distance.toStringAsFixed(0)}m";
+    } else {
+      return "${(distance / 1000).toStringAsFixed(1)}km";
+    }
+  }
+
+  //2点の緯度経度間の距離を計算
+  double distanceBetween(
+    double latitude1,
+    double longitude1,
+    double latitude2,
+    double longitude2,
+  ) {
+    toRadians(double degree) => degree * pi / 180;
+    const double r = 6378137.0; // 地球の半径
+    final double f1 = toRadians(latitude1);
+    final double f2 = toRadians(latitude2);
+    final double l1 = toRadians(longitude1);
+    final double l2 = toRadians(longitude2);
+    final num a = pow(sin((f2 - f1) / 2), 2);
+    final double b = cos(f1) * cos(f2) * pow(sin((l2 - l1) / 2), 2);
+    final double d = 2 * r * asin(sqrt(a + b));
+    return d;
+  }
+}
 
 //履歴エリア
 class HistoryArea extends StatelessWidget {
   final List<SearchHistory> searchHistories;
-  const HistoryArea(
-      {Key? key,
-      required this.searchHistories})
+  const HistoryArea({Key? key, required this.searchHistories})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        for (var history in searchHistories)...[
-            Card(
-              margin: EdgeInsets.zero,
-              elevation: 0,
-              child: InkWell(
-                onTap: () async {
-                  //検索結果をタップしたときの処理
-                  //検索履歴に追加
-                  final h = SearchHistory()
-                    ..name = history.name
-                    ..address = history.address
-                    ..placeId = history.placeId
-                    ..latitude  = history.latitude
-                    ..longitude = history.longitude
-                    ..updatedAt = DateTime.now()
-                    ..createdAt = DateTime.now();
-                  await IsarUtils.addSearchHistory(h);
-                  bool isRegistered = (await IsarUtils.getShopByGooglePlaceId(history.placeId)!=null);
-                  if (isRegistered) {
-                    //idを返す
-                    Shop? s = await IsarUtils.getShopByGooglePlaceId(
-                        history.placeId);
-                    if (s != null && context.mounted) {
-                      Navigator.pop(context, s.id);
-                    }
-                  } else {
-                    //ApiResultを返す
-                    if (context.mounted) {
-                      PlaceApiRestaurantResult res = PlaceApiRestaurantResult(
-                        name: history.name,
-                        address: history.address,
-                        placeId: history.placeId,
-                        latlng: LatLng(history.latitude, history.longitude),
-                      );
-                      Navigator.pop(context, res);
-                    }
+        for (var history in searchHistories) ...[
+          Card(
+            margin: EdgeInsets.zero,
+            elevation: 0,
+            child: InkWell(
+              onTap: () async {
+                //検索結果をタップしたときの処理
+                //検索履歴に追加
+                final h = SearchHistory()
+                  ..name = history.name
+                  ..address = history.address
+                  ..placeId = history.placeId
+                  ..latitude = history.latitude
+                  ..longitude = history.longitude
+                  ..updatedAt = DateTime.now()
+                  ..createdAt = DateTime.now();
+                await IsarUtils.addSearchHistory(h);
+                bool isRegistered =
+                    (await IsarUtils.getShopByGooglePlaceId(history.placeId) !=
+                        null);
+                if (isRegistered) {
+                  //idを返す
+                  Shop? s =
+                      await IsarUtils.getShopByGooglePlaceId(history.placeId);
+                  if (s != null && context.mounted) {
+                    Navigator.pop(context, s.id);
                   }
-                },
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    const Column(
+                } else {
+                  //ApiResultを返す
+                  if (context.mounted) {
+                    PlaceApiRestaurantResult res = PlaceApiRestaurantResult(
+                      name: history.name,
+                      address: history.address,
+                      placeId: history.placeId,
+                      latlng: LatLng(history.latitude, history.longitude),
+                    );
+                    Navigator.pop(context, res);
+                  }
+                }
+              },
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Column(
+                    children: [
+                      //アイコン
+                      SizedBox(
+                        //角丸四角形
+                        width: 22,
+                        height: 22,
+                        child: Icon(
+                          AppIcons.clock,
+                          size: 22,
+                          color: AppColors.greyDarkColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    width: 12,
+                  ),
+                  Flexible(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        //アイコン
-                        SizedBox(
-                          //角丸四角形
-                          width: 22,
-                          height: 22,
-                          child: Icon(
-                            AppIcons.clock,
-                            size: 22,
-                            color: AppColors.greyDarkColor,
-                          ),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Text(
+                          history.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          history.address,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontSize: 12, color: AppColors.greyDarkColor),
+                        ),
+                        const SizedBox(
+                          height: 16,
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      width: 12,
-                    ),
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(
-                            height: 16,
-                          ),
-                          Text(
-                            history.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            history.address,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                                fontSize: 12, color: AppColors.greyDarkColor),
-                          ),
-                          const SizedBox(
-                            height: 16,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-            const Divider(
-              height: 1,
-              thickness: 1,
-            ),
-          ],
+          ),
+          const Divider(
+            height: 1,
+            thickness: 1,
+          ),
+        ],
       ],
     );
   }
