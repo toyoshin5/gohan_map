@@ -41,7 +41,8 @@ class IsarUtils {
   // shopの全取得
   static Future<List<Shop>> getAllShops() async {
     await ensureInitialized();
-    final shops = await isar!.shops.where().findAll();    return shops.toList();
+    final shops = await isar!.shops.where().findAll();
+    return shops.toList();
   }
 
   // shopを条件で絞り込み検索
@@ -85,7 +86,7 @@ class IsarUtils {
     return timelines.toList();
   }
 
-    static Future<List<Timeline>> getAllTimelines() async {
+  static Future<List<Timeline>> getAllTimelines() async {
     await ensureInitialized();
     final timelines = await isar!.timelines
         .where()
@@ -95,16 +96,11 @@ class IsarUtils {
     return timelines.toList();
   }
 
-  static Future<Timeline?> getTimelineById(int id) async{
+  static Future<Timeline?> getTimelineById(int id) async {
     await ensureInitialized();
-    final timeline = await isar!.timelines
-        .where()
-        .idEqualTo(id)
-        .findFirst();
+    final timeline = await isar!.timelines.where().idEqualTo(id).findFirst();
     return timeline;
   }
-
-
 
   // timelineの作成・更新
   static Future<void> createTimeline(Timeline timeline) async {
@@ -134,9 +130,42 @@ class IsarUtils {
     });
   }
 
+  // shopの取得
   static Future<Shop?> getShopById(Id id) async {
     await ensureInitialized();
     final shop = await isar!.shops.get(id);
     return shop;
   }
+
+  //googlePlaceIdからshopを取得
+  static Future<Shop?> getShopByGooglePlaceId(String googlePlaceId) async {
+    await ensureInitialized();
+    final shop = await isar!.shops
+        .where()
+        .filter()
+        .googlePlaceIdEqualTo(googlePlaceId)
+        .findFirst();
+    return shop;
+  }
+  //   final shop = await isar!.writeTxn((isar) async {
+  //     // 'googlePlaceId'が指定したテキストであるShopレコードを検索
+  //     final shopQuery = isar.read<Shop>()
+  //         .where()
+  //         .filter()
+  //         .googlePlaceIdEqualTo(googlePlaceId)
+  //         .build();
+
+  //     final shops = await shopQuery.find();
+
+  //     if (shops.isNotEmpty) {
+  //       // 該当するレコードが存在する場合、最初の要素を返す
+  //       return shops.first;
+  //     } else {
+  //       // 該当するレコードが存在しない場合、nullを返す
+  //       return null;
+  //     }
+  //   } as Future Function());
+
+  //   return shop;
+  // }
 }

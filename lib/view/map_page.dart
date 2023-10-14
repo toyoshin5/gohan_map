@@ -163,7 +163,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 //valueの型がInt→詳細画面
                 //int型ならそのまま、Id型ならばnullにしたい
                 int? id = (value is int) ? value : null;
-                //valueの型がHotPepper→検索から新規作成
+                //valueの型がPlaceApiRestaurantResult→新規作成画面
                 PlaceApiRestaurantResult? paResult =
                     (value is PlaceApiRestaurantResult) ? value : null;
 
