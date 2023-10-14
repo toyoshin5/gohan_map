@@ -248,7 +248,7 @@ class SearchResultArea extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(
-                            height: 4,
+                            height: 10,
                           ),
                           Text(
                             shop.apiResult.name,
@@ -263,7 +263,7 @@ class SearchResultArea extends StatelessWidget {
                                 fontSize: 12, color: AppColors.greyDarkColor),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8),
+                            padding: const EdgeInsets.fromLTRB(0, 6, 0, 12),
                             child:
                                 _RegisterBudge(isRegistered: shop.isRegistered),
                           ),
