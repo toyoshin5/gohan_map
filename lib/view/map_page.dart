@@ -288,7 +288,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     //マップを自動スクロールする
                     final deviceHeight = MediaQuery.of(context).size.height;
                     _moveToPin(latLng, deviceHeight * 0.2);
-                    HapticFeedback.heavyImpact();
+                    HapticFeedback.mediumImpact();
                     //300ms後にモーダルを表示する
                     Future.delayed(const Duration(milliseconds: 300), () {
                       setState(() {
