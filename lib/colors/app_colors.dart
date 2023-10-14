@@ -6,7 +6,7 @@ class AppColors {
   static const Color blackTextColor = Color(0xFF000000);
   static const Color primaryColor = Color(0xFFFC8B56);
   static const Color tabBarColor = Color(0xFFF86F35);
-  static const Color redTextColor = Color(0xFFDF3030);
+  static const Color redTextColor = Color(0xFFFF5959);
   static const Color searchBarColor = Color(0xFFE2DFDC);
   static const Color whiteColor = Color(0xffffffff);
   static const Color greyDarkColor = Color(0xffa9a9a9);//テキストなど
