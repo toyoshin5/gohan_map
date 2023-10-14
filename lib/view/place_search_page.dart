@@ -144,8 +144,14 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
       }
     }
     //現在位置を取得
-    var currentLocation = await Geolocator.getCurrentPosition();
-    currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude);
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 3));
+      currentLatLng = LatLng(position.latitude, position.longitude);
+    } catch (e) {
+      logger.d("現在地取得失敗");
+    }
     logger.d("API呼び出し");
     setState(() {
       isLoadingPlaceApi = false;
@@ -248,7 +254,7 @@ class SearchResultArea extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(
-                            height: 10,
+                            height: 8,
                           ),
                           Text(
                             shop.apiResult.name,
@@ -256,6 +262,8 @@ class SearchResultArea extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
                               fontSize: 16,
+                              color: Colors.black,
+                              height: 1.3,
                             ),
                           ),
                           Text(
@@ -263,10 +271,13 @@ class SearchResultArea extends StatelessWidget {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: const TextStyle(
-                                fontSize: 12, color: AppColors.greyDarkColor),
+                              fontSize: 12,
+                              color: AppColors.greyDarkColor,
+                              height: 1.3,
+                            ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 6, 0, 12),
+                            padding: const EdgeInsets.fromLTRB(0, 4, 0, 10),
                             child:
                                 _RegisterBudge(isRegistered: shop.isRegistered),
                           ),
