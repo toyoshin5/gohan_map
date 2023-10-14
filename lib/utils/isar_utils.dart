@@ -113,7 +113,9 @@ class IsarUtils {
         await isar!.timelines.where().idEqualTo(timeline.id).findFirst();
     // 編集の場合、既存の画像ファイルを先に削除する
     if (beforeTimeline != null) {
-      deleteImageFile(beforeTimeline.image);
+      for (var image in beforeTimeline.images) {
+        deleteImageFile(image);
+      }
     }
     await isar!.writeTxn(() async {
       await isar!.timelines.put(timeline);
@@ -127,7 +129,9 @@ class IsarUtils {
         await isar!.timelines.where().idEqualTo(id).findFirst();
     // 画像ファイルを先に削除する
     if (beforeTimeline != null) {
-      deleteImageFile(beforeTimeline.image);
+      for (var image in beforeTimeline.images) {
+        deleteImageFile(image);
+      }
     }
     await isar!.writeTxn(() async {
       await isar!.timelines.delete(id);

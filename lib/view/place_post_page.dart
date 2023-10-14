@@ -40,8 +40,8 @@ class _PlacePostPageState extends State<PlacePostPage> {
     Future(() async {
       if (widget.timeline != null) {
         // 編集画面
-        image = widget.timeline!.image != null
-            ? File(p.join(await getLocalPath(), widget.timeline!.image!))
+        image = widget.timeline!.images.isNotEmpty
+            ? File(p.join(await getLocalPath(), widget.timeline!.images[0]))
             : null;
         date = widget.timeline!.date;
         comment = widget.timeline!.comment;
@@ -245,8 +245,12 @@ class _PlacePostPageState extends State<PlacePostPage> {
   //DBに投稿を追加
   Future<void> _addToDB() async {
     String? imagePath = await saveImageFile(image);
+    List<String> imagePathList = [];
+    if (imagePath != null) {
+      imagePathList.add(imagePath);
+    }
     final timeline = Timeline()
-      ..image = imagePath
+      ..images = imagePathList
       ..comment = comment
       ..star = star
       ..isPublic = false
@@ -267,9 +271,13 @@ class _PlacePostPageState extends State<PlacePostPage> {
   //DBの投稿を更新
   Future<void> _updateTimeline() async {
     String? imagePath = await saveImageFile(image);
+    List<String> imagePathList = [];
+    if (imagePath != null) {
+      imagePathList.add(imagePath);
+    }
     final timeline = Timeline()
       ..id = widget.timeline!.id
-      ..image = imagePath
+      ..images = imagePathList
       ..comment = comment
       ..star = star
       ..isPublic = false
