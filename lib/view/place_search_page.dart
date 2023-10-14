@@ -236,7 +236,7 @@ class SearchResultArea extends StatelessWidget {
                         ),
                         Text(
                           _calcDistance(shop.apiResult.latlng),
-                          style: const TextStyle(fontSize: 8),
+                          style: const TextStyle(fontSize: 10),
                         ),
                       ],
                     ),
@@ -254,6 +254,9 @@ class SearchResultArea extends StatelessWidget {
                             shop.apiResult.name,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            ),
                           ),
                           Text(
                             shop.apiResult.address,
@@ -401,6 +404,9 @@ class HistoryArea extends StatelessWidget {
                           history.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 16,
+                          ),
                         ),
                         Text(
                           history.address,
