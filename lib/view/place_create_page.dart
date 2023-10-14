@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
@@ -8,6 +7,7 @@ import 'package:gohan_map/collections/shop.dart';
 
 import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -54,6 +54,49 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(
+              height: 10,
+            ),
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  height: 160,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryColor.withOpacity(0.5),
+                        spreadRadius: 2,
+                        blurRadius: 6,
+                        offset: const Offset(0, 0),
+                      ),
+                    ],
+                    color: AppColors.whiteColor,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        widget.initialShopName ?? '名称未設定',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 24),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  top: -12,
+                  left: 16,
+                  child: NewBudge(),
+                ),
+              ],
+            ),
             //飲食店名
             Text(
               widget.initialShopName ?? '名称未設定',
@@ -135,17 +178,16 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   backgroundColor: AppColors.primaryColor,
                 ),
                 onPressed: () {
-                  _onTapComfirm(context,false);
+                  _onTapComfirm(context, false);
                 },
                 child: const Text(
                   '店舗を登録',
                   style: TextStyle(
-                      color: AppColors.whiteColor,
-                      fontWeight: FontWeight.bold),
+                      color: AppColors.whiteColor, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-             //行きたいボタン
+            //行きたいボタン
             Container(
               width: double.infinity,
               height: 50,
@@ -163,7 +205,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
-                  _onTapComfirm(context,true);
+                  _onTapComfirm(context, true);
                 },
                 child: const Text(
                   '行ってみたい店舗として登録',
@@ -204,7 +246,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   }
 
   //決定ボタンを押した時の処理
-  void _onTapComfirm(BuildContext context,bool wantToGoFlg) {
+  void _onTapComfirm(BuildContext context, bool wantToGoFlg) {
     _addToDB(wantToGoFlg);
   }
 
@@ -222,7 +264,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now();
     IsarUtils.createShop(shop).then((shopId) {
-      if (wantToGoFlg){
+      if (wantToGoFlg) {
         Navigator.pop(context);
         return;
       }
@@ -258,9 +300,45 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
           Navigator.pop(context);
         }
       });
-
     });
   }
-
 }
 
+class NewBudge extends StatelessWidget {
+  const NewBudge({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36,
+      width: 100,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppColors.whiteColor,
+          width: 3,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.greyColor,
+            spreadRadius: 2,
+            blurRadius: 6,
+          ),
+        ],
+        color: AppColors.primaryColor,
+      ),
+      child: const Center(
+        child: Text(
+          "NEW!!",
+          style: TextStyle(
+              height: 1.2,
+              color: AppColors.whiteColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16),
+        ),
+      ),
+    );
+  }
+}
