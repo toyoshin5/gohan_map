@@ -231,7 +231,6 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
       ..id = widget.shop.id
       ..shopName = widget.shop.shopName
       ..shopAddress = widget.shop.shopAddress
-      ..googleMapURL = null
       ..googlePlaceId = widget.shop.googlePlaceId
       ..shopLatitude = widget.shop.shopLatitude
       ..shopLongitude = widget.shop.shopLongitude

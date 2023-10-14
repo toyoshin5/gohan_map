@@ -27,25 +27,25 @@ const SearchHistorySchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'name': PropertySchema(
+    r'latitude': PropertySchema(
       id: 2,
+      name: r'latitude',
+      type: IsarType.double,
+    ),
+    r'longitude': PropertySchema(
+      id: 3,
+      name: r'longitude',
+      type: IsarType.double,
+    ),
+    r'name': PropertySchema(
+      id: 4,
       name: r'name',
       type: IsarType.string,
     ),
     r'placeId': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'placeId',
       type: IsarType.string,
-    ),
-    r'shopLatitude': PropertySchema(
-      id: 4,
-      name: r'shopLatitude',
-      type: IsarType.double,
-    ),
-    r'shopLongitude': PropertySchema(
-      id: 5,
-      name: r'shopLongitude',
-      type: IsarType.double,
     ),
     r'updatedAt': PropertySchema(
       id: 6,
@@ -87,10 +87,10 @@ void _searchHistorySerialize(
 ) {
   writer.writeString(offsets[0], object.address);
   writer.writeDateTime(offsets[1], object.createdAt);
-  writer.writeString(offsets[2], object.name);
-  writer.writeString(offsets[3], object.placeId);
-  writer.writeDouble(offsets[4], object.shopLatitude);
-  writer.writeDouble(offsets[5], object.shopLongitude);
+  writer.writeDouble(offsets[2], object.latitude);
+  writer.writeDouble(offsets[3], object.longitude);
+  writer.writeString(offsets[4], object.name);
+  writer.writeString(offsets[5], object.placeId);
   writer.writeDateTime(offsets[6], object.updatedAt);
 }
 
@@ -104,10 +104,10 @@ SearchHistory _searchHistoryDeserialize(
   object.address = reader.readString(offsets[0]);
   object.createdAt = reader.readDateTime(offsets[1]);
   object.id = id;
-  object.name = reader.readString(offsets[2]);
-  object.placeId = reader.readString(offsets[3]);
-  object.shopLatitude = reader.readDouble(offsets[4]);
-  object.shopLongitude = reader.readDouble(offsets[5]);
+  object.latitude = reader.readDouble(offsets[2]);
+  object.longitude = reader.readDouble(offsets[3]);
+  object.name = reader.readString(offsets[4]);
+  object.placeId = reader.readString(offsets[5]);
   object.updatedAt = reader.readDateTime(offsets[6]);
   return object;
 }
@@ -124,13 +124,13 @@ P _searchHistoryDeserializeProp<P>(
     case 1:
       return (reader.readDateTime(offset)) as P;
     case 2:
-      return (reader.readString(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 4:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
       return (reader.readDateTime(offset)) as P;
     default:
@@ -480,6 +480,138 @@ extension SearchHistoryQueryFilter
     });
   }
 
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      latitudeEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'latitude',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      latitudeGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'latitude',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      latitudeLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'latitude',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      latitudeBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'latitude',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      longitudeEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'longitude',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      longitudeGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'longitude',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      longitudeLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'longitude',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
+      longitudeBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'longitude',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition> nameEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -752,138 +884,6 @@ extension SearchHistoryQueryFilter
   }
 
   QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLatitudeEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'shopLatitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLatitudeGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'shopLatitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLatitudeLessThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'shopLatitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLatitudeBetween(
-    double lower,
-    double upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'shopLatitude',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLongitudeEqualTo(
-    double value, {
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'shopLongitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLongitudeGreaterThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'shopLongitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLongitudeLessThan(
-    double value, {
-    bool include = false,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'shopLongitude',
-        value: value,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
-      shopLongitudeBetween(
-    double lower,
-    double upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    double epsilon = Query.epsilon,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'shopLongitude',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        epsilon: epsilon,
-      ));
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterFilterCondition>
       updatedAtEqualTo(DateTime value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -973,6 +973,32 @@ extension SearchHistoryQuerySortBy
     });
   }
 
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> sortByLatitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
+      sortByLatitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.desc);
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> sortByLongitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
+      sortByLongitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.desc);
+    });
+  }
+
   QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -994,34 +1020,6 @@ extension SearchHistoryQuerySortBy
   QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> sortByPlaceIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'placeId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      sortByShopLatitude() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLatitude', Sort.asc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      sortByShopLatitudeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLatitude', Sort.desc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      sortByShopLongitude() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLongitude', Sort.asc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      sortByShopLongitudeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLongitude', Sort.desc);
     });
   }
 
@@ -1078,6 +1076,32 @@ extension SearchHistoryQuerySortThenBy
     });
   }
 
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> thenByLatitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
+      thenByLatitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'latitude', Sort.desc);
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> thenByLongitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.asc);
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
+      thenByLongitudeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'longitude', Sort.desc);
+    });
+  }
+
   QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> thenByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -1099,34 +1123,6 @@ extension SearchHistoryQuerySortThenBy
   QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy> thenByPlaceIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'placeId', Sort.desc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      thenByShopLatitude() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLatitude', Sort.asc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      thenByShopLatitudeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLatitude', Sort.desc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      thenByShopLongitude() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLongitude', Sort.asc);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QAfterSortBy>
-      thenByShopLongitudeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'shopLongitude', Sort.desc);
     });
   }
 
@@ -1159,6 +1155,18 @@ extension SearchHistoryQueryWhereDistinct
     });
   }
 
+  QueryBuilder<SearchHistory, SearchHistory, QDistinct> distinctByLatitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'latitude');
+    });
+  }
+
+  QueryBuilder<SearchHistory, SearchHistory, QDistinct> distinctByLongitude() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'longitude');
+    });
+  }
+
   QueryBuilder<SearchHistory, SearchHistory, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1170,20 +1178,6 @@ extension SearchHistoryQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'placeId', caseSensitive: caseSensitive);
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QDistinct>
-      distinctByShopLatitude() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'shopLatitude');
-    });
-  }
-
-  QueryBuilder<SearchHistory, SearchHistory, QDistinct>
-      distinctByShopLongitude() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'shopLongitude');
     });
   }
 
@@ -1214,6 +1208,18 @@ extension SearchHistoryQueryProperty
     });
   }
 
+  QueryBuilder<SearchHistory, double, QQueryOperations> latitudeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'latitude');
+    });
+  }
+
+  QueryBuilder<SearchHistory, double, QQueryOperations> longitudeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'longitude');
+    });
+  }
+
   QueryBuilder<SearchHistory, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
@@ -1223,19 +1229,6 @@ extension SearchHistoryQueryProperty
   QueryBuilder<SearchHistory, String, QQueryOperations> placeIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'placeId');
-    });
-  }
-
-  QueryBuilder<SearchHistory, double, QQueryOperations> shopLatitudeProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'shopLatitude');
-    });
-  }
-
-  QueryBuilder<SearchHistory, double, QQueryOperations>
-      shopLongitudeProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'shopLongitude');
     });
   }
 

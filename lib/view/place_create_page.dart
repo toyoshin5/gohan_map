@@ -213,7 +213,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
     final shop = Shop()
       ..shopName = widget.initialShopName ?? '名称未設定'
       ..shopAddress = widget.address
-      ..googleMapURL = null
       ..googlePlaceId = widget.placeId
       ..shopLatitude = widget.latlng.latitude
       ..shopLongitude = widget.latlng.longitude

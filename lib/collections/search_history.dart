@@ -8,8 +8,8 @@ class SearchHistory {
   late String name;
   late String placeId;
   late String address;
-  late double shopLatitude;
-  late double shopLongitude;
+  late double latitude;
+  late double longitude;
   late DateTime createdAt;
   late DateTime updatedAt;
 }

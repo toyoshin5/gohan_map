@@ -1,3 +1,4 @@
+import 'package:gohan_map/collections/search_history.dart';
 import 'package:gohan_map/utils/common.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
@@ -26,6 +27,7 @@ class IsarUtils {
       [
         ShopSchema,
         TimelineSchema,
+        SearchHistorySchema,
       ],
       directory: path,
     );
@@ -147,25 +149,41 @@ class IsarUtils {
         .findFirst();
     return shop;
   }
-  //   final shop = await isar!.writeTxn((isar) async {
-  //     // 'googlePlaceId'が指定したテキストであるShopレコードを検索
-  //     final shopQuery = isar.read<Shop>()
-  //         .where()
-  //         .filter()
-  //         .googlePlaceIdEqualTo(googlePlaceId)
-  //         .build();
 
-  //     final shops = await shopQuery.find();
+  //search_history
+  //
 
-  //     if (shops.isNotEmpty) {
-  //       // 該当するレコードが存在する場合、最初の要素を返す
-  //       return shops.first;
-  //     } else {
-  //       // 該当するレコードが存在しない場合、nullを返す
-  //       return null;
-  //     }
-  //   } as Future Function());
+  // search_historyの全取得
+  static Future<List<SearchHistory>> getAllSearchHistories() async {
+    await ensureInitialized();
+    final searchHistories = await isar!.searchHistorys
+        .where()
+        .sortByUpdatedAtDesc()
+        .thenByCreatedAt()
+        .findAll();
+    return searchHistories.toList();
+  }
 
-  //   return shop;
-  // }
+  // search_historyの追加
+  static Future<void> addSearchHistory(SearchHistory searchHistory) async {
+    await ensureInitialized();
+    await isar!.writeTxn(() async {
+      await isar!.searchHistorys.put(searchHistory);
+    });
+    //6件目以降を削除して保存
+    final searchHistories = await getAllSearchHistories();
+    while (searchHistories.length > 5) {
+        deleteSearchHistory(searchHistories.last.id);
+        searchHistories.removeLast();
+    }
+  }
+
+  // search_historyの削除
+  static Future<void> deleteSearchHistory(Id id) async {
+    await ensureInitialized();
+    await isar!.writeTxn(() async {
+      await isar!.searchHistorys.delete(id);
+    });
+  }
+
 }
