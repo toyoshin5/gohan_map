@@ -6,7 +6,7 @@ part 'timeline.g.dart';
 class Timeline {
   Id id = Isar.autoIncrement;
 
-  String? image;
+  late List<String> images;
   late String comment;
   late double star;
   late bool isPublic;
