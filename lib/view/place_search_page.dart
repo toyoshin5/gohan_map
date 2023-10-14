@@ -28,16 +28,7 @@ class _PlaceSearchPageState extends State<PlaceSearchPage>
   List<Shop> shopList = [];
   bool isLoadingPlaceApi = false;
 
-  List<RestaurantResult> restaurants = [
-    RestaurantResult(
-        apiResult: PlaceApiRestaurantResult(
-            latlng: LatLng(0, 0),
-            name: "サイゼリヤサイゼリヤサイゼリヤサイゼリヤサイゼリヤ",
-            placeId: "test",
-            address: "札幌市北区北２条東1丁目サンプルサンプルサンプルサンプル"),
-        isRegistered: false,
-      ) 
-  ];
+  List<RestaurantResult> restaurants = [];
   TextEditingController controller = TextEditingController();
   late TabController tabController;
   bool filterRegistered = false; // 0: マップ付近の飲食店, 1: 登録済み
