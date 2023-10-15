@@ -1,14 +1,12 @@
 //1投稿分のカード
-import 'dart:io';
-import 'dart:math';
-
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:gohan_map/collections/timeline.dart';
+import 'package:gohan_map/component/app_photos_view.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-import 'package:path/path.dart' as p;
+
 
 class PostCardWidget extends StatelessWidget {
   const PostCardWidget({
@@ -53,25 +51,29 @@ class PostCardWidget extends StatelessWidget {
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                      DateFormat('yyyy')
-                                          .format(timeline.date),
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.black,height: 1.5),
-                                    ),
+                                DateFormat('yyyy').format(timeline.date),
+                                style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.black,
+                                    height: 1.5),
+                              ),
                               const SizedBox(width: 2),
                               Text(
-                                      DateFormat('MM/dd')
-                                          .format(timeline.date),
-                                      style: const TextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black,height: 1.0),
-                                    ),
+                                DateFormat('MM/dd').format(timeline.date),
+                                style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    height: 1.0),
+                              ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 8, bottom: 8, left: 2),
+                                padding: const EdgeInsets.only(
+                                    top: 8, bottom: 8, left: 2),
                                 child: Row(children: [
                                   Text(
                                     timeline.star.toString(),
-                                    style: const TextStyle(color: Colors.black38),
+                                    style:
+                                        const TextStyle(color: Colors.black38),
                                   ),
                                   const Padding(
                                     padding: EdgeInsets.only(right: 4),
@@ -126,19 +128,8 @@ class PostCardWidget extends StatelessWidget {
         ),
         if (timeline.images.isNotEmpty)
           //縦長の場合は正方形にする
-          Container(
-            width: double.infinity,
-            color: Colors.grey[200],
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: min(MediaQuery.of(context).size.width, 400)
-              ),
-              child: Image.file(
-                        File(p.join(imageData, timeline.images[0])),
-                        fit: BoxFit.contain,
-                      ),
-            ),
-          ),
+          AppPhotosView(timeline: timeline, imageData: imageData),
+        //test
         if (timeline.comment != "")
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -151,8 +142,11 @@ class PostCardWidget extends StatelessWidget {
             ),
           )
         else
-          const SizedBox(height: 16,),
+          const SizedBox(
+            height: 16,
+          ),
       ]),
     );
   }
 }
+

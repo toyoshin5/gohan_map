@@ -12,7 +12,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
-import 'package:gohan_map/component/app_search_bar.dart';
 import 'package:gohan_map/icon/app_icon_icons.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
@@ -24,6 +23,7 @@ import 'package:gohan_map/view/place_post_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
 import 'package:isar/isar.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 ///地図が表示されている画面
 class MapPage extends StatefulWidget {
@@ -294,12 +294,13 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       setState(() {
                         tapFlgs[shop.id] = true;
                       });
-                      showModalBottomSheet(
+                      //Heroアニメーションに対応したモーダル
+                      showMaterialModalBottomSheet(
                         barrierColor: Colors.black.withOpacity(0),
                         isDismissible: true,
-                        isScrollControlled: true,
                         backgroundColor: Colors.transparent,
                         context: context,
+                        closeProgressThreshold: 0.3,
                         builder: (context) {
                           return PlaceDetailPage(
                             id: shop.id,
