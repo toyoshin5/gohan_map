@@ -298,7 +298,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                       showMaterialModalBottomSheet(
                         barrierColor: Colors.black.withOpacity(0),
                         isDismissible: true,
-                        //enableDrag: false,
+                        duration: const Duration(milliseconds: 250),
                         backgroundColor: Colors.transparent,
                         context: context,
                         builder: (context) {
