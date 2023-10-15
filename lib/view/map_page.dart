@@ -191,7 +191,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                           LatLng(shop.shopLatitude, shop.shopLongitude);
                       //ピンの位置に移動する
                       final deviceHeight = MediaQuery.of(context).size.height;
-                      _moveToPin(latLng, deviceHeight * 0.2);
+                      _moveToPin(latLng, (deviceHeight - 150) * 0.2);
                     }
                   });
                 }
@@ -204,7 +204,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   });
                   //mapをスクロールする
                   final deviceHeight = MediaQuery.of(context).size.height;
-                  _moveToPin(paResult.latlng, deviceHeight * 0.2);
+                  _moveToPin(paResult.latlng, (deviceHeight - 150) * 0.2);
                   showModalBottomSheet(
                     barrierColor: Colors.black.withOpacity(0),
                     isDismissible: true,
@@ -227,7 +227,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                         if (shop != null) {
                           final latLng =
                               LatLng(shop.shopLatitude, shop.shopLongitude);
-                          _moveToPin(latLng, deviceHeight * 0.2);
+                          _moveToPin(latLng, (deviceHeight - 150) * 0.2);
                           //初回投稿
                           showModalBottomSheet(
                             barrierColor: Colors.black.withOpacity(0),
@@ -287,8 +287,8 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   if (shop != null) {
                     //マップを自動スクロールする
                     final deviceHeight = MediaQuery.of(context).size.height;
-                    _moveToPin(latLng, deviceHeight * 0.2);
-                    HapticFeedback.mediumImpact();
+                    _moveToPin(latLng, (deviceHeight - 150) * 0.2);
+                    HapticFeedback.heavyImpact();
                     //300ms後にモーダルを表示する
                     Future.delayed(const Duration(milliseconds: 300), () {
                       setState(() {

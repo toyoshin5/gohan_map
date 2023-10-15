@@ -48,6 +48,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   Widget build(BuildContext context) {
     return AppModal(
       initialChildSize: 0.6,
+      maxChildSize: 0.7,
       avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -140,6 +141,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
+                  //行ってみたいお店として登録
                   _onTapComfirm(context, true);
                 },
                 child: const Row(
@@ -176,6 +178,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   backgroundColor: AppColors.primaryColor,
                 ),
                 onPressed: () {
+                  //行ったお店として登録
                   _onTapComfirm(context, false);
                 },
                 child: const Row(
@@ -247,43 +250,93 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now();
     IsarUtils.createShop(shop).then((shopId) {
-      if (wantToGoFlg) {
-        Navigator.pop(context);
-        return;
-      }
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('食事の記録を行いますか?'),
-            content: const Text('早速このお店での食事の記録を残すことができます'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('後で行う'),
-                onPressed: () async {
-                  Navigator.pop(context, false);
-                },
-              ),
-              CupertinoDialogAction(
-                child: const Text(
-                  '記録する',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+        if (wantToGoFlg) {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: const Text('行ってみたいお店として\n登録しました'),
+                content: Container(
+                  width: 82,
+                  height: 82,
+                  margin: const EdgeInsets.only(top: 20, bottom: 12),
+                  child: Image.asset(
+                    findPinByKind(shopMapIconKind)?.pinImagePath ?? '',
+                    fit: BoxFit.contain,
+                  ),
                 ),
-                onPressed: () async {
-                  Navigator.pop(context, true);
-                },
-              ),
-            ],
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('閉じる'),
+                    onPressed: () async {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ],
+              );
+            },
+          ).then(
+            (isInitialPost) {
+              if (isInitialPost) {
+                Navigator.pop(context, shopId);
+              } else {
+                Navigator.pop(context);
+              }
+            },
           );
-        },
-      ).then((isInitialPost) {
-        if (isInitialPost) {
-          Navigator.pop(context, shopId);
         } else {
-          Navigator.pop(context);
+          showCupertinoDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: const Text('行ったお店として登録しました'),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //ピン画像
+                    Container(
+                      width: 82,
+                      height: 82,
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      child: Image.asset(
+                        findPinByKind(shopMapIconKind)?.pinImagePath ?? '',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const Text('早速お店の感想を記録しましょう！'),
+                  ],
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('後で行う'),
+                    onPressed: () async {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  CupertinoDialogAction(
+                    child: const Text(
+                      '記録する',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context, true);
+                    },
+                  ),
+                ],
+              );
+            },
+          ).then(
+            (isInitialPost) {
+              if (isInitialPost) {
+                Navigator.pop(context, shopId);
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          );
         }
-      });
-    });
+      },
+    );
   }
 }
 
