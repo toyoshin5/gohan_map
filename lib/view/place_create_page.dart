@@ -158,7 +158,8 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                       '行ってみたいお店として登録',
                       style: TextStyle(
                           color: AppColors.primaryColor,
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
                     ),
                   ],
                 ),
@@ -195,7 +196,8 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                       '行ったお店として登録',
                       style: TextStyle(
                           color: AppColors.whiteColor,
-                          fontWeight: FontWeight.bold),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
                     ),
                   ],
                 ),
@@ -221,7 +223,8 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   'キャンセル',
                   style: TextStyle(
                       color: AppColors.redTextColor,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
               ),
             ),
