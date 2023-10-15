@@ -224,7 +224,6 @@ class _PlacePostPageState extends State<PlacePostPage> {
           ..id = widget.shop.id
           ..shopName = widget.shop.shopName
           ..shopAddress = widget.shop.shopAddress
-          ..googleMapURL = widget.shop.googleMapURL
           ..googlePlaceId = widget.shop.googlePlaceId
           ..shopLatitude = widget.shop.shopLatitude
           ..shopLongitude = widget.shop.shopLongitude

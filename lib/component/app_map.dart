@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_direction_light.dart';
-import 'package:gohan_map/view/all_post_page.dart';
 import 'package:gohan_map/view/change_map_page.dart';
 import 'package:gohan_map/view/tutorial_page.dart';
 import 'package:latlong2/latlong.dart';

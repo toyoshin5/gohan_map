@@ -104,17 +104,17 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
           child: AbsorbPointer(
             child: Container(
               //モーダル風UIの中身
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.whiteColor,
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
                 boxShadow:
-                    [BoxShadow(blurRadius: 16, color: Colors.grey)],
+                    [BoxShadow(blurRadius: 16, color: Colors.black.withOpacity(0.2))],
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 27),
+                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
@@ -163,7 +163,7 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 //valueの型がInt→詳細画面
                 //int型ならそのまま、Id型ならばnullにしたい
                 int? id = (value is int) ? value : null;
-                //valueの型がHotPepper→検索から新規作成
+                //valueの型がPlaceApiRestaurantResult→新規作成画面
                 PlaceApiRestaurantResult? paResult =
                     (value is PlaceApiRestaurantResult) ? value : null;
 
