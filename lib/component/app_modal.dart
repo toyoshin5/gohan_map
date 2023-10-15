@@ -61,9 +61,8 @@ class _AppModalState extends State<AppModal> {
             child: Container(
               //モーダルの中身
               decoration: BoxDecoration(
-                boxShadow:const  [
-                  BoxShadow(blurRadius: 5, color: Colors.grey, spreadRadius: 0.5)
-                ],
+                boxShadow:
+                   [BoxShadow(blurRadius: 16, color: Colors.black.withOpacity(0.2))],
                 color: widget.backgroundColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20.0),

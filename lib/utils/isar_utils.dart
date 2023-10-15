@@ -1,3 +1,4 @@
+import 'package:gohan_map/collections/search_history.dart';
 import 'package:gohan_map/utils/common.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:isar/isar.dart';
@@ -26,6 +27,7 @@ class IsarUtils {
       [
         ShopSchema,
         TimelineSchema,
+        SearchHistorySchema,
       ],
       directory: path,
     );
@@ -41,7 +43,8 @@ class IsarUtils {
   // shopの全取得
   static Future<List<Shop>> getAllShops() async {
     await ensureInitialized();
-    final shops = await isar!.shops.where().findAll();    return shops.toList();
+    final shops = await isar!.shops.where().findAll();
+    return shops.toList();
   }
 
   // shopを条件で絞り込み検索
@@ -85,7 +88,7 @@ class IsarUtils {
     return timelines.toList();
   }
 
-    static Future<List<Timeline>> getAllTimelines() async {
+  static Future<List<Timeline>> getAllTimelines() async {
     await ensureInitialized();
     final timelines = await isar!.timelines
         .where()
@@ -95,16 +98,11 @@ class IsarUtils {
     return timelines.toList();
   }
 
-  static Future<Timeline?> getTimelineById(int id) async{
+  static Future<Timeline?> getTimelineById(int id) async {
     await ensureInitialized();
-    final timeline = await isar!.timelines
-        .where()
-        .idEqualTo(id)
-        .findFirst();
+    final timeline = await isar!.timelines.where().idEqualTo(id).findFirst();
     return timeline;
   }
-
-
 
   // timelineの作成・更新
   static Future<void> createTimeline(Timeline timeline) async {
@@ -138,9 +136,58 @@ class IsarUtils {
     });
   }
 
+  // shopの取得
   static Future<Shop?> getShopById(Id id) async {
     await ensureInitialized();
     final shop = await isar!.shops.get(id);
     return shop;
   }
+
+  //googlePlaceIdからshopを取得
+  static Future<Shop?> getShopByGooglePlaceId(String googlePlaceId) async {
+    await ensureInitialized();
+    final shop = await isar!.shops
+        .where()
+        .filter()
+        .googlePlaceIdEqualTo(googlePlaceId)
+        .findFirst();
+    return shop;
+  }
+
+  //search_history
+  //
+
+  // search_historyの全取得
+  static Future<List<SearchHistory>> getAllSearchHistories() async {
+    await ensureInitialized();
+    final searchHistories = await isar!.searchHistorys
+        .where()
+        .sortByUpdatedAtDesc()
+        .thenByCreatedAt()
+        .findAll();
+    return searchHistories.toList();
+  }
+
+  // search_historyの追加
+  static Future<void> addSearchHistory(SearchHistory searchHistory) async {
+    await ensureInitialized();
+    await isar!.writeTxn(() async {
+      await isar!.searchHistorys.put(searchHistory);
+    });
+    //6件目以降を削除して保存
+    final searchHistories = await getAllSearchHistories();
+    while (searchHistories.length > 5) {
+        deleteSearchHistory(searchHistories.last.id);
+        searchHistories.removeLast();
+    }
+  }
+
+  // search_historyの削除
+  static Future<void> deleteSearchHistory(Id id) async {
+    await ensureInitialized();
+    await isar!.writeTxn(() async {
+      await isar!.searchHistorys.delete(id);
+    });
+  }
+
 }

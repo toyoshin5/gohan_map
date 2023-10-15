@@ -22,48 +22,43 @@ const ShopSchema = CollectionSchema(
       name: r'createdAt',
       type: IsarType.dateTime,
     ),
-    r'googleMapURL': PropertySchema(
-      id: 1,
-      name: r'googleMapURL',
-      type: IsarType.string,
-    ),
     r'googlePlaceId': PropertySchema(
-      id: 2,
+      id: 1,
       name: r'googlePlaceId',
       type: IsarType.string,
     ),
     r'shopAddress': PropertySchema(
-      id: 3,
+      id: 2,
       name: r'shopAddress',
       type: IsarType.string,
     ),
     r'shopLatitude': PropertySchema(
-      id: 4,
+      id: 3,
       name: r'shopLatitude',
       type: IsarType.double,
     ),
     r'shopLongitude': PropertySchema(
-      id: 5,
+      id: 4,
       name: r'shopLongitude',
       type: IsarType.double,
     ),
     r'shopMapIconKind': PropertySchema(
-      id: 6,
+      id: 5,
       name: r'shopMapIconKind',
       type: IsarType.string,
     ),
     r'shopName': PropertySchema(
-      id: 7,
+      id: 6,
       name: r'shopName',
       type: IsarType.string,
     ),
     r'updatedAt': PropertySchema(
-      id: 8,
+      id: 7,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'wantToGoFlg': PropertySchema(
-      id: 9,
+      id: 8,
       name: r'wantToGoFlg',
       type: IsarType.bool,
     )
@@ -88,12 +83,6 @@ int _shopEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
-  {
-    final value = object.googleMapURL;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
   bytesCount += 3 + object.googlePlaceId.length * 3;
   bytesCount += 3 + object.shopAddress.length * 3;
   bytesCount += 3 + object.shopMapIconKind.length * 3;
@@ -108,15 +97,14 @@ void _shopSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDateTime(offsets[0], object.createdAt);
-  writer.writeString(offsets[1], object.googleMapURL);
-  writer.writeString(offsets[2], object.googlePlaceId);
-  writer.writeString(offsets[3], object.shopAddress);
-  writer.writeDouble(offsets[4], object.shopLatitude);
-  writer.writeDouble(offsets[5], object.shopLongitude);
-  writer.writeString(offsets[6], object.shopMapIconKind);
-  writer.writeString(offsets[7], object.shopName);
-  writer.writeDateTime(offsets[8], object.updatedAt);
-  writer.writeBool(offsets[9], object.wantToGoFlg);
+  writer.writeString(offsets[1], object.googlePlaceId);
+  writer.writeString(offsets[2], object.shopAddress);
+  writer.writeDouble(offsets[3], object.shopLatitude);
+  writer.writeDouble(offsets[4], object.shopLongitude);
+  writer.writeString(offsets[5], object.shopMapIconKind);
+  writer.writeString(offsets[6], object.shopName);
+  writer.writeDateTime(offsets[7], object.updatedAt);
+  writer.writeBool(offsets[8], object.wantToGoFlg);
 }
 
 Shop _shopDeserialize(
@@ -127,16 +115,15 @@ Shop _shopDeserialize(
 ) {
   final object = Shop();
   object.createdAt = reader.readDateTime(offsets[0]);
-  object.googleMapURL = reader.readStringOrNull(offsets[1]);
-  object.googlePlaceId = reader.readString(offsets[2]);
+  object.googlePlaceId = reader.readString(offsets[1]);
   object.id = id;
-  object.shopAddress = reader.readString(offsets[3]);
-  object.shopLatitude = reader.readDouble(offsets[4]);
-  object.shopLongitude = reader.readDouble(offsets[5]);
-  object.shopMapIconKind = reader.readString(offsets[6]);
-  object.shopName = reader.readString(offsets[7]);
-  object.updatedAt = reader.readDateTime(offsets[8]);
-  object.wantToGoFlg = reader.readBool(offsets[9]);
+  object.shopAddress = reader.readString(offsets[2]);
+  object.shopLatitude = reader.readDouble(offsets[3]);
+  object.shopLongitude = reader.readDouble(offsets[4]);
+  object.shopMapIconKind = reader.readString(offsets[5]);
+  object.shopName = reader.readString(offsets[6]);
+  object.updatedAt = reader.readDateTime(offsets[7]);
+  object.wantToGoFlg = reader.readBool(offsets[8]);
   return object;
 }
 
@@ -150,22 +137,20 @@ P _shopDeserializeProp<P>(
     case 0:
       return (reader.readDateTime(offset)) as P;
     case 1:
-      return (reader.readStringOrNull(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readDouble(offset)) as P;
     case 4:
       return (reader.readDouble(offset)) as P;
     case 5:
-      return (reader.readDouble(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 6:
       return (reader.readString(offset)) as P;
     case 7:
-      return (reader.readString(offset)) as P;
-    case 8:
       return (reader.readDateTime(offset)) as P;
-    case 9:
+    case 8:
       return (reader.readBool(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -309,152 +294,6 @@ extension ShopQueryFilter on QueryBuilder<Shop, Shop, QFilterCondition> {
         includeLower: includeLower,
         upper: upper,
         includeUpper: includeUpper,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'googleMapURL',
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'googleMapURL',
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'googleMapURL',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'googleMapURL',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLLessThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'googleMapURL',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLBetween(
-    String? lower,
-    String? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'googleMapURL',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'googleMapURL',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'googleMapURL',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLContains(
-      String value,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'googleMapURL',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'googleMapURL',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'googleMapURL',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterFilterCondition> googleMapURLIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'googleMapURL',
-        value: '',
       ));
     });
   }
@@ -1235,18 +1074,6 @@ extension ShopQuerySortBy on QueryBuilder<Shop, Shop, QSortBy> {
     });
   }
 
-  QueryBuilder<Shop, Shop, QAfterSortBy> sortByGoogleMapURL() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'googleMapURL', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterSortBy> sortByGoogleMapURLDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'googleMapURL', Sort.desc);
-    });
-  }
-
   QueryBuilder<Shop, Shop, QAfterSortBy> sortByGooglePlaceId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'googlePlaceId', Sort.asc);
@@ -1354,18 +1181,6 @@ extension ShopQuerySortThenBy on QueryBuilder<Shop, Shop, QSortThenBy> {
   QueryBuilder<Shop, Shop, QAfterSortBy> thenByCreatedAtDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'createdAt', Sort.desc);
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterSortBy> thenByGoogleMapURL() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'googleMapURL', Sort.asc);
-    });
-  }
-
-  QueryBuilder<Shop, Shop, QAfterSortBy> thenByGoogleMapURLDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'googleMapURL', Sort.desc);
     });
   }
 
@@ -1485,13 +1300,6 @@ extension ShopQueryWhereDistinct on QueryBuilder<Shop, Shop, QDistinct> {
     });
   }
 
-  QueryBuilder<Shop, Shop, QDistinct> distinctByGoogleMapURL(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'googleMapURL', caseSensitive: caseSensitive);
-    });
-  }
-
   QueryBuilder<Shop, Shop, QDistinct> distinctByGooglePlaceId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1557,12 +1365,6 @@ extension ShopQueryProperty on QueryBuilder<Shop, Shop, QQueryProperty> {
   QueryBuilder<Shop, DateTime, QQueryOperations> createdAtProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'createdAt');
-    });
-  }
-
-  QueryBuilder<Shop, String?, QQueryOperations> googleMapURLProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'googleMapURL');
     });
   }
 

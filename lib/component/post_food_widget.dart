@@ -289,7 +289,6 @@ class _ImgSectionState extends State<_ImgSection> {
   }
 }
 
-//うまいボタン
 class _StarSection extends StatelessWidget {
   const _StarSection({
     this.initialStar,
