@@ -20,6 +20,24 @@ class AppPhotosView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     int imageCount = timeline.images.length;
+    List<int> imgNum = [];
+    //0 1
+    //2 3
+    //の順で画像を表示するときに何番目の画像を表示するかを決める
+    switch (imageCount) {
+      case 1:
+        imgNum = [0, 0, 0, 0];
+        break;
+      case 2:
+        imgNum = [0, 1, 0, 1];
+        break;
+      case 3:
+        imgNum = [0, 1, 2, 1];
+        break;
+      case 4:
+        imgNum = [0, 1, 2, 3];
+        break;
+    }
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -37,14 +55,15 @@ class AppPhotosView extends StatelessWidget {
                   children: [
                     Flexible(
                       child: GestureDetector(
-                        onTap: () => openImage(context, 0),
+                        onTap: () => openImage(context, imgNum[0]),
                         child: SizedBox(
                           height: double.infinity,
                           width: double.infinity,
                           child: Hero(
-                            tag: timeline.images[0],
+                            tag: timeline.images[imgNum[0]],
                             child: Image.file(
-                              File(p.join(imageData, timeline.images[0])),
+                              File(p.join(
+                                  imageData, timeline.images[imgNum[0]])),
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -57,14 +76,15 @@ class AppPhotosView extends StatelessWidget {
                       ),
                       Flexible(
                         child: GestureDetector(
-                          onTap: () => openImage(context, 3),
+                          onTap: () => openImage(context, imgNum[imgNum[2]]),
                           child: SizedBox(
                             height: double.infinity,
                             width: double.infinity,
                             child: Hero(
-                              tag: timeline.images[3],
+                              tag: timeline.images[imgNum[2]],
                               child: Image.file(
-                                File(p.join(imageData, timeline.images[3])),
+                                File(p.join(
+                                    imageData, timeline.images[imgNum[2]])),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -82,14 +102,15 @@ class AppPhotosView extends StatelessWidget {
                     children: [
                       Flexible(
                         child: GestureDetector(
-                          onTap: () => openImage(context, 1),
+                          onTap: () => openImage(context, imgNum[1]),
                           child: SizedBox(
                             height: double.infinity,
                             width: double.infinity,
                             child: Hero(
-                              tag: timeline.images[1],
+                              tag: timeline.images[imgNum[1]],
                               child: Image.file(
-                                File(p.join(imageData, timeline.images[1])),
+                                File(p.join(
+                                    imageData, timeline.images[imgNum[1]])),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -102,14 +123,15 @@ class AppPhotosView extends StatelessWidget {
                         ),
                         Flexible(
                           child: GestureDetector(
-                            onTap: () => openImage(context, 2),
+                            onTap: () => openImage(context, imgNum[3]),
                             child: SizedBox(
                               height: double.infinity,
                               width: double.infinity,
                               child: Hero(
-                                tag: timeline.images[2],
+                                tag: timeline.images[imgNum[3]],
                                 child: Image.file(
-                                  File(p.join(imageData, timeline.images[2])),
+                                  File(p.join(
+                                      imageData, timeline.images[imgNum[3]])),
                                   fit: BoxFit.cover,
                                 ),
                               ),
@@ -135,9 +157,6 @@ class AppPhotosView extends StatelessWidget {
             _GalleryPhotoViewWrapper(
           imageData: imageData,
           imagePaths: timeline.images,
-          backgroundDecoration: const BoxDecoration(
-            color: Colors.black,
-          ),
           initialIndex: index,
         ),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -148,28 +167,18 @@ class AppPhotosView extends StatelessWidget {
   }
 }
 
+// 画像を拡大表示するページ
 class _GalleryPhotoViewWrapper extends StatefulWidget {
   _GalleryPhotoViewWrapper({
-    super.key,
-    this.loadingBuilder,
-    this.backgroundDecoration,
-    this.minScale,
-    this.maxScale,
     this.initialIndex = 0,
     required this.imagePaths,
     required this.imageData,
-    this.scrollDirection = Axis.horizontal,
   }) : pageController = PageController(initialPage: initialIndex);
 
-  final LoadingBuilder? loadingBuilder;
-  final BoxDecoration? backgroundDecoration;
-  final dynamic minScale;
-  final dynamic maxScale;
   final int initialIndex;
   final PageController pageController;
   final List<String> imagePaths; // 画像のパス
   final String imageData; // 画像の保存先のルートパス
-  final Axis scrollDirection;
 
   @override
   State<StatefulWidget> createState() {
@@ -190,22 +199,29 @@ class _GalleryPhotoViewWrapperState extends State<_GalleryPhotoViewWrapper> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: widget.backgroundDecoration,
+        decoration: const BoxDecoration(
+          color: Colors.black,
+        ),
         constraints: BoxConstraints.expand(
           height: MediaQuery.of(context).size.height,
         ),
         child: Stack(
           alignment: Alignment.bottomRight,
           children: <Widget>[
-            PhotoViewGallery.builder(
-              scrollPhysics: const BouncingScrollPhysics(),
-              builder: _buildItem,
-              itemCount: widget.imagePaths.length,
-              loadingBuilder: widget.loadingBuilder,
-              backgroundDecoration: widget.backgroundDecoration,
-              pageController: widget.pageController,
-              onPageChanged: onPageChanged,
-              scrollDirection: widget.scrollDirection,
+            GestureDetector(
+              onVerticalDragStart: (details) {
+                Navigator.of(context).pop();
+              },
+              child: PhotoViewGallery.builder(
+                scrollPhysics: const BouncingScrollPhysics(),
+                builder: _buildItem,
+                itemCount: widget.imagePaths.length,
+                loadingBuilder: null,
+                backgroundDecoration: null,
+                pageController: widget.pageController,
+                onPageChanged: onPageChanged,
+                scrollDirection: Axis.horizontal,
+              ),
             ),
             Container(
               padding: const EdgeInsets.all(20.0),
