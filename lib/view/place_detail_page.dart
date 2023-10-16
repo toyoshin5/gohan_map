@@ -10,6 +10,8 @@ import 'package:gohan_map/view/place_post_page.dart';
 import 'package:gohan_map/view/place_update_page.dart';
 
 import 'package:isar/isar.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../utils/isar_utils.dart';
 
@@ -124,38 +126,57 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   thickness: 1,
                   height: 16,
                 ),
-                Wrap(
-                  spacing: 12,
-                  children: [
-                    SubButton(
-                      title: '編集',
-                      icon: Icons.edit,
-                      onPressed: () {
-                        showModalBottomSheet(
-                          //モーダルを表示する関数
-                          barrierColor:
-                              Colors.black.withOpacity(0), //背景をどれぐらい暗くするか
-                          backgroundColor: Colors.transparent,
-                          context: context,
-                          isScrollControlled: true, //スクロールで閉じたりするか
-                          builder: (context) {
-                            return PlaceUpdatePage(
-                              shop: selectedShop!,
-                            ); //ご飯投稿
-                          },
-                        ).then((value) {
-                          IsarUtils.getShopById(widget.id).then((shop) {
-                            setState(() {
-                              selectedShop = shop;
+                if (selectedShop != null)
+                  Wrap(
+                    spacing: 12,
+                    children: [
+                      SubButton(
+                        title: '編集',
+                        icon: Icons.edit,
+                        onPressed: () {
+                          showModalBottomSheet(
+                            //モーダルを表示する関数
+                            barrierColor:
+                                Colors.black.withOpacity(0), //背景をどれぐらい暗くするか
+                            backgroundColor: Colors.transparent,
+                            context: context,
+                            isScrollControlled: true, //スクロールで閉じたりするか
+                            builder: (context) {
+                              return PlaceUpdatePage(
+                                shop: selectedShop!,
+                              ); //ご飯投稿
+                            },
+                          ).then((value) {
+                            IsarUtils.getShopById(widget.id).then((shop) {
+                              setState(() {
+                                selectedShop = shop;
+                              });
                             });
                           });
-                        });
-                      },
-                    ),
-                    const SubButton(title: "共有", icon: AppIcons.share),
-                    const SubButton(title: "GoogleMapで開く", icon: Icons.map),
-                  ],
-                ),
+                        },
+                      ),
+                      SubButton(
+                        title: "共有",
+                        icon: AppIcons.share,
+                        onPressed: () {
+                          Share.shareUri(
+                            Uri.parse(
+                                "https://www.google.com/maps/place/?q=place_id:${selectedShop!.googlePlaceId}"),
+                          );
+                        },
+                      ),
+                      SubButton(
+                        title: "GoogleMapで開く",
+                        icon: Icons.map,
+                        onPressed: () async {
+                          await launchUrl(
+                              Uri.parse(
+                                  "https://www.google.com/maps/place/?q=place_id:${selectedShop!.googlePlaceId}"),
+                              mode: LaunchMode.externalApplication);
+                        },
+                      ),
+                    ],
+                  ),
                 //記録一覧
                 const SizedBox(height: 16),
                 const Row(
