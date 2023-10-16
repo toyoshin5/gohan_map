@@ -161,7 +161,7 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         onPressed: () {
                           Share.shareUri(
                             Uri.parse(
-                                "https://www.google.com/maps/place/?q=place_id:${selectedShop!.googlePlaceId}"),
+                                "https://www.google.com/maps/place/?q=${selectedShop!.shopName}"),
                           );
                         },
                       ),
@@ -171,8 +171,9 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         onPressed: () async {
                           await launchUrl(
                             Uri.parse(
-                              "https://www.google.com/maps/place/?q=place_id:${selectedShop!.googlePlaceId}",
+                              "https://www.google.com/maps/place/?q=${selectedShop!.shopName}",
                             ),
+                            mode: LaunchMode.externalApplication,
                           );
                         },
                       ),
