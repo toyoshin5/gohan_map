@@ -2,11 +2,11 @@
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:gohan_map/collections/timeline.dart';
+import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_photos_view.dart';
 import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_down_button/pull_down_button.dart';
-
 
 class PostCardWidget extends StatelessWidget {
   const PostCardWidget({
@@ -24,129 +24,111 @@ class PostCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
-      child: Column(children: [
-        Card(
-          margin: const EdgeInsets.all(0),
-          elevation: 0,
-          child: Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              const Icon(
-                                Icons.access_time,
-                                color: Colors.black,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                DateFormat('yyyy').format(timeline.date),
-                                style: const TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.black,
-                                    height: 1.5),
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                DateFormat('MM/dd').format(timeline.date),
-                                style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    height: 1.0),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    top: 8, bottom: 8, left: 2),
-                                child: Row(children: [
-                                  Text(
-                                    timeline.star.toString(),
-                                    style:
-                                        const TextStyle(color: Colors.black38),
-                                  ),
-                                  const Padding(
-                                    padding: EdgeInsets.only(right: 4),
-                                  ),
-                                  IgnorePointer(
-                                    ignoring: true,
-                                    child: AppRatingBar(
-                                      initialRating: timeline.star,
-                                      onRatingUpdate: (rating) {},
-                                      itemSize: 20,
-                                    ),
-                                  )
-                                ]),
-                              ),
-                            ],
-                          ),
-                          PullDownButton(
-                            itemBuilder: (context) => [
-                              PullDownMenuItem(
-                                onTap: onEditTapped,
-                                title: '編集',
-                                icon: CupertinoIcons.pencil,
-                              ),
-                              PullDownMenuItem(
-                                onTap: onDeleteTapped,
-                                title: '削除',
-                                isDestructive: true,
-                                icon: CupertinoIcons.delete,
-                              ),
-                            ],
-                            animationBuilder: null,
-                            position: PullDownMenuPosition.automatic,
-                            buttonBuilder: (_, showMenu) => CupertinoButton(
-                              onPressed: showMenu,
-                              padding: EdgeInsets.zero,
-                              pressedOpacity: 1,
-                              child: const Icon(
-                                CupertinoIcons.ellipsis,
-                                color: Colors.black,
-                                size: 24,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            border: Border.all(color: AppColors.primaryColor, width: 1),
+            borderRadius: const BorderRadius.all(Radius.circular(16)),
+            color: AppColors.whiteColor,
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primaryColor.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+              BoxShadow(
+                color: AppColors.greyDarkColor.withOpacity(0.5),
+                spreadRadius: 1,
+                blurRadius: 2,
               ),
             ],
           ),
-        ),
-        if (timeline.images.isNotEmpty)
-          //縦長の場合は正方形にする
-          AppPhotosView(timeline: timeline, imageData: imageData),
-        //test
-        if (timeline.comment != "")
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-            child: SizedBox(
+          child: Column(children: [
+            SizedBox(
               width: double.infinity,
-              child: Text(
-                timeline.comment,
-                style: const TextStyle(fontSize: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        DateFormat('yyyy年MM月dd日').format(timeline.date),
+                        style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            height: 1.3),
+                      ),
+                    ],
+                  ),
+                  PullDownButton(
+                    itemBuilder: (context) => [
+                      PullDownMenuItem(
+                        onTap: onEditTapped,
+                        title: '編集',
+                        icon: CupertinoIcons.pencil,
+                      ),
+                      PullDownMenuItem(
+                        onTap: onDeleteTapped,
+                        title: '削除',
+                        isDestructive: true,
+                        icon: CupertinoIcons.delete,
+                      ),
+                    ],
+                    animationBuilder: null,
+                    position: PullDownMenuPosition.automatic,
+                    buttonBuilder: (_, showMenu) => CupertinoButton(
+                      onPressed: showMenu,
+                      padding: EdgeInsets.zero,
+                      pressedOpacity: 1,
+                      child: const Icon(
+                        CupertinoIcons.ellipsis,
+                        color: Colors.black,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          )
-        else
-          const SizedBox(
-            height: 16,
+            if (timeline.images.isNotEmpty)
+              //縦長の場合は正方形にする
+              AppPhotosView(timeline: timeline, imageData: imageData),
+            if (timeline.images.isNotEmpty && timeline.comment != "")
+              const SizedBox(
+                height: 12,
+              ),
+            if (timeline.comment != "")
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 2),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    timeline.comment,
+                  ),
+                ),
+              )
+          ]),
+        ),
+        Positioned(
+          right: 32,
+          child: IgnorePointer(
+            ignoring: true,
+            child: AppRatingBar(
+              initialRating: timeline.star,
+              onRatingUpdate: (rating) {},
+              itemSize: 32,
+            ),
           ),
-      ]),
+        )
+      ],
     );
   }
 }
-

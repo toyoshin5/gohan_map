@@ -42,12 +42,12 @@ class AppPhotosView extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.greyDarkColor),
-        borderRadius: const BorderRadius.all(Radius.circular(12)),
+        borderRadius: const BorderRadius.all(Radius.circular(4)),
       ),
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(12)),
+          borderRadius: const BorderRadius.all(Radius.circular(4)),
           child: Row(
             children: [
               Flexible(

@@ -25,7 +25,7 @@ class AppRatingBar extends StatelessWidget {
         allowHalfRating: true,
         itemCount: 5,
         itemSize: itemSize,
-        glowColor: Colors.amber,
+        glowColor: Colors.transparent,
         onRatingUpdate: onRatingUpdate,
         ratingWidget: RatingWidget(
           full: const Icon(Icons.star, color: Colors.amber),
