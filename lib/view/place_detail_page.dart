@@ -170,9 +170,10 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         icon: Icons.map,
                         onPressed: () async {
                           await launchUrl(
-                              Uri.parse(
-                                  "https://www.google.com/maps/place/?q=place_id:${selectedShop!.googlePlaceId}"),
-                              mode: LaunchMode.externalApplication);
+                            Uri.parse(
+                              "https://www.google.com/maps/place/?q=place_id:${selectedShop!.googlePlaceId}",
+                            ),
+                          );
                         },
                       ),
                     ],
