@@ -93,6 +93,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               ),
             ),
             DropdownButton(
+              borderRadius: BorderRadius.circular(12),
+              elevation: 4,
               items: [
                 for (var v in mapPins)
                   DropdownMenuItem(
