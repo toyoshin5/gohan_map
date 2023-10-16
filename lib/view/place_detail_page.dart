@@ -176,10 +176,11 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                     )
                   ],
                 ),
+                //記録ボタン
                 Center(
                   child: Container(
                     height: 44,
-                    margin: const EdgeInsets.all(16),
+                    margin: const EdgeInsets.only(top: 16),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primaryColor,
@@ -248,6 +249,27 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                   );
                 } else {
                   return Column(children: [
+                    if (shopTimeline?.isEmpty ?? true)
+                      Column(
+                        children: [
+                          //画像
+                          Padding(
+                            padding: const EdgeInsets.only(left: 100),
+                            child: Image.asset(
+                              "images/arrow_spin.png",
+                              height: 80,
+                            ),
+                          ),
+                          const Text(
+                            "記録がまだありません\n1つ目の記録を追加しましょう",
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    if (shopTimeline?.isNotEmpty ?? false)
+                      const SizedBox(
+                        height: 16,
+                      ),
                     for (Timeline timeline in (shopTimeline ?? [])) ...[
                       PostCardWidget(
                         timeline: timeline,
