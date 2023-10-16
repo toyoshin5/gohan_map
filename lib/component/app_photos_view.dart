@@ -255,6 +255,8 @@ class _GalleryPhotoViewWrapperState extends State<_GalleryPhotoViewWrapper> {
   PhotoViewGalleryPageOptions _buildItem(BuildContext context, int index) {
     final String item = widget.imagePaths[index];
     return PhotoViewGalleryPageOptions(
+      minScale: PhotoViewComputedScale.contained,
+      maxScale: PhotoViewComputedScale.covered * 2.0,
       imageProvider: FileImage(File(p.join(widget.imageData, item))),
       initialScale: PhotoViewComputedScale.contained,
       heroAttributes: PhotoViewHeroAttributes(tag: item),
