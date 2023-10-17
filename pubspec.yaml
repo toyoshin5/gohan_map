@@ -110,11 +110,11 @@ flutter:
     - family: AppIcon #アイコンセットのタイトル
       fonts:
         - asset: icon/AppIcon.ttf #設置したファイル
-    - family: NotoSansJP
+    - family: HiraginoSans
       fonts:
-        - asset: icon/font/NotoSansJP-Bold.ttf
+        - asset: icon/font/hiragino-w6.ttc
           weight: 700
-        - asset: icon/font/NotoSansJP-Regular.ttf
+        - asset: icon/font/hiragino-w3.ttc
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
