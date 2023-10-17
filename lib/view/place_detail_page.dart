@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/collections/timeline.dart';
@@ -381,7 +383,14 @@ class SubButton extends StatelessWidget {
                 child: Icon(icon, size: 18, color: foreColor),
               ),
             ),
-            TextSpan(text: title, style: const TextStyle(color: foreColor)),
+            TextSpan(
+                text: title,
+                style: TextStyle(
+                  color: foreColor,
+                  fontFamily: (Platform.isAndroid) ? "SanFrancisco" : null,
+                  fontFamilyFallback:
+                      (Platform.isAndroid) ? ["HiraginoSans"] : null,
+                )),
           ]),
         ),
       ),

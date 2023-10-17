@@ -41,12 +41,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const Scaffold(
         resizeToAvoidBottomInset: false,
-
         body: MainPage(),
       ),
       theme: ThemeData(
-        fontFamily: (Platform.isAndroid) ? "HiraginoSans" : null,
-  ),
+        fontFamily: (Platform.isAndroid) ? "SanFrancisco" : null,
+        fontFamilyFallback: (Platform.isAndroid) ? ["HiraginoSans"] : null,
+      ),
     );
   }
 }
@@ -131,21 +131,25 @@ class _MainPageState extends State<MainPage> {
     //選択されたタブをリロードする
     if (tabItem == TabItem.swipe) {
       SwipeUIPageState? allpostPageState =
-            _globalKeys[tabItem]!.currentState as SwipeUIPageState?;
+          _globalKeys[tabItem]!.currentState as SwipeUIPageState?;
       allpostPageState?.reload();
       _navigatorKeys[tabItem]?.currentState?.popUntil((route) => route.isFirst);
-    }else if(tabItem == TabItem.map){
+    } else if (tabItem == TabItem.map) {
       MapPageState? mapPageState =
-           _globalKeys[tabItem]!.currentState as MapPageState?;
+          _globalKeys[tabItem]!.currentState as MapPageState?;
       mapPageState?.reload();
-    }else if (tabItem == TabItem.character) {
+    } else if (tabItem == TabItem.character) {
       CharacterPageState? characterPageState =
-           _globalKeys[tabItem]!.currentState as CharacterPageState?;
+          _globalKeys[tabItem]!.currentState as CharacterPageState?;
       characterPageState?.reload();
     }
     //タブの最初の画面に戻る
     //_navigatorKeys[TabItem.swipe]?.currentState?.popUntil((route) => route.isFirst);
-    _navigatorKeys[TabItem.map]?.currentState?.popUntil((route) => route.isFirst);
-    _navigatorKeys[TabItem.character]?.currentState?.popUntil((route) => route.isFirst);
+    _navigatorKeys[TabItem.map]
+        ?.currentState
+        ?.popUntil((route) => route.isFirst);
+    _navigatorKeys[TabItem.character]
+        ?.currentState
+        ?.popUntil((route) => route.isFirst);
   }
 }

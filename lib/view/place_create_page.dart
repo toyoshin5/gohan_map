@@ -445,6 +445,7 @@ class NewBudge extends StatelessWidget {
           "NEW!!",
           style: TextStyle(
               height: 1.2,
+              fontFamily: "SFProRounded",
               color: AppColors.whiteColor,
               fontWeight: FontWeight.bold,
               fontSize: 16),
