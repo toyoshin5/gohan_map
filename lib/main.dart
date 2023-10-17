@@ -45,9 +45,7 @@ class MyApp extends StatelessWidget {
         body: MainPage(),
       ),
       theme: ThemeData(
-    textTheme: (Platform.isAndroid)?GoogleFonts.mPlus1TextTheme(
-      Theme.of(context).textTheme
-    ):null,
+        fontFamily: (Platform.isAndroid) ? "NotoSansJP" : null,
   ),
     );
   }
