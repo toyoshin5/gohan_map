@@ -15,8 +15,9 @@ import 'package:intl/intl.dart';
 class PostFoodWidget extends StatefulWidget {
   const PostFoodWidget({
     Key? key,
-    this.initialImage,
-    required this.onImageChanged,
+    required this.images,
+    required this.onImageAdded,
+    required this.onImageDeleted,
     this.initialStar,
     required this.onStarChanged,
     this.initialDate,
@@ -25,8 +26,9 @@ class PostFoodWidget extends StatefulWidget {
     required this.onCommentChanged,
     this.onCommentFocusChanged,
   }) : super(key: key);
-  final File? initialImage;
-  final Function(File?) onImageChanged;
+  final List<File> images;
+  final Function(File) onImageAdded;
+  final Function(int) onImageDeleted;
 
   final double? initialStar;
   final Function(double) onStarChanged;
@@ -57,39 +59,35 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.whiteColor,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _ImgSection(
-              initialImage: widget.initialImage,
-              onChanged: widget.onImageChanged,
-              onDateTimeChanged: (DateTime dateTime) {
-                dateController.value =
-                    dateController.value.copyWith(text: dateTime.toString());
-                widget.onDateChanged(dateTime);
-              }),
-          _StarSection(
-            initialStar: widget.initialStar,
-            onChanged: widget.onStarChanged,
-          ),
-          _DateSection(
-            controller: dateController,
-            onChanged: widget.onDateChanged,
-          ),
-          _CommentSection(
-            initialComment: widget.initialComment,
-            onChanged: widget.onCommentChanged,
-            onFocusChanged: widget.onCommentFocusChanged,
-          ),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StarSection(
+          initialStar: widget.initialStar,
+          onChanged: widget.onStarChanged,
+        ),
+        const SizedBox(height: 16),
+        _ImgSection(
+            images: widget.images,
+            onAdded: widget.onImageAdded,
+            onDeleted: widget.onImageDeleted,
+            onDateTimeChanged: (DateTime dateTime) {
+              dateController.value =
+                  dateController.value.copyWith(text: dateTime.toString());
+              widget.onDateChanged(dateTime);
+            }),
+        const SizedBox(height: 16),
+        _DateSection(
+          controller: dateController,
+          onChanged: widget.onDateChanged,
+        ),
+        const SizedBox(height: 16),
+        _CommentSection(
+          initialComment: widget.initialComment,
+          onChanged: widget.onCommentChanged,
+          onFocusChanged: widget.onCommentFocusChanged,
+        ),
+      ],
     );
   }
 
@@ -100,47 +98,64 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
   }
 }
 
-class _ImgSection extends StatefulWidget {
-  final File? initialImage;
-  final Function(File?) onChanged;
+class _StarSection extends StatelessWidget {
+  const _StarSection({
+    this.initialStar,
+    required this.onChanged,
+  });
+
+  final double? initialStar;
+  final Function(double) onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          child: _SectionTitle(icon: Icons.star_rounded, title: "評価"),
+        ),
+        AppRatingBar(
+            initialRating: initialStar ?? 4.0, onRatingUpdate: onChanged),
+      ],
+    );
+  }
+}
+
+class _ImgSection extends StatelessWidget {
+  final List<File> images;
+  final Function(File) onAdded;
+  final Function(int) onDeleted;
   final Function(DateTime) onDateTimeChanged;
   const _ImgSection({
-    this.initialImage,
-    required this.onChanged,
+    required this.images,
+    required this.onAdded,
+    required this.onDeleted,
     required this.onDateTimeChanged,
   });
 
   @override
-  State<_ImgSection> createState() => _ImgSectionState();
-}
-
-//画像選択欄
-class _ImgSectionState extends State<_ImgSection> {
-  File? image;
-  bool isSelecting = false; //選択/ロード中か
-
-  @override
-  void initState() {
-    super.initState();
-    image = widget.initialImage;
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return DottedBorder(
-      padding: EdgeInsets.zero,
-      borderType: BorderType.RRect,
-      radius: const Radius.circular(10),
-      dashPattern: const [5, 5],
-      color: (image == null) ? Colors.grey : Colors.transparent,
-      child: SizedBox(
-        width: double.infinity,
-        child: Stack(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                onPressed: () {
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 16),
+          child: _SectionTitle(icon: Icons.camera_alt_rounded, title: "写真"),
+        ),
+        DottedBorder(
+          padding: EdgeInsets.zero,
+          borderType: BorderType.RRect,
+          radius: const Radius.circular(10),
+          dashPattern: const [5, 5],
+          color: AppColors.blackTextColor,
+          child: SizedBox(
+            width: double.infinity,
+            child: Column(
+              children: [
+                _UploadButton(
+                    onPressed: (images.length >= 4)
+                        ? null
+                        : () {
                   //iOS風のアクションシート
                   showCupertinoModalPopup(
                     context: context,
@@ -150,10 +165,7 @@ class _ImgSectionState extends State<_ImgSection> {
                         actions: [
                           CupertinoActionSheetAction(
                             onPressed: () async {
-                              setState(() {
-                                isSelecting = true;
-                              });
-                              if (mounted) {
+                                        if (context.mounted) {
                                 Navigator.pop(context);
                               }
                               await takePhoto();
@@ -162,10 +174,7 @@ class _ImgSectionState extends State<_ImgSection> {
                           ),
                           CupertinoActionSheetAction(
                             onPressed: () async {
-                              setState(() {
-                                isSelecting = true;
-                              });
-                              if (mounted) {
+                                        if (context.mounted) {
                                 Navigator.pop(context);
                               }
                               await pickImage();
@@ -182,64 +191,19 @@ class _ImgSectionState extends State<_ImgSection> {
                       );
                     },
                   );
-                },
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                          }),
+                for (int i = 0; i < images.length; i++)
+                  _SelectedImgWidget(
+                    image: images[i],
+                    onDeletePressed: () {
+                      onDeleted(i);
+                    },
                   ),
-                  backgroundColor: AppColors.whiteColor,
-                ),
-                child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.upload_file,
-                        color: Colors.grey.shade800,
-                        size: 40,
-                      ),
-                      Text(
-                        (isSelecting) ? '写真を読み込み中..' : '写真を追加する',
-                        style: const TextStyle(color: AppColors.blackTextColor),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              ],
             ),
-            if (image != null)
-              //画像を表示
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: IntrinsicHeight(
-                  child: Image.file(
-                    image!,
-                    fit: BoxFit.contain,
-                  ),
-                ),
-              ),
-            if (image != null)
-              Positioned(
-                right: 0,
-                top: 0,
-                child: IconButton(
-                  onPressed: () {
-                    widget.onChanged(null);
-                    setState(() {
-                      image = null;
-                      isSelecting = false;
-                    });
-                  },
-                  icon: const Icon(
-                    Icons.cancel,
-                    color: AppColors.whiteColor,
-                  ),
-                ),
-              ),
-          ],
+          ),
         ),
-      ),
+      ],
     );
   }
 
@@ -251,10 +215,7 @@ class _ImgSectionState extends State<_ImgSection> {
       if (image == null) return;
 
       final imageTemp = File(image.path);
-      widget.onChanged(imageTemp);
-      setState(() {
-        this.image = imageTemp;
-      });
+      onAdded(imageTemp);
     } on PlatformException catch (e) {
       logger.e('Failed to pick image: $e');
     }
@@ -276,31 +237,92 @@ class _ImgSectionState extends State<_ImgSection> {
         // フォーマットが全デバイスで正しいのかは検討
         var imageDateTime = DateFormat("yyyy:MM:dd HH:mm:ss")
             .parse(tags["Image DateTime"].toString());
-        widget.onDateTimeChanged(imageDateTime);
+        onDateTimeChanged(imageDateTime);
       }
-
-      widget.onChanged(imageTemp);
-      setState(() {
-        this.image = imageTemp;
-      });
+      onAdded(imageTemp);
     } on PlatformException catch (e) {
       logger.e('Failed to pick image: $e');
     }
   }
 }
 
-class _StarSection extends StatelessWidget {
-  const _StarSection({
-    this.initialStar,
-    required this.onChanged,
+class _SelectedImgWidget extends StatelessWidget {
+  const _SelectedImgWidget({
+    super.key,
+    required this.image,
+    required this.onDeletePressed,
   });
 
-  final double? initialStar;
-  final Function(double) onChanged;
+  final File? image;
+  final VoidCallback onDeletePressed;
 
   @override
   Widget build(BuildContext context) {
-    return AppRatingBar(initialRating: initialStar ?? 4.0,onRatingUpdate: onChanged);
+    return Stack(
+      children: [
+        //画像を表示
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: IntrinsicHeight(
+            child: Image.file(
+              image!,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+        Positioned(
+          right: 0,
+          top: 0,
+          child: IconButton(
+            onPressed: onDeletePressed,
+            icon: const Icon(
+              Icons.cancel,
+              color: AppColors.whiteColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _UploadButton extends StatelessWidget {
+  const _UploadButton({
+    required this.onPressed,
+  });
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          backgroundColor: AppColors.whiteColor,
+        ),
+        child: SizedBox(
+          height: 50,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.upload_rounded,
+                color: Colors.grey.shade800,
+                size: 30,
+              ),
+              const Text(
+                '写真を追加する',
+                style: TextStyle(color: AppColors.blackTextColor),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -316,28 +338,35 @@ class _DateSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      //角丸四角形
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      decoration: BoxDecoration(
-        color: AppColors.searchBarColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: DateTimePicker(
-        type: DateTimePickerType.date,
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2100),
-        dateMask: 'yyyy/MM/dd',
-        //icon: Icon(Icons.watch_later_outlined),
-        dateLabelText: '訪問日',
-        controller: controller,
-        use24HourFormat: true,
-        onChanged: (value) {
-          onChanged(DateTime.parse(value));
-        },
-      ),
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 16),
+          child: _SectionTitle(icon: Icons.edit_calendar_rounded, title: "訪問日"),
+        ),
+        Container(
+          //角丸四角形
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          decoration: BoxDecoration(
+            color: AppColors.searchBarColor,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: DateTimePicker(
+            type: DateTimePickerType.date,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2100),
+            dateMask: 'yyyy/MM/dd',
+            //icon: Icon(Icons.watch_later_outlined),
+            dateLabelText: '訪問日',
+            controller: controller,
+            use24HourFormat: true,
+            onChanged: (value) {
+              onChanged(DateTime.parse(value));
+            },
+          ),
+        ),
+      ],
     );
   }
 }
@@ -355,34 +384,70 @@ class _CommentSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Focus(
-      onFocusChange: onFocusChanged,
-      child: TextFormField(
-        keyboardType: TextInputType.multiline,
-        maxLines: null,
-        minLines: 3,
-        initialValue: initialComment,
-        decoration: InputDecoration(
-          hintText: 'コメント',
-          filled: true,
-          fillColor: AppColors.searchBarColor,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: AppColors.whiteColor,
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 16),
+          child: _SectionTitle(icon: Icons.comment_bank_rounded, title: "コメント"),
+        ),
+        Focus(
+          onFocusChange: onFocusChanged,
+          child: TextFormField(
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            minLines: 3,
+            initialValue: initialComment,
+            decoration: InputDecoration(
+              hintText: 'コメント',
+              filled: true,
+              fillColor: AppColors.searchBarColor,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              enabledBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
+                  color: AppColors.whiteColor,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: const BorderSide(
+                  color: AppColors.whiteColor,
+                ),
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: AppColors.whiteColor,
-            ),
-            borderRadius: BorderRadius.circular(8),
+            onChanged: onChanged,
           ),
         ),
-        onChanged: onChanged,
-      ),
+      ],
+    );
+  }
+}
+
+class _SectionTitle extends StatelessWidget {
+  const _SectionTitle({
+    required this.icon,
+    required this.title,
+  });
+  final IconData icon;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 26,
+        ),
+        const SizedBox(
+          width: 4,
+        ),
+        Text(
+          title,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+      ],
     );
   }
 }

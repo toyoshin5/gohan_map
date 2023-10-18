@@ -110,7 +110,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                     ],
                     onChanged: (value) {
                       if (value == null) return;
-            
                       setState(
                         () {
                           shopMapIconKind = value;
@@ -344,7 +343,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
 
 class _ShopNameArea extends StatelessWidget {
   const _ShopNameArea({
-    super.key,
     required this.shopName,
     required this.shopAddress,
   });

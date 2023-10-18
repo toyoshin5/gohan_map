@@ -71,58 +71,10 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 //高さ未定の子は、最も高い子の高さに合わせる
-                IntrinsicHeight(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 8,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(4),
-                          color: AppColors.primaryColor,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              selectedShop?.shopName ?? '',
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                height: 1.3,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                const Icon(
-                                  Icons.place,
-                                  color: Colors.grey,
-                                  size: 18,
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 2, top: 20),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    selectedShop?.shopAddress ?? '',
-                                    style: const TextStyle(fontSize: 12),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                ShopNameHeader(
+                  title: selectedShop?.shopName ?? "",
+                  address: selectedShop?.shopAddress ?? "",
                 ),
-
                 const Divider(
                   color: AppColors.greyColor,
                   thickness: 1,
@@ -339,6 +291,71 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                 }
               }),
         ]));
+  }
+}
+
+class ShopNameHeader extends StatelessWidget {
+  const ShopNameHeader({
+    super.key,
+    required this.title,
+    required this.address,
+  });
+  final String title;
+  final String address;
+
+  @override
+  Widget build(BuildContext context) {
+    return IntrinsicHeight(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 8,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              color: AppColors.primaryColor,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    height: 1.3,
+                  ),
+                ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.place,
+                      color: Colors.grey,
+                      size: 18,
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.only(right: 2, top: 20),
+                    ),
+                    Flexible(
+                      child: Text(
+                        address,
+                        style: const TextStyle(fontSize: 12),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:gohan_map/collections/timeline.dart';
 import 'package:gohan_map/component/post_food_widget.dart';
 import 'package:gohan_map/utils/common.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
+import 'package:gohan_map/view/place_detail_page.dart';
 import 'package:path/path.dart' as p;
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -26,7 +27,7 @@ class PlacePostPage extends StatefulWidget {
 }
 
 class _PlacePostPageState extends State<PlacePostPage> {
-  File? image;
+  List<File> images = [];
   DateTime date = DateTime.now();
   String comment = '';
   double star = 4.0;
@@ -40,9 +41,13 @@ class _PlacePostPageState extends State<PlacePostPage> {
     Future(() async {
       if (widget.timeline != null) {
         // 編集画面
-        image = widget.timeline!.images.isNotEmpty
-            ? File(p.join(await getLocalPath(), widget.timeline!.images[0]))
-            : null;
+        images = widget.timeline!.images.isNotEmpty
+            ? await Future.wait(
+                widget.timeline!.images.map((e) async {
+                  return File(p.join(await getLocalPath(), e));
+                }),
+              )
+            : [];
         date = widget.timeline!.date;
         comment = widget.timeline!.comment;
         star = widget.timeline!.star;
@@ -69,50 +74,37 @@ class _PlacePostPageState extends State<PlacePostPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              margin: const EdgeInsets.only(bottom: 20),
+              margin: const EdgeInsets.only(bottom: 8),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    //飲食店名
-                    Text(
-                      widget.shop.shopName,
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
+                    ShopNameHeader(
+                      title: widget.shop.shopName,
+                      address: widget.shop.shopAddress,
                     ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                            child: Text(
-                          (widget.timeline != null) ? "投稿編集" : "新規投稿",
-                          style: const TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                        )),
-                        const SizedBox(width: 24),
-                        SizedBox(
-                          height: 30,
-                          width: 30,
-                          child: IconButton(
-                            padding: const EdgeInsets.all(0),
-                            icon: const Icon(
-                              Icons.cancel_outlined,
-                              size: 32,
-                            ),
-                            onPressed: () {
-                              Navigator.pop(context); //前の画面に戻る
-                            },
-                          ),
-                        ),
-                      ],
+                    const Divider(
+                      color: AppColors.greyColor,
+                      thickness: 1,
+                      height: 16,
+                    ),
+                    Text(
+                      (widget.timeline != null) ? "記録の編集" : "新規記録",
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
                     ),
                   ]),
             ),
             // 追加の投稿
             PostFoodWidget(
-              initialImage: image,
-              onImageChanged: (image) {
+              images: images,
+              onImageAdded: (image) {
                 setState(() {
-                  this.image = image;
+                  images.add(image);
+                });
+              },
+              onImageDeleted: (index) {
+                setState(() {
+                  images.removeAt(index);
                 });
               },
               initialStar: star,
@@ -196,7 +188,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
   //決定ボタンを押した時の処理
   void onTapComfirm(BuildContext context) {
     //バリデーション
-    if (image == null && comment.isEmpty) {
+    if (images.isEmpty && comment.isEmpty) {
       showCupertinoDialog(
         context: context,
         builder: (context) {
@@ -243,10 +235,12 @@ class _PlacePostPageState extends State<PlacePostPage> {
 
   //DBに投稿を追加
   Future<void> _addToDB() async {
-    String? imagePath = await saveImageFile(image);
     List<String> imagePathList = [];
-    if (imagePath != null) {
-      imagePathList.add(imagePath);
+    for (var image in images) {
+      String? imagePath = await saveImageFile(image);
+      if (imagePath != null) {
+        imagePathList.add(imagePath);
+      }
     }
     final timeline = Timeline()
       ..images = imagePathList
@@ -269,10 +263,12 @@ class _PlacePostPageState extends State<PlacePostPage> {
 
   //DBの投稿を更新
   Future<void> _updateTimeline() async {
-    String? imagePath = await saveImageFile(image);
     List<String> imagePathList = [];
-    if (imagePath != null) {
-      imagePathList.add(imagePath);
+    for (var image in images) {
+      String? imagePath = await saveImageFile(image);
+      if (imagePath != null) {
+        imagePathList.add(imagePath);
+      }
     }
     final timeline = Timeline()
       ..id = widget.timeline!.id

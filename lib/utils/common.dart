@@ -38,10 +38,9 @@ Future<String> getLocalPath() async {
   return directory.path;
 }
 
-Future<String?> saveImageFile(File? image) async {
-  if (image == null) return null;
+Future<String?> saveImageFile(File image) async {
 
-  final name = const Uuid().v1() + p.extension(image.path);
+  final name = const Uuid().v4() + p.extension(image.path);
   // localPathはデバック毎に変わるので、DBに保存するパスは相対部分のみ
   final imagePath = "$foodImageFolderName/$name";
   final dir = Directory(p.join(await getLocalPath(), foodImageFolderName));
