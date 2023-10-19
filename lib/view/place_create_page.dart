@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'package:gohan_map/collections/shop.dart';
 
@@ -97,7 +98,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                                 width: 30,
                                 height: 40,
                                 padding: const EdgeInsets.only(right: 10),
-                                child: Image.asset(
+                                child: SvgPicture.asset(
                                   v.pinImagePath,
                                   fit: BoxFit.contain,
                                 ),
@@ -260,8 +261,8 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   width: 82,
                   height: 82,
                   margin: const EdgeInsets.only(top: 20, bottom: 12),
-                  child: Image.asset(
-                    findPinByKind(shopMapIconKind)?.pinImagePath ?? '',
+                  child: SvgPicture.asset(
+                    'images/pins/pin_man.svg',
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -298,7 +299,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                       width: 82,
                       height: 82,
                       margin: const EdgeInsets.symmetric(vertical: 20),
-                      child: Image.asset(
+                      child: SvgPicture.asset(
                         findPinByKind(shopMapIconKind)?.pinImagePath ?? '',
                         fit: BoxFit.contain,
                       ),

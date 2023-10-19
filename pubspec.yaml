@@ -66,6 +66,7 @@ dependencies:
   modal_bottom_sheet: ^3.0.0-pre 
   share_plus: ^7.2.1
   calendar_date_picker2: ^0.5.3
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_test:
