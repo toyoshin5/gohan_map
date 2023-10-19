@@ -16,10 +16,10 @@ class AllPostPage extends StatefulWidget {
   const AllPostPage({super.key});
 
   @override
-  State<AllPostPage> createState() => _AllPostPageState();
+  State<AllPostPage> createState() => AllPostPageState();
 }
 
-class _AllPostPageState extends State<AllPostPage> {
+class AllPostPageState extends State<AllPostPage> {
   List<Timeline>? shopTimeline;
   int segmentIndex = 1;
   @override
@@ -33,12 +33,24 @@ class _AllPostPageState extends State<AllPostPage> {
     }();
   }
 
+  void reload() {
+    () async {
+      final timelines = await IsarUtils.getAllTimelines();
+      setState(() {
+        shopTimeline = timelines;
+      });
+    }();
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Timeline>? shopTimelineWithImg;
+    List<Timeline> shopTimelineWithImg = [];
     if (shopTimeline != null) {
-      shopTimelineWithImg =
-          shopTimeline!.where((element) => element.image != null).toList();
+      for (Timeline timeline in shopTimeline!) {
+        if (timeline.images.isNotEmpty) {
+          shopTimelineWithImg.add(timeline);
+        }
+      }
     }
 
     return Scaffold(
@@ -46,13 +58,6 @@ class _AllPostPageState extends State<AllPostPage> {
         title: const Text(
           'すべての投稿',
           style: TextStyle(color: Colors.black),
-        ),
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black,
-          ),
-          onPressed: () => Navigator.pop(context),
         ),
         //色
         backgroundColor: Colors.white,
@@ -93,7 +98,7 @@ class _AllPostPageState extends State<AllPostPage> {
                     if (snapshot.connectionState != ConnectionState.done) {
                       return Container();
                     } else {
-                      if((shopTimeline ?? []).isEmpty){
+                      if ((shopTimeline ?? []).isEmpty) {
                         return Container(
                           padding: const EdgeInsets.all(16),
                           child: const Text("投稿がありません"),
@@ -119,46 +124,48 @@ class _AllPostPageState extends State<AllPostPage> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                       ),
-                                      if(snapshot2.data != null)
-                                      PostCardWidget(
-                                        timeline: timeline,
-                                        imageData: snapshot.data!,
-                                        onEditTapped: () {
-                                          showModalBottomSheet(
-                                            //モーダルを表示する関数
-                                            backgroundColor: Colors.transparent,
-                                            context: context,
-                                            isScrollControlled:
-                                                true, //スクロールで閉じたりするか
-                                            builder: (context) {
-                                              if (snapshot2.data != null) {
-                                                return PlacePostPage(
-                                                  shop: snapshot2.data!,
-                                                  timeline: timeline,
-                                                ); //ご飯投稿
-                                              } else {
-                                                return Container();
+                                      if (snapshot2.data != null)
+                                        PostCardWidget(
+                                          timeline: timeline,
+                                          imageData: snapshot.data!,
+                                          onEditTapped: () {
+                                            showModalBottomSheet(
+                                              //モーダルを表示する関数
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              context: context,
+                                              isScrollControlled:
+                                                  true, //スクロールで閉じたりするか
+                                              builder: (context) {
+                                                if (snapshot2.data != null) {
+                                                  return PlacePostPage(
+                                                    shop: snapshot2.data!,
+                                                    timeline: timeline,
+                                                  ); //ご飯投稿
+                                                } else {
+                                                  return Container();
+                                                }
+                                              },
+                                            ).then((value) {
+                                              if (value == null) {
+                                                return;
                                               }
-                                            },
-                                          ).then((value) {
-                                            if (value == null) {
-                                              return;
-                                            }
-                                            IsarUtils.getAllTimelines()
-                                                .then((timeline) {
-                                              setState(() {
-                                                shopTimeline = timeline;
+                                              IsarUtils.getAllTimelines()
+                                                  .then((timeline) {
+                                                setState(() {
+                                                  shopTimeline = timeline;
+                                                });
                                               });
                                             });
-                                          });
-                                        },
-                                        onDeleteTapped: () {
-                                          IsarUtils.deleteTimeline(timeline.id);
-                                          setState(() {
-                                            shopTimeline!.remove(timeline);
-                                          });
-                                        },
-                                      ),
+                                          },
+                                          onDeleteTapped: () {
+                                            IsarUtils.deleteTimeline(
+                                                timeline.id);
+                                            setState(() {
+                                              shopTimeline!.remove(timeline);
+                                            });
+                                          },
+                                        ),
                                       const Divider(
                                         thickness: 1,
                                         height: 1,
@@ -201,24 +208,30 @@ class _AllPostPageState extends State<AllPostPage> {
                             onTap: () async {
                               final s = shopTimelineWithImg![index].shopId;
                               final shop = await IsarUtils.getShopById(s);
-                              if (mounted && shop != null){
+                              if (mounted && shop != null) {
                                 Navigator.push(
                                   context,
                                   CupertinoPageRoute(
-                                      builder: (context) =>
-                                          PostDetailPage(timeline: shopTimelineWithImg![index],imageData: snapshot.data, shop: shop,),),)
-                                          .then((value) => {
-                                            if(value == "delete"){
-                                              setState(() {
-                                                shopTimeline!.remove(shopTimelineWithImg![index]);
-                                              })
-                                            }
-                                          });
+                                    builder: (context) => PostDetailPage(
+                                      timeline: shopTimelineWithImg![index],
+                                      imageData: snapshot.data,
+                                      shop: shop,
+                                    ),
+                                  ),
+                                ).then((value) => {
+                                      if (value == "delete")
+                                        {
+                                          setState(() {
+                                            shopTimeline!.remove(
+                                                shopTimelineWithImg![index]);
+                                          })
+                                        }
+                                    });
                               }
                             },
                             child: Image.file(
                               File(p.join(snapshot.data!,
-                                  shopTimelineWithImg![index].image!)),
+                                  shopTimelineWithImg[index].images[0])),
                               fit: BoxFit.cover,
                             ),
                           );

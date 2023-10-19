@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 
@@ -21,7 +20,7 @@ class AppModal extends StatefulWidget {
     this.maxChildSize = 0.9,
     this.showKnob = true,
     this.avoidKeyboardFlg = false,
-    this.backgroundColor = AppColors.unBluredModalColor,
+    this.backgroundColor = AppColors.whiteColor,
     required this.child,
     Key? key,
   }) : super(key: key);
@@ -34,6 +33,7 @@ class _AppModalState extends State<AppModal> {
   final DraggableScrollableController controller =
       DraggableScrollableController();
 
+  bool finished = false;
   @override
   Widget build(BuildContext context) {
     //modalの高さをNavigationBarに合わせる
@@ -53,6 +53,15 @@ class _AppModalState extends State<AppModal> {
         //スクロール可能なモーダルウィジェット
         controller: controller,
         builder: (BuildContext context, scrollController) {
+          controller.addListener(() {
+            double sheetHeight = controller.size;
+            //minChildSize以下になったらモーダルを閉じる
+            //MaterialModalBottomSheetを使うときは、これがないとモーダルを閉じられない
+            if (sheetHeight == widget.minChildSize && !finished) {
+              finished = true;
+              Navigator.pop(context);
+            }
+          });
           return InkWell(
             onTap: () {
               //キーボードを閉じる
@@ -61,27 +70,22 @@ class _AppModalState extends State<AppModal> {
             child: Container(
               //モーダルの中身
               decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                      blurRadius: 16, color: Colors.black.withOpacity(0.2))
+                ],
                 color: widget.backgroundColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
               ),
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.bluredModalColor,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20.0),
-                    topRight: Radius.circular(20.0),
-                  ),
-                ),
-                child: _ChildScrollView(
-                    draggableController: controller,
-                    scrollController: scrollController,
-                    avoidKeyboard: widget.avoidKeyboardFlg,
-                    showKnob: widget.showKnob,
-                    child: widget.child),
-              ),
+              child: _ChildScrollView(
+                  draggableController: controller,
+                  scrollController: scrollController,
+                  avoidKeyboard: widget.avoidKeyboardFlg,
+                  showKnob: widget.showKnob,
+                  child: widget.child),
             ),
           );
         },

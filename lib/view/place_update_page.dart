@@ -1,19 +1,16 @@
-import 'dart:convert';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_haptic/haptic.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gohan_map/collections/shop.dart';
-import 'package:gohan_map/component/app_rating_bar.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/map_pins.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gohan_map/view/place_detail_page.dart';
 
 // 飲食店の更新画面
 class PlaceUpdatePage extends StatefulWidget {
@@ -30,29 +27,26 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
   @override
   void initState() {
     super.initState();
-    defaultLatLng = LatLng(widget.shop.shopLatitude, widget.shop.shopLongitude);
-    shopName = widget.shop.shopName;
-    shopLatitude = widget.shop.shopLatitude;
-    shopLongitude = widget.shop.shopLongitude;
     shopMapIconKind = widget.shop.shopMapIconKind;
-    shopStar = widget.shop.shopStar;
+    wantToGoFlg = widget.shop.wantToGoFlg;
+    Future(() async {
+      // 一度でも行ったことがあるか
+      haveEverBeen = await IsarUtils.getTimelinesByShopId(widget.shop.id)
+          .then((value) => value.isNotEmpty);
+      setState(() {
+        // reload
+      });
+    });
   }
 
   MapController mapController = MapController();
-  late LatLng defaultLatLng;
-
-  late String shopName;
-  late double shopLatitude;
-  late double shopLongitude;
   late String shopMapIconKind;
-  late double shopStar;
+  late bool wantToGoFlg;
   bool isValidating = false;
+  bool haveEverBeen = true;
 
-  
   @override
   Widget build(BuildContext context) {
-    final String? pinImgPath = findPinByKind(shopMapIconKind)?.pinImagePath;
-
     return AppModal(
       initialChildSize: 0.9,
       child: Padding(
@@ -60,180 +54,18 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              //飲食店名
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  const Expanded(
-                      child: Text(
-                    "飲食店編集",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )),
-                  const SizedBox(width: 24),
-                  SizedBox(
-                    height: 30,
-                    width: 30,
-                    child: IconButton(
-                      padding: const EdgeInsets.all(0),
-                      icon: const Icon(
-                        Icons.cancel_outlined,
-                        size: 32,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(context); //前の画面に戻る
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ]),
-            Padding(
-              padding: const EdgeInsets.only(top: 16),
-              child: _ShopNameTextField(
-                initialValue: shopName,
-                onChanged: (value) {
-                  setState(() {
-                    shopName = value;
-                  });
-                },
-              ),
+            ShopNameHeader(
+                title: widget.shop.shopName, address: widget.shop.shopAddress),
+            const Divider(
+              color: AppColors.greyColor,
+              thickness: 1,
+              height: 16,
             ),
-            //地図
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
-              child: Text(
-                "場所",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 250,
-              child: Stack(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: AppColors.backgroundGreyColor,
-                      ),
-                    ),
-                    child: FutureBuilder(
-                      future: SharedPreferences.getInstance(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          final pref = snapshot.data as SharedPreferences;
-                          final currentTileURL = pref.getString("currentTileURL");
-                          return FlutterMap(
-                            mapController: mapController,
-                            options: MapOptions(
-                              center: defaultLatLng, //東京駅
-                              zoom: 15.0,
-                              maxZoom: 17.0,
-                              minZoom: 3.0,
-                              onPositionChanged: (position, hasGesture) {
-                                if (position.center != null) {
-                                  setState(() {
-                                    shopLatitude = position.center!.latitude;
-                                    shopLongitude = position.center!.longitude;
-                                  });
-                                }
-                              },
-                              onTap: (tapPosition, latlng) {
-                                _animatedMapMove(latlng, 15, 500);
-                              },
-                            ),
-                            children: [
-                              TileLayer(
-                                urlTemplate:
-                                    currentTileURL,
-                              ),
-                            ],
-                          );
-                        } else {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      },
-                    ),
-                  ),
-                     
-                  //上にimages/pin.pngを重ねる。ただしピンの下端がSizedBoxの中心になるようにする。
-                  Align(
-                    alignment: Alignment.center,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        SizedBox(
-                          height: 35,
-                          width: 35,
-                          child: Image.asset(pinImgPath ?? "images/pin.png"),
-                        ),
-                        const SizedBox(height: 35),
-                      ],
-                    ),
-                  ),
-                  //右下に戻すボタンを表示
-                  if (defaultLatLng.latitude != shopLatitude ||
-                      defaultLatLng.longitude != shopLongitude)
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 16, right: 16),
-                        child: SizedBox(
-                          height: 44,
-                          width: 44,
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              foregroundColor: AppColors.blackTextColor,
-                              backgroundColor: AppColors.backgroundWhiteColor,
-                            ),
-                            onPressed: () {
-                              _animatedMapMove(defaultLatLng, 15, 500);
-                            },
-                            child: const Icon(
-                              Icons.replay_outlined,
-                              color: AppColors.blueTextColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-            //評価
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
-              child: Text(
-                "評価",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            AppRatingBar(
-                onRatingUpdate: (value) {
-                  setState(() {
-                    shopStar = value;
-                  });
-                },
-                initialRating: shopStar),
             // ピンの種類
             const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
               child: Text(
-                'ピンの種類',
+                'お店のジャンル',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -241,6 +73,8 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               ),
             ),
             DropdownButton(
+              borderRadius: BorderRadius.circular(12),
+              elevation: 4,
               items: [
                 for (var v in mapPins)
                   DropdownMenuItem(
@@ -250,7 +84,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                           width: 30,
                           height: 40,
                           padding: const EdgeInsets.only(right: 10),
-                          child: Image.asset(
+                          child: SvgPicture.asset(
                             v.pinImagePath,
                             fit: BoxFit.contain,
                           ),
@@ -267,6 +101,35 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
               },
               value: shopMapIconKind,
             ),
+            // 行きたいフラグ
+            const Padding(
+              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
+              child: Text(
+                '訪問状況',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Opacity(
+              opacity: (haveEverBeen) ? 0.5 : 1,
+              child: CupertinoSlidingSegmentedControl(
+                groupValue: wantToGoFlg,
+                children: const <bool, Widget>{
+                  true: Text('行ってみたい'),
+                  false: Text('行った'),
+                },
+                onValueChanged: (bool? value) {
+                  if (value == null || haveEverBeen) return;
+                  setState(() {
+                    wantToGoFlg = value;
+                  });
+                },
+              ),
+            ),
+            if(haveEverBeen)
+            const Text("記録済みのため、行ってみたいへの変更はできません。", style: TextStyle(color: Colors.grey, fontSize: 12),),
             //決定ボタン
             Container(
               width: double.infinity,
@@ -278,7 +141,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.primaryColor,
                 ),
                 onPressed: (isValidating)
                     ? null
@@ -296,13 +159,13 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                         width: 14,
                         child: const CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.blueTextColor),
+                              AppColors.whiteColor),
                         ),
                       ),
                     const Text(
                       '決定',
                       style: TextStyle(
-                          color: AppColors.blueTextColor,
+                          color: AppColors.whiteColor,
                           fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -320,13 +183,13 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
                   _deleteShop();
                 },
                 child: const Text(
-                  '削除',
+                  'お店を削除',
                   style: TextStyle(
                       color: AppColors.redTextColor,
                       fontWeight: FontWeight.bold),
@@ -339,74 +202,22 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
     );
   }
 
+  bool isDeleted = false;
 //決定ボタンを押した時の処理
   Future<void> _onTapComfirm(BuildContext context) async {
-    setState(() {
-      isValidating = true;
-    });
-    //住所取得
-    final shopAddress =
-        await _getAddressFromLatLng(LatLng(shopLatitude, shopLongitude));
-    //バリデーション
-    if (context.mounted) {
-      if (shopName.isEmpty) {
-        showCupertinoDialog(
-          context: context,
-          builder: (context) {
-            return CupertinoAlertDialog(
-              title: const Text('店名を入力してください'),
-              content: const Text('店を登録するためには、店名の入力が必要です。'),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('OK'),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            );
-          },
-        );
-        setState(() {
-          isValidating = false;
-        });
-        return;
-      } else if (shopAddress.isEmpty || shopAddress == "住所を取得できませんでした") {
-        showCupertinoDialog(
-          context: context,
-          builder: (context) {
-            return CupertinoAlertDialog(
-              title: const Text('住所を取得できません'),
-              content: const Text('インターネットへの接続状況をご確認ください。'),
-              actions: [
-                CupertinoDialogAction(
-                  child: const Text('OK'),
-                  onPressed: () async {
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            );
-          },
-        );
-        setState(() {
-          isValidating = false;
-        });
-        return;
-      }
-      _updateDB(shopAddress);
-    }
+    _updateDB();
   }
 
-  Future<void> _updateDB(String shopAddress) async {
+  Future<void> _updateDB() async {
     final shop = Shop()
       ..id = widget.shop.id
-      ..shopName = shopName
-      ..shopAddress = shopAddress
-      ..shopLatitude = shopLatitude
-      ..shopLongitude = shopLongitude
-      ..shopStar = shopStar
+      ..shopName = widget.shop.shopName
+      ..shopAddress = widget.shop.shopAddress
+      ..googlePlaceId = widget.shop.googlePlaceId
+      ..shopLatitude = widget.shop.shopLatitude
+      ..shopLongitude = widget.shop.shopLongitude
       ..shopMapIconKind = shopMapIconKind
+      ..wantToGoFlg = wantToGoFlg
       ..createdAt = widget.shop.createdAt
       ..updatedAt = DateTime.now();
     await IsarUtils.createShop(shop);
@@ -438,104 +249,29 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                 ),
                 onPressed: () async {
                   await IsarUtils.deleteShop(widget.shop.id);
-                  if (mounted) {
+                  if (context.mounted) {
                     setState(() {
                       // reload
                     });
-                    Navigator.of(context).popUntil((route) => route.isFirst);
+                    isDeleted = true;
+                    Navigator.of(context, rootNavigator: true)
+                        .pop(context); //rootNavigator: trueを指定しないと、モーダルが閉じない
                   }
                 },
-              ),
+              )
             ],
             cancelButton: CupertinoActionSheetAction(
               child: const Text('キャンセル'),
               onPressed: () {
-                Navigator.pop(context);
+                isDeleted = false;
+                Navigator.of(context, rootNavigator: true).pop(context);
               },
             ));
       },
-    );
-  }
-
-  void _animatedMapMove(LatLng destLocation, double destZoom, int millsec) {
-    final latTween = Tween<double>(
-        begin: mapController.center.latitude, end: destLocation.latitude);
-    final lngTween = Tween<double>(
-        begin: mapController.center.longitude, end: destLocation.longitude);
-    final zoomTween = Tween<double>(begin: mapController.zoom, end: destZoom);
-    final controller = AnimationController(
-        duration: Duration(milliseconds: millsec), vsync: this);
-    final Animation<double> animation =
-        CurvedAnimation(parent: controller, curve: Curves.fastOutSlowIn);
-    controller.addListener(() {
-      mapController.move(
-          LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
-          zoomTween.evaluate(animation));
-    });
-    animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        controller.dispose();
-      } else if (status == AnimationStatus.dismissed) {
-        controller.dispose();
+    ).then((value) {
+      if (isDeleted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
     });
-    controller.forward();
-  }
-
-  //緯度経度から住所を取得する
-  Future<String> _getAddressFromLatLng(LatLng latLng) async {
-    const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
-    final String apiUrl =
-        'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
-    try {
-      final response = await http
-          .get(Uri.parse(apiUrl))
-          .timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
-        final address = responseData['Feature'][0]['Property']['Address'];
-        return address;
-      } else {
-        return '住所を取得できませんでした';
-      }
-    } catch (e) {
-      return '住所を取得できませんでした';
-    }
-  }
-}
-
-class _ShopNameTextField extends StatelessWidget {
-  const _ShopNameTextField({
-    Key? key,
-    this.initialValue,
-    required this.onChanged,
-  }) : super(key: key);
-  final Function(String) onChanged;
-  final String? initialValue;
-  @override
-  Widget build(BuildContext context) {
-    //角丸,白いぬりつぶし,枠線なし
-    return TextFormField(
-      initialValue: initialValue,
-      decoration: InputDecoration(
-        hintText: '店名を入力',
-        filled: true,
-        fillColor: AppColors.textFieldColor,
-        contentPadding: const EdgeInsets.all(16),
-        enabledBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: AppColors.textFieldColor,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: const BorderSide(
-            color: AppColors.textFieldColor,
-          ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-      onChanged: onChanged,
-    );
   }
 }

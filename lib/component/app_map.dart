@@ -1,28 +1,24 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_direction_light.dart';
-import 'package:gohan_map/view/all_post_page.dart';
 import 'package:gohan_map/view/change_map_page.dart';
-import 'package:gohan_map/view/tutorial_page.dart';
+import 'package:gohan_map/view/place_list_page.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:geolocator/geolocator.dart';
 
 class AppMap extends StatefulWidget {
-  final void Function(TapPosition?, LatLng) onLongPress;
   final List<Marker>? pins;
   final MapController? mapController;
 
   const AppMap({
     Key? key,
-    required this.onLongPress,
     this.pins,
     this.mapController,
   }) : super(key: key);
@@ -125,7 +121,6 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   zoom: 15,
                   interactiveFlags: InteractiveFlag.all,
                   enableMultiFingerGestureRace: true,
-                  onLongPress: widget.onLongPress,
                   onPositionChanged: (position, hasGesture) {
                     if (isCurrentLocation = true) {
                       setState(() {
@@ -165,75 +160,40 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 ],
               );
             }),
-
-        //右上のボタン
-        Positioned(
-          top: 50,
-          right: 20,
-          child: SizedBox(
-            height: 44,
-            child: ElevatedButton(
-              //角丸で白
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.all(0),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                ),
-                backgroundColor: Colors.white,
-                foregroundColor: AppColors.blueTextColor,
-              ),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (context) => const AllPostPage()));
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12),
-                child: Row(
-                  children: [
-                    Icon(Icons.format_list_bulleted),
-                    Text("すべての投稿",style: TextStyle(fontWeight: FontWeight.bold),), 
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
         //右下のボタン
         Positioned(
-          bottom: 120,
+          top: 60,
           right: 20,
           child: Column(
             children: [
               //ヘルプボタン
-              SizedBox(
-                width: 44,
-                height: 44,
-                child: ElevatedButton(
-                  //角丸で白
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(0),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
-                    ),
-                    backgroundColor: Colors.white,
-                    foregroundColor: AppColors.blueTextColor,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const TutorialPage(),
-                      ),
-                    );
-                  },
-                  child: const Icon(Icons.help),
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
+              // SizedBox(
+              //   width: 44,
+              //   height: 44,
+              //   child: ElevatedButton(
+              //     //角丸で白
+              //     style: ElevatedButton.styleFrom(
+              //       padding: const EdgeInsets.all(0),
+              //       shape: const RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.all(Radius.circular(10)),
+              //       ),
+              //       backgroundColor: Colors.white,
+              //       foregroundColor: AppColors.primaryColor,
+              //     ),
+              //     onPressed: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => const TutorialPage(),
+              //         ),
+              //       );
+              //     },
+              //     child: const Icon(Icons.help),
+              //   ),
+              // ),
+              // const SizedBox(
+              //   height: 8,
+              // ),
               //現在地に戻るボタン
               SizedBox(
                 width: 44,
@@ -243,10 +203,10 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(0),
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderRadius: BorderRadius.all(Radius.circular(100)),
                     ),
                     backgroundColor: Colors.white,
-                    foregroundColor: AppColors.blueTextColor,
+                    foregroundColor: AppColors.greyDarkColor,
                   ),
                   onPressed: () {
                     Future.delayed(const Duration(milliseconds: 600)).then((_) {
@@ -273,10 +233,10 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.all(0),
                     shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                      borderRadius: BorderRadius.all(Radius.circular(100)),
                     ),
                     backgroundColor: Colors.white,
-                    foregroundColor: AppColors.blueTextColor,
+                    foregroundColor: AppColors.greyDarkColor,
                   ),
                   onPressed: () {
                     showModalBottomSheet(
@@ -302,6 +262,60 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
                 ),
               ),
             ],
+          ),
+        ),
+        Positioned(
+          bottom: 100,
+          right: 20,
+          child: SizedBox(
+            width: 120,
+            height: 44,
+            child: ElevatedButton(
+                //角丸で白
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.all(0),
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primaryColor,
+                ),
+                onPressed: () {
+                  showModalBottomSheet(
+                    barrierColor: Colors.black.withOpacity(0),
+                    context: context,
+                    isDismissible: true,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) {
+                      return PlaceListPage(
+                        mapController: widget.mapController!,
+                      );
+                    },
+                  ).then((value) {
+                    //MapTileの読み込み
+                    SharedPreferences.getInstance().then((pref) {
+                      setState(() {
+                        currentTileURL = pref.getString("currentTileURL") ??
+                            "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png";
+                      });
+                    });
+                  });
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.format_list_bulleted,
+                      color: AppColors.greyDarkColor,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      "店舗一覧",
+                      style: TextStyle(color: AppColors.greyDarkColor),
+                    )
+                  ],
+                )),
           ),
         ),
       ],
@@ -351,13 +365,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
         height: markerSize,
         point: currentPosition!,
         builder: (context) => GestureDetector(
-            onLongPress: () {
-              if (currentPosition == null) {
-                return;
-              }
-              widget.onLongPress(null, currentPosition!);
-            },
-            child: Container(
+                child: Container(
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 boxShadow: [
@@ -396,7 +404,7 @@ class _AppMapState extends State<AppMap> with TickerProviderStateMixin {
               child: Transform.rotate(
                   angle: (direction * (math.pi / 180)),
                   origin: const Offset(0, 16),
-                  child: AppDirectionLight()));
+                  child: const AppDirectionLight()));
         });
   }
 

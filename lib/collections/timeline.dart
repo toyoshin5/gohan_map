@@ -1,4 +1,3 @@
-
 import 'package:isar/isar.dart';
 
 part 'timeline.g.dart';
@@ -7,9 +6,10 @@ part 'timeline.g.dart';
 class Timeline {
   Id id = Isar.autoIncrement;
 
-  String? image;
+  late List<String> images;
   late String comment;
-  late bool umai;
+  late double star;
+  late bool isPublic;
   late DateTime createdAt;
   late DateTime updatedAt;
   @Index()

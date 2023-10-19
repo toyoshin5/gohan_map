@@ -1,17 +1,13 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
-import 'package:flutter_haptic/haptic.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
 import 'package:gohan_map/collections/shop.dart';
-import 'package:gohan_map/collections/timeline.dart';
-import 'package:gohan_map/component/app_rating_bar.dart';
-import 'package:gohan_map/component/post_food_widget.dart';
-import 'package:gohan_map/utils/common.dart';
+
 import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 
 import 'package:gohan_map/colors/app_colors.dart';
@@ -20,8 +16,15 @@ import 'package:gohan_map/component/app_modal.dart';
 //飲食店の登録画面
 class PlaceCreatePage extends StatefulWidget {
   final LatLng latlng;
-  final String? initialShopName;
-  const PlaceCreatePage({Key? key, required this.latlng, this.initialShopName})
+  final String? shopName;
+  final String placeId;
+  final String address;
+  const PlaceCreatePage(
+      {Key? key,
+      required this.latlng,
+      this.shopName,
+      required this.placeId,
+      required this.address})
       : super(key: key);
 
   @override
@@ -29,208 +32,173 @@ class PlaceCreatePage extends StatefulWidget {
 }
 
 class _PlaceCreatePageState extends State<PlaceCreatePage> {
-  String shopName = '';
-  String address = '';
-  double rating = 3;
   String shopMapIconKind = "default";
   File? image;
-  bool isUmai = false;
+  double star = 4.0;
   DateTime date = DateTime.now();
   String comment = '';
   bool avoidkeyBoard = false;
 
   @override
   void initState() {
-    shopName = widget.initialShopName ?? "";
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return AppModal(
-      initialChildSize: 0.7,
+      initialChildSize: 0.6,
+      maxChildSize: 0.7,
       avoidKeyboardFlg: avoidkeyBoard,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //飲食店名
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(
+              height: 10,
+            ),
+            Stack(
+              clipBehavior: Clip.none,
               children: [
-                _ShopNameTextField(
-                  initialShopName: shopName,
-                  onChanged: (value) {
-                    setState(() {
-                      shopName = value;
-                    });
-                  },
+                _ShopNameArea(
+                  shopName: widget.shopName ?? "名称未設定",
+                  shopAddress: widget.address,
                 ),
-                const SizedBox(width: 24),
-                SizedBox(
-                  height: 30,
-                  width: 30,
-                  child: IconButton(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 12, 12), //44px確保
-                    icon: const Icon(
-                      Icons.cancel_outlined,
-                      size: 32,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context); //前の画面に戻る
-                    },
-                  ),
+                const Positioned(
+                  top: -12,
+                  left: 16,
+                  child: NewBudge(),
                 ),
               ],
             ),
-            //住所
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
+          
+            // ピンの種類
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Icon(
-                    Icons.place,
-                    color: Colors.blue,
-                  ),
-                  Padding(padding: EdgeInsets.only(right: 5)),
-                  Text(
-                    '住所',
+                  const Text(
+                    'お店のジャンル',
                     style: TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.bold,
                     ),
-                  )
+                  ),
+                  DropdownButton(
+                    borderRadius: BorderRadius.circular(12),
+                    elevation: 4,
+                    items: [
+                      for (var v in mapPins)
+                        DropdownMenuItem(
+                          value: v.kind,
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 30,
+                                height: 40,
+                                padding: const EdgeInsets.only(right: 10),
+                                child: SvgPicture.asset(
+                                  v.pinImagePath,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              Text(v.displayName),
+                            ],
+                          ),
+                        ),
+                    ],
+                    onChanged: (value) {
+                      if (value == null) return;
+                      setState(
+                        () {
+                          shopMapIconKind = value;
+                        },
+                      );
+                    },
+                    value: shopMapIconKind,
+                  ),
                 ],
               ),
             ),
-            FutureBuilder(
-              future: _getAddressFromLatLng(widget.latlng),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  address = snapshot.data.toString();
-                  return Text(snapshot.data.toString());
-                } else {
-                  return const Text('住所を取得中...');
-                }
-              },
-            ),
-            //評価
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
-              child: Text(
-                '店の評価',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            AppRatingBar(
-              initialRating: rating,
-              onRatingUpdate: (val) {
-                setState(() {
-                  rating = val;
-                });
-              },
-            ),
-            // ピンの種類
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
-              child: Text(
-                'ピンの種類',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            DropdownButton(
-              items: [
-                for (var v in mapPins)
-                  DropdownMenuItem(
-                      value: v.kind,
-                      child: Row(children: [
-                        Container(
-                          width: 30,
-                          height: 40,
-                          padding: const EdgeInsets.only(right: 10),
-                          child: Image.asset(
-                            v.pinImagePath,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        Text(v.displayName),
-                      ]))
-              ],
-              onChanged: (value) {
-                if (value == null) return;
 
-                setState(() {
-                  shopMapIconKind = value;
-                });
-              },
-              value: shopMapIconKind,
-            ),
-            //最初の投稿
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 8),
-              child: Text(
-                '最初の投稿',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            PostFoodWidget(
-              onImageChanged: (image) {
-                setState(() {
-                  this.image = image;
-                });
-              },
-              onUmaiChanged: (isUmai) {
-                setState(() {
-                  this.isUmai = isUmai;
-                });
-              },
-              onDateChanged: (date) {
-                setState(() {
-                  this.date = date;
-                });
-              },
-              onCommentChanged: (comment) {
-                setState(() {
-                  this.comment = comment;
-                });
-              },
-              onCommentFocusChanged: (isFocus) {
-                setState(() {
-                  avoidkeyBoard = isFocus;
-                });
-              },
-            ),
-            //決定ボタン
+            //行きたいボタン
             Container(
               width: double.infinity,
               height: 50,
-              margin: const EdgeInsets.symmetric(vertical: 16),
+              margin: const EdgeInsets.only(top: 12),
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: const BorderSide(
+                      color: AppColors.primaryColor,
+                      width: 2,
+                    ),
+                  ),
+                  foregroundColor: AppColors.blackTextColor,
+                  backgroundColor: AppColors.whiteColor,
+                ),
+                onPressed: () {
+                  //行ってみたいお店として登録
+                  _onTapComfirm(context, true);
+                },
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.directions_walk,
+                      color: AppColors.primaryColor,
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      '行ってみたいお店として登録',
+                      style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            //登録ボタン
+            Container(
+              width: double.infinity,
+              height: 50,
+              margin: const EdgeInsets.only(top: 12),
               child: TextButton(
                 style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.primaryColor,
                 ),
                 onPressed: () {
-                  _onTapComfirm(context);
+                  //行ったお店として登録
+                  _onTapComfirm(context, false);
                 },
-                child: const Text(
-                  '店舗を登録',
-                  style: TextStyle(
-                      color: AppColors.blueTextColor,
-                      fontWeight: FontWeight.bold),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.check,
+                      color: AppColors.whiteColor,
+                    ),
+                    SizedBox(
+                      width: 4,
+                    ),
+                    Text(
+                      '行ったお店として登録',
+                      style: TextStyle(
+                          color: AppColors.whiteColor,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -238,14 +206,14 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
             Container(
               width: double.infinity,
               height: 50,
-              margin: const EdgeInsets.only(bottom: 50),
+              margin: const EdgeInsets.only(top: 12, bottom: 24),
               child: TextButton(
                 style: TextButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.backgroundWhiteColor,
+                  backgroundColor: AppColors.whiteColor,
                 ),
                 onPressed: () {
                   Navigator.pop(context);
@@ -254,7 +222,8 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   'キャンセル',
                   style: TextStyle(
                       color: AppColors.redTextColor,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16),
                 ),
               ),
             ),
@@ -265,166 +234,220 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
   }
 
   //決定ボタンを押した時の処理
-  void _onTapComfirm(BuildContext context) {
-    //バリデーション
-    if (shopName.isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('店名を入力してください'),
-            content: const Text('店を登録するためには、店名の入力が必要です。'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    } else if (address.isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('住所を取得できません'),
-            content: const Text('インターネットへの接続状況をご確認ください。'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('OK'),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    } else if (image == null && comment.isEmpty) {
-      showCupertinoDialog(
-        context: context,
-        builder: (context) {
-          return CupertinoAlertDialog(
-            title: const Text('最初の投稿がありません'),
-            content: const Text('最初の投稿なしで登録しますか？'),
-            actions: [
-              CupertinoDialogAction(
-                child: const Text('キャンセル'),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              CupertinoDialogAction(
-                child: const Text('店だけ登録'),
-                onPressed: () async {
-                  _addToDB(false);
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          );
-        },
-      );
-      return;
-    }
-    _addToDB(true);
+  void _onTapComfirm(BuildContext context, bool wantToGoFlg) {
+    _addToDB(wantToGoFlg);
   }
 
-  //DBに店を登録(initalPostFlg: 最初の投稿をするかどうか)
-  Future<void> _addToDB(bool initialPostFlg) async {
+  //DBに店を登録
+  Future<void> _addToDB(bool wantToGoFlg) async {
     final shop = Shop()
-      ..shopName = shopName
-      ..shopAddress = address 
+      ..shopName = widget.shopName ?? '名称未設定'
+      ..shopAddress = widget.address
+      ..googlePlaceId = widget.placeId
       ..shopLatitude = widget.latlng.latitude
       ..shopLongitude = widget.latlng.longitude
-      ..shopStar = rating
       ..shopMapIconKind = shopMapIconKind
+      ..wantToGoFlg = wantToGoFlg
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now();
-    final shopId = await IsarUtils.createShop(shop);
-    if (initialPostFlg) {
-      String? imagePath = await saveImageFile(image);
-
-      final timeline = Timeline()
-        ..image = imagePath
-        ..comment = comment
-        ..umai = isUmai
-        ..createdAt = DateTime.now()
-        ..updatedAt = DateTime.now()
-        ..shopId = shopId
-        ..date = date;
-      await IsarUtils.createTimeline(timeline);
-      if (context.mounted) {
-        //振動
-        Haptic.onSuccess();
-        Navigator.pop(context);
-        return;
-      }
-    }
-    if (context.mounted) {
-      //振動
-      Haptic.onSuccess();
-      Navigator.pop(context);
-    }
-  }
-
-  //緯度経度から住所を取得する
-  Future<String> _getAddressFromLatLng(LatLng latLng) async {
-    const String apiKey = String.fromEnvironment("YAHOO_API_KEY");
-    final String apiUrl =
-        'https://map.yahooapis.jp/geoapi/V1/reverseGeoCoder?lat=${latLng.latitude}&lon=${latLng.longitude}&appid=$apiKey&output=json';
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      final responseData = json.decode(response.body);
-      final address = responseData['Feature'][0]['Property']['Address'];
-      return address;
-    } else {
-      return '住所を取得できませんでした';
-    }
+    IsarUtils.createShop(shop).then((shopId) {
+        if (wantToGoFlg) {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: const Text('行ってみたいお店として\n登録しました'),
+                content: Container(
+                  width: 82,
+                  height: 82,
+                  margin: const EdgeInsets.only(top: 20, bottom: 12),
+                  child: SvgPicture.asset(
+                    'images/pins/pin_man.svg',
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('閉じる'),
+                    onPressed: () async {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ],
+              );
+            },
+          ).then(
+            (isInitialPost) {
+              if (isInitialPost) {
+                Navigator.pop(context, shopId);
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          );
+        } else {
+          showCupertinoDialog(
+            context: context,
+            builder: (context) {
+              return CupertinoAlertDialog(
+                title: const Text('行ったお店として登録しました'),
+                content: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    //ピン画像
+                    Container(
+                      width: 82,
+                      height: 82,
+                      margin: const EdgeInsets.symmetric(vertical: 20),
+                      child: SvgPicture.asset(
+                        findPinByKind(shopMapIconKind)?.pinImagePath ?? '',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    const Text('早速お店の感想を記録しましょう！'),
+                  ],
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    child: const Text('後で行う'),
+                    onPressed: () async {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                  CupertinoDialogAction(
+                    child: const Text(
+                      '記録する',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context, true);
+                    },
+                  ),
+                ],
+              );
+            },
+          ).then(
+            (isInitialPost) {
+              if (isInitialPost) {
+                Navigator.pop(context, shopId);
+              } else {
+                Navigator.pop(context);
+              }
+            },
+          );
+        }
+      },
+    );
   }
 }
 
-//店名を入力するWidget
-class _ShopNameTextField extends StatelessWidget {
-  final Function(String) onChanged;
-  final String? initialShopName;
+class _ShopNameArea extends StatelessWidget {
+  const _ShopNameArea({
+    required this.shopName,
+    required this.shopAddress,
+  });
 
-  const _ShopNameTextField({
-    Key? key,
-    required this.onChanged,
-    this.initialShopName,
-  }) : super(key: key);
+  final String shopName;
+  final String shopAddress;
 
   @override
   Widget build(BuildContext context) {
-    //角丸,白いぬりつぶし,枠線なし
-    return Flexible(
-      child: TextFormField(
-        decoration: InputDecoration(
-          hintText: '店名を入力',
-          filled: true,
-          fillColor: AppColors.textFieldColor,
-          contentPadding: const EdgeInsets.all(16),
-          enabledBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: AppColors.textFieldColor,
-            ),
-            borderRadius: BorderRadius.circular(12),
+    return ConstrainedBox(
+      //最低限の高さを設定
+      constraints: const BoxConstraints(
+        minHeight: 160,
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(12, 30, 12, 16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: AppColors.primaryColor,
+            width: 2,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: const BorderSide(
-              color: AppColors.textFieldColor,
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryColor.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 6,
+              offset: const Offset(0, 0),
             ),
-            borderRadius: BorderRadius.circular(12),
-          ),
+          ],
+          color: AppColors.whiteColor,
         ),
-        initialValue: initialShopName,
-        onChanged: onChanged,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              shopName,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(
+                  Icons.place,
+                  color: AppColors.greyDarkColor,
+                  size: 20,
+                ),
+                Flexible(
+                  child: Text(
+                    shopAddress,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.greyDarkColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class NewBudge extends StatelessWidget {
+  const NewBudge({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 36,
+      width: 100,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppColors.whiteColor,
+          width: 3,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.greyColor,
+            spreadRadius: 2,
+            blurRadius: 6,
+          ),
+        ],
+        color: AppColors.primaryColor,
+      ),
+      child: const Center(
+        child: Text(
+          "NEW!!",
+          style: TextStyle(
+              height: 1.2,
+              fontFamily: "SFProRounded",
+              color: AppColors.whiteColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 16),
+        ),
       ),
     );
   }

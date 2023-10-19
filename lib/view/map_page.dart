@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:bordered_text/bordered_text.dart';
@@ -8,28 +9,31 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
-import 'package:gohan_map/component/app_search_bar.dart';
+import 'package:gohan_map/icon/app_icon_icons.dart';
 import 'package:gohan_map/utils/apis.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
 import 'package:gohan_map/view/place_create_page.dart';
 import 'package:gohan_map/view/place_detail_page.dart';
+import 'package:gohan_map/view/place_post_page.dart';
 import 'package:gohan_map/view/place_search_page.dart';
 import 'package:isar/isar.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 ///地図が表示されている画面
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
   @override
-  State<MapPage> createState() => _MapPageState();
+  State<MapPage> createState() => MapPageState();
 }
 
-class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
+class MapPageState extends State<MapPage> with TickerProviderStateMixin {
   // Key? keyは、ウィジェットの識別子。ウィジェットの状態を保持するためには必要だが、今回は特に使わない。
   List<Marker> pins = [];
   Map<Id, bool> tapFlgs = {};
@@ -47,10 +51,23 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       FlutterNativeSplash.remove();
     });
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      changeTo120fps();
+      if (Platform.isAndroid) {
+        changeTo120fps();
+      }
     });
   }
-   Future<void> changeTo120fps() async {
+
+  void reload() {
+    Future(() async {
+      await _loadAllShop(); //DBから飲食店の情報を取得してピンを配置
+
+      await Future.delayed(
+          const Duration(milliseconds: 500)); // 高速に画面が切り替わることを避ける
+      FlutterNativeSplash.remove();
+    });
+  }
+
+  Future<void> changeTo120fps() async {
     try {
       FlutterDisplayMode.setHighRefreshRate();
     } on PlatformException catch (e) {
@@ -68,59 +85,8 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           child: AppMap(
             pins: pins,
             mapController: mapController,
-            onLongPress: (_, latLng) {
-              //画面の座標, 緯度経度
-              //振動
-              HapticFeedback.mediumImpact();
-
-              setState(() {
-                //ピンを配置する
-                _addPinToMap(latLng, null);
-              });
-              //mapをスクロールする
-              final deviceHeight = MediaQuery.of(context).size.height;
-              _moveToPin(latLng, deviceHeight * 0.2);
-              showModalBottomSheet(
-                barrierColor: Colors.black.withOpacity(0),
-                isDismissible: true,
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) {
-                  return PlaceCreatePage(
-                    latlng: latLng,
-                  );
-                },
-              ).then((value) {
-                _loadAllShop();
-              });
-            },
           ),
         ),
-        //下の検索ボタン
-        // Center(
-        //   //画像ボタン
-        //   child: Stack(
-        //     children: [
-        //       Image.asset(
-        //         'images/pin_tap.png',
-        //         width: 100,
-        //         height: 100,
-        //       ),
-        //       Positioned.fill(
-        //         child: Material(
-        //           color: Colors.transparent,
-        //           child: InkWell(
-        //             onTap: () {
-        //               // ボタンがタップされたときの処理
-        //               print('Button tapped!');
-        //             },
-        //           ),
-        //         ),
-        //       ),
-        //     ],
-        //   ),
-        // ),
         buildDummySearchWidget(),
       ],
     );
@@ -128,9 +94,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   //下の検索バー
   Widget buildDummySearchWidget() {
-    final paddingBottom = (SafeAreaUtil.unSafeAreaBottomHeight == 0)
-        ? 24.0
-        : SafeAreaUtil.unSafeAreaBottomHeight + 4.0;
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
@@ -140,20 +103,42 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
             child: Container(
               //モーダル風UIの中身
               decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                border: Border.all(
-                  color: AppColors.backgroundGreyColor,
-                  width: 1,
-                ),
+                color: AppColors.whiteColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20.0),
                   topRight: Radius.circular(20.0),
                 ),
+                boxShadow:
+                    [BoxShadow(blurRadius: 16, color: Colors.black.withOpacity(0.2))],
               ),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(16, 28, 16, paddingBottom),
-                child: AppSearchBar(
-                  onSubmitted: (value) {},
+                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(10)),
+                            border: Border.all(
+                              color: AppColors.greyColor,
+                              width: 1,
+                            ),
+                        ),
+                  child: Row(
+                    children: [
+                      Container(
+                        height: 50,
+                        width: 50,
+                        decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            color: AppColors.primaryColor
+                        ),
+                        child: const Icon(AppIcons.search, color: AppColors.whiteColor,),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 12),
+                        child: Text("お店の 検索 / 登録",style: TextStyle(color: Colors.black38,),),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -176,7 +161,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 //valueの型がInt→詳細画面
                 //int型ならそのまま、Id型ならばnullにしたい
                 int? id = (value is int) ? value : null;
-                //valueの型がHotPepper→検索から新規作成
+                //valueの型がPlaceApiRestaurantResult→新規作成画面
                 PlaceApiRestaurantResult? paResult =
                     (value is PlaceApiRestaurantResult) ? value : null;
 
@@ -204,7 +189,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                           LatLng(shop.shopLatitude, shop.shopLongitude);
                       //ピンの位置に移動する
                       final deviceHeight = MediaQuery.of(context).size.height;
-                      _moveToPin(latLng, deviceHeight * 0.2);
+                      _moveToPin(latLng, (deviceHeight - 150) * 0.2);
                     }
                   });
                 }
@@ -217,7 +202,7 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   });
                   //mapをスクロールする
                   final deviceHeight = MediaQuery.of(context).size.height;
-                  _moveToPin(paResult.latlng, deviceHeight * 0.2);
+                  _moveToPin(paResult.latlng, (deviceHeight - 150) * 0.2);
                   showModalBottomSheet(
                     barrierColor: Colors.black.withOpacity(0),
                     isDismissible: true,
@@ -227,11 +212,36 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                     builder: (context) {
                       return PlaceCreatePage(
                         latlng: paResult.latlng,
-                        initialShopName: paResult.name,
+                        shopName: paResult.name,
+                        placeId: paResult.placeId,
+                        address: paResult.address,
                       );
                     },
-                  ).then((value) {
+                  ).then((shopId) {
                     _loadAllShop();
+                    if (shopId != null) {
+                      //ピンの位置に移動する
+                      IsarUtils.getShopById(shopId).then((shop) {
+                        if (shop != null) {
+                          final latLng =
+                              LatLng(shop.shopLatitude, shop.shopLongitude);
+                          _moveToPin(latLng, (deviceHeight - 150) * 0.2);
+                          //初回投稿
+                          showModalBottomSheet(
+                            barrierColor: Colors.black.withOpacity(0),
+                            isDismissible: true,
+                            context: context,
+                            isScrollControlled: true,
+                            backgroundColor: Colors.transparent,
+                            builder: (context) {
+                              return PlacePostPage(
+                                shop: shop,
+                              );
+                            },
+                          );
+                        }
+                      });
+                    }
                   });
                 }
               },
@@ -244,10 +254,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   //1つのピンを、地図に描画するための配列pinsに追加する関数
   void _addPinToMap(LatLng latLng, Shop? shop) {
-    const markerSize = 40.0;
-    const imgRatio = 345 / 512;
+    const markerSize = 44.0;
+    const imgRatio = 405 / 512;
     final shopMapPin = findPinByKind(shop?.shopMapIconKind);
-
     pins.add(
       Marker(
         width: markerSize * imgRatio,
@@ -256,7 +265,9 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
         point: latLng,
         builder: (context) {
           //ラベルの表示判定に利用する文字長
-          int? textLen = shop?.shopName.replaceAll(RegExp(r'[^\x00-\x7F]'), '  ').length;//ASCII文字:1文字分、日本語:2文字分
+          int? textLen = shop?.shopName
+              .replaceAll(RegExp(r'[^\x00-\x7F]'), '  ')
+              .length; //ASCII文字:1文字分、日本語:2文字分
           //ピンのデザイン
           return AnimatedContainer(
             duration: const Duration(milliseconds: 200),
@@ -271,44 +282,56 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 onTap: () {
                   //ピンをタップしたときの処理
                   if (shop != null) {
-                    setState(() {
-                      tapFlgs[shop.id] = true;
-                    });
+                    //マップを自動スクロールする
                     final deviceHeight = MediaQuery.of(context).size.height;
-                    _moveToPin(latLng, deviceHeight * 0.2);
-                    showModalBottomSheet(
-                      barrierColor: Colors.black.withOpacity(0),
-                      isDismissible: true,
-                      isScrollControlled: true,
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (context) {
-                        return PlaceDetailPage(
-                          id: shop.id,
-                        ); //飲食店の詳細画面
-                      },
-                    ).then((value) => _onModalPop(value, shop.id));
+                    _moveToPin(latLng, (deviceHeight - 150) * 0.2);
+                    HapticFeedback.heavyImpact();
+                    //300ms後にモーダルを表示する
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      setState(() {
+                        tapFlgs[shop.id] = true;
+                      });
+                      //Heroアニメーションに対応したモーダル
+                      showMaterialModalBottomSheet(
+                        barrierColor: Colors.black.withOpacity(0),
+                        isDismissible: true,
+                        duration: const Duration(milliseconds: 250),
+                        backgroundColor: Colors.transparent,
+                        context: context,
+                        builder: (context) {
+                          return PlaceDetailPage(
+                            id: shop.id,
+                          ); //飲食店の詳細画面
+                        },
+                      ).then((value) => _onModalPop(value, shop.id));
+                    });
                   }
                 },
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Image.asset(shopMapPin != null
-                        ? shopMapPin.pinImagePath
-                        : 'images/pins/pin_default.png'),
-                    if (shop != null && shopMapPin != null && _isShowShopName(shop, shops,textLen ?? 0))
+                    SvgPicture.asset(shopMapPin != null
+                        ? (shop?.wantToGoFlg ?? false)
+                            ? 'images/pins/pin_man.svg'
+                            : shopMapPin.pinImagePath
+                        : 'images/pins/pin_default.svg'),
+                    if (shop != null &&
+                        shopMapPin != null &&
+                        _isShowShopName(shop, shops, textLen ?? 0))
                       Positioned(
-                        left: 33,
-                        top: 7,
+                        left: 38,
+                        top: 10,
                         child: BorderedText(
                           strokeWidth: 2,
-                          strokeColor: AppColors.backgroundWhiteColor,
+                          strokeColor: AppColors.whiteColor,
                           child: Text(
                             shop.shopName,
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: shopMapPin.textColor),
+                                color: (shop.wantToGoFlg)
+                                    ? AppColors.tabBarColor
+                                    : shopMapPin.textColor),
                           ),
                         ),
                       )
@@ -326,10 +349,10 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
     var zoom = 15.0;
     var rot = 0.0;
     var rtnFlg = true;
-    try{
+    try {
       zoom = mapController.zoom;
       rot = mapController.rotation;
-    }finally{
+    } finally {
       //1ピクセルあたりの緯度経度
       var pixelPerLat = pow(2, zoom + 8) / 360;
       var pixelPerLng =
@@ -341,9 +364,14 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
           final latDiff = s.shopLatitude - shop.shopLatitude;
           final lngDiff = s.shopLongitude - shop.shopLongitude;
           //マップの回転を考慮しピクセルの差を計算
-          final pixelHDiff = latDiff * pixelPerLat * cos(rot * pi / 180) - lngDiff * pixelPerLng * sin(rot * pi / 180);
-          final pixelWDiff = latDiff * pixelPerLat * sin(rot * pi / 180) + lngDiff * pixelPerLng * cos(rot * pi / 180);
-          if (pixelHDiff < 10 && pixelHDiff > -10 && pixelWDiff < textLen*5 && pixelWDiff > 0) {
+          final pixelHDiff = latDiff * pixelPerLat * cos(rot * pi / 180) -
+              lngDiff * pixelPerLng * sin(rot * pi / 180);
+          final pixelWDiff = latDiff * pixelPerLat * sin(rot * pi / 180) +
+              lngDiff * pixelPerLng * cos(rot * pi / 180);
+          if (pixelHDiff < 10 &&
+              pixelHDiff > -10 &&
+              pixelWDiff < textLen * 5 &&
+              pixelWDiff > 0) {
             rtnFlg = false;
             break;
           }
@@ -353,7 +381,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
     return rtnFlg;
   }
-
 
   //DBから飲食店の情報を全て取得してピンを配置する関数。ラベルの表示するかも判定する。
   Future<void> _loadAllShop() async {
@@ -368,8 +395,6 @@ class _MapPageState extends State<MapPage> with TickerProviderStateMixin {
       // reload
     });
   }
-
-
 
   //modalから戻ってきたときに実行される関数
   void _onModalPop(dynamic value, int id) {
