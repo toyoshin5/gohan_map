@@ -158,8 +158,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
                 child: const Text(
                   '決定',
                   style: TextStyle(
-                      color: AppColors.whiteColor,
-                      fontWeight: FontWeight.bold),
+                      color: AppColors.whiteColor, fontWeight: FontWeight.bold),
                 ),
               ),
             ),
@@ -216,7 +215,11 @@ class _PlacePostPageState extends State<PlacePostPage> {
       return;
     }
 
-    
+    if (isPublic) {
+      //TODO:画像投稿APIを叩く
+    } else if (widget.timeline != null) {
+      //TODO:画像削除APIを叩く
+    }
     Future(() async {
       //wantToGoフラグがTrueの場合はFalseに変更
       if (widget.shop.wantToGoFlg) {

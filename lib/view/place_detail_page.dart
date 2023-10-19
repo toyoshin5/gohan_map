@@ -70,7 +70,10 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                //高さ未定の子は、最も高い子の高さに合わせる
+                if (selectedShop?.wantToGoFlg ?? false)
+                  Container(
+                      alignment: Alignment.centerRight,
+                      child: const _WantToGoBudge()),
                 ShopNameHeader(
                   title: selectedShop?.shopName ?? "",
                   address: selectedShop?.shopAddress ?? "",
@@ -413,6 +416,45 @@ class SubButton extends StatelessWidget {
                 )),
           ]),
         ),
+      ),
+    );
+  }
+}
+
+
+class _WantToGoBudge extends StatelessWidget {
+  const _WantToGoBudge({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppColors.whiteColor,
+          width: 2,
+        ),
+        boxShadow: const [
+          BoxShadow(
+            color: AppColors.greyColor,
+            spreadRadius: 1,
+            blurRadius: 1,
+            offset: Offset(0, 1),
+          ),
+        ],
+        color: const Color(0xFFFF5959),
+      ),
+      child: const Text(
+        "行ってみたい！",
+        style: TextStyle(
+            height: 1.2,
+            fontFamily: "SFProRounded",
+            color: AppColors.whiteColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 10),
       ),
     );
   }
