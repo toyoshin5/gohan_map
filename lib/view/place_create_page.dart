@@ -4,7 +4,6 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 
 import 'package:gohan_map/collections/shop.dart';
-import 'package:gohan_map/icon/app_icon_icons.dart';
 
 import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/isar_utils.dart';

@@ -31,6 +31,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
   DateTime date = DateTime.now();
   String comment = '';
   double star = 4.0;
+  bool isPublic = false;
   bool avoidkeyBoard = false;
   bool isLoading = true;
 
@@ -51,6 +52,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
         date = widget.timeline!.date;
         comment = widget.timeline!.comment;
         star = widget.timeline!.star;
+        isPublic = widget.timeline!.isPublic;
       }
       setState(() {
         // reload
@@ -130,6 +132,12 @@ class _PlacePostPageState extends State<PlacePostPage> {
                   avoidkeyBoard = isFocus;
                 });
               },
+              initialPublic: isPublic,
+              onPublicChanged: (isPublic) {
+                setState(() {
+                  this.isPublic = isPublic;
+                });
+              },
             ),
             //決定ボタン
             Container(
@@ -141,16 +149,16 @@ class _PlacePostPageState extends State<PlacePostPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.whiteColor,
+                  foregroundColor: AppColors.whiteColor,
+                  backgroundColor: AppColors.primaryColor,
                 ),
                 onPressed: () {
                   onTapComfirm(context);
                 },
                 child: const Text(
-                  '投稿',
+                  '決定',
                   style: TextStyle(
-                      color: AppColors.primaryColor,
+                      color: AppColors.whiteColor,
                       fontWeight: FontWeight.bold),
                 ),
               ),
@@ -246,7 +254,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
       ..images = imagePathList
       ..comment = comment
       ..star = star
-      ..isPublic = false
+      ..isPublic = isPublic
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now()
       ..shopId = widget.shop.id
@@ -275,7 +283,7 @@ class _PlacePostPageState extends State<PlacePostPage> {
       ..images = imagePathList
       ..comment = comment
       ..star = star
-      ..isPublic = false
+      ..isPublic = isPublic
       ..createdAt = widget.timeline!.createdAt
       ..updatedAt = DateTime.now()
       ..shopId = widget.shop.id

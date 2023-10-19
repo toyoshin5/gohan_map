@@ -201,13 +201,16 @@ class _PlaceDetailPageState extends State<PlaceDetailPage> {
                         children: [
                           Icon(
                             Icons.edit_note,
+                            color: AppColors.whiteColor,
                             size: 25,
                           ),
                           SizedBox(width: 8),
                           Text(
                             "記録する",
                             style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: AppColors.whiteColor),
                           ),
                         ],
                       ),

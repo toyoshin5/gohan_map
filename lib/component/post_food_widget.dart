@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:date_time_picker/date_time_picker.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:exif/exif.dart';
 import 'package:flutter/Cupertino.dart';
@@ -12,7 +12,7 @@ import 'package:gohan_map/utils/logger.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
-class PostFoodWidget extends StatefulWidget {
+class PostFoodWidget extends StatelessWidget {
   const PostFoodWidget({
     Key? key,
     required this.images,
@@ -25,6 +25,8 @@ class PostFoodWidget extends StatefulWidget {
     this.initialComment,
     required this.onCommentChanged,
     this.onCommentFocusChanged,
+    required this.onPublicChanged,
+    this.initialPublic,
   }) : super(key: key);
   final List<File> images;
   final Function(File) onImageAdded;
@@ -41,21 +43,8 @@ class PostFoodWidget extends StatefulWidget {
 
   final Function(bool)? onCommentFocusChanged;
 
-  @override
-  State<PostFoodWidget> createState() => _PostFoodWidgetState();
-}
-
-//白い枠で囲まれた、投稿内容を入力する部分
-class _PostFoodWidgetState extends State<PostFoodWidget> {
-  TextEditingController dateController = TextEditingController();
-
-  @override
-  void initState() {
-    dateController.text = widget.initialDate != null
-        ? widget.initialDate.toString()
-        : DateTime.now().toString();
-    super.initState();
-  }
+  final Function(bool) onPublicChanged;
+  final bool? initialPublic;
 
   @override
   Widget build(BuildContext context) {
@@ -63,38 +52,36 @@ class _PostFoodWidgetState extends State<PostFoodWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _StarSection(
-          initialStar: widget.initialStar,
-          onChanged: widget.onStarChanged,
+          initialStar: initialStar,
+          onChanged: onStarChanged,
         ),
         const SizedBox(height: 16),
         _ImgSection(
-            images: widget.images,
-            onAdded: widget.onImageAdded,
-            onDeleted: widget.onImageDeleted,
+            images: images,
+            onAdded: onImageAdded,
+            onDeleted: onImageDeleted,
             onDateTimeChanged: (DateTime dateTime) {
-              dateController.value =
-                  dateController.value.copyWith(text: dateTime.toString());
-              widget.onDateChanged(dateTime);
+              // date = dateTime;
+              onDateChanged(dateTime);
             }),
         const SizedBox(height: 16),
         _DateSection(
-          controller: dateController,
-          onChanged: widget.onDateChanged,
+          date: initialDate ?? DateTime.now(),
+          onChanged: onDateChanged,
         ),
         const SizedBox(height: 16),
         _CommentSection(
-          initialComment: widget.initialComment,
-          onChanged: widget.onCommentChanged,
-          onFocusChanged: widget.onCommentFocusChanged,
+          initialComment: initialComment,
+          onChanged: onCommentChanged,
+          onFocusChanged: onCommentFocusChanged,
+        ),
+        const SizedBox(height: 16),
+        _PublicSection(
+          isPublic: initialPublic ?? false,
+          onChanged: onPublicChanged,
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    dateController.dispose();
-    super.dispose();
   }
 }
 
@@ -144,64 +131,81 @@ class _ImgSection extends StatelessWidget {
         ),
         DottedBorder(
           padding: EdgeInsets.zero,
+          strokeWidth: 2,
           borderType: BorderType.RRect,
-          radius: const Radius.circular(10),
+          radius: const Radius.circular(8),
           dashPattern: const [5, 5],
-          color: AppColors.blackTextColor,
+          color: const Color(0xFF444444),
           child: SizedBox(
             width: double.infinity,
             child: Column(
               children: [
                 _UploadButton(
-                    onPressed: (images.length >= 4)
-                        ? null
-                        : () {
-                  //iOS風のアクションシート
-                  showCupertinoModalPopup(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return CupertinoActionSheet(
-                        title: const Text('写真を追加'),
-                        actions: [
-                          CupertinoActionSheetAction(
-                            onPressed: () async {
-                                        if (context.mounted) {
-                                Navigator.pop(context);
-                              }
-                              await takePhoto();
+                  isMax: images.length >= 4,
+                  onPressed: (images.length >= 4)
+                      ? null
+                      : () {
+                          //iOS風のアクションシート
+                          showCupertinoModalPopup(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return CupertinoActionSheet(
+                                title: const Text('写真を追加'),
+                                actions: [
+                                  CupertinoActionSheetAction(
+                                    onPressed: () async {
+                                      if (context.mounted) {
+                                        Navigator.pop(context);
+                                      }
+                                      await takePhoto();
+                                    },
+                                    child: const Text('カメラで撮影'),
+                                  ),
+                                  CupertinoActionSheetAction(
+                                    onPressed: () async {
+                                      if (context.mounted) {
+                                        Navigator.pop(context);
+                                      }
+                                      await pickImage();
+                                    },
+                                    child: const Text('アルバムから選択'),
+                                  ),
+                                ],
+                                cancelButton: CupertinoActionSheetAction(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('キャンセル'),
+                                ),
+                              );
                             },
-                            child: const Text('カメラで撮影'),
-                          ),
-                          CupertinoActionSheetAction(
-                            onPressed: () async {
-                                        if (context.mounted) {
-                                Navigator.pop(context);
-                              }
-                              await pickImage();
-                            },
-                            child: const Text('アルバムから選択'),
-                          ),
-                        ],
-                        cancelButton: CupertinoActionSheetAction(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: const Text('キャンセル'),
-                        ),
-                      );
-                    },
-                  );
-                          }),
-                for (int i = 0; i < images.length; i++)
-                  _SelectedImgWidget(
-                    image: images[i],
-                    onDeletePressed: () {
-                      onDeleted(i);
-                    },
-                  ),
+                          );
+                        },
+                ),
               ],
             ),
           ),
+        ),
+        //GridViewを使う
+        if (images.isNotEmpty) const SizedBox(height: 8),
+        GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: images.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 4,
+            crossAxisSpacing: 4,
+            childAspectRatio: 16 / 9,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            return _SelectedImgWidget(
+              image: images[index],
+              onDeletePressed: () {
+                onDeleted(index);
+              },
+            );
+          },
         ),
       ],
     );
@@ -248,7 +252,6 @@ class _ImgSection extends StatelessWidget {
 
 class _SelectedImgWidget extends StatelessWidget {
   const _SelectedImgWidget({
-    super.key,
     required this.image,
     required this.onDeletePressed,
   });
@@ -261,18 +264,20 @@ class _SelectedImgWidget extends StatelessWidget {
     return Stack(
       children: [
         //画像を表示
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: IntrinsicHeight(
+        SizedBox(
+          height: double.infinity,
+          width: double.infinity,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
             child: Image.file(
               image!,
-              fit: BoxFit.contain,
+              fit: BoxFit.cover,
             ),
           ),
         ),
         Positioned(
-          right: 0,
-          top: 0,
+          right: -4,
+          top: -4,
           child: IconButton(
             onPressed: onDeletePressed,
             icon: const Icon(
@@ -289,8 +294,10 @@ class _SelectedImgWidget extends StatelessWidget {
 class _UploadButton extends StatelessWidget {
   const _UploadButton({
     required this.onPressed,
+    this.isMax = false,
   });
   final VoidCallback? onPressed;
+  final bool isMax;
 
   @override
   Widget build(BuildContext context) {
@@ -302,24 +309,27 @@ class _UploadButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          backgroundColor: AppColors.whiteColor,
         ),
-        child: SizedBox(
-          height: 50,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (!isMax)
+              const Icon(
                 Icons.upload_rounded,
-                color: Colors.grey.shade800,
+                color: Color(0xFF444444),
                 size: 30,
               ),
-              const Text(
-                '写真を追加する',
-                style: TextStyle(color: AppColors.blackTextColor),
-              ),
-            ],
-          ),
+            const SizedBox(
+              width: 8,
+            ),
+            Text(
+              (isMax) ? '写真は最大4枚まで' : '写真を追加する',
+              style: TextStyle(
+                  color: (isMax)
+                      ? AppColors.greyDarkColor
+                      : const Color(0xFF595959)),
+            ),
+          ],
         ),
       ),
     );
@@ -329,11 +339,11 @@ class _UploadButton extends StatelessWidget {
 //訪問日入力欄
 class _DateSection extends StatelessWidget {
   const _DateSection({
-    required this.controller,
+    required this.date,
     required this.onChanged,
   });
 
-  final TextEditingController controller;
+  final DateTime date;
   final Function(DateTime) onChanged;
 
   @override
@@ -344,27 +354,52 @@ class _DateSection extends StatelessWidget {
           padding: EdgeInsets.only(bottom: 16),
           child: _SectionTitle(icon: Icons.edit_calendar_rounded, title: "訪問日"),
         ),
-        Container(
-          //角丸四角形
+        SizedBox(
           width: double.infinity,
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-          decoration: BoxDecoration(
-            color: AppColors.searchBarColor,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: DateTimePicker(
-            type: DateTimePickerType.date,
-            firstDate: DateTime(2000),
-            lastDate: DateTime(2100),
-            dateMask: 'yyyy/MM/dd',
-            //icon: Icon(Icons.watch_later_outlined),
-            dateLabelText: '訪問日',
-            controller: controller,
-            use24HourFormat: true,
-            onChanged: (value) {
-              onChanged(DateTime.parse(value));
-            },
-          ),
+          height: 50,
+          child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: const BorderSide(
+                      color: Color(0xFF444444),
+                      width: 1,
+                    ),
+                  ),
+                  backgroundColor: AppColors.whiteColor,
+                  foregroundColor: const Color(0xFF444444)),
+              onPressed: () async {
+                var results = await showCalendarDatePicker2Dialog(
+                  context: context,
+                  config: CalendarDatePicker2WithActionButtonsConfig(
+                    weekdayLabels: ['日', '月', '火', '水', '木', '金', '土'],
+                    selectedDayHighlightColor: AppColors.primaryColor,
+                    cancelButton: const Text(
+                      "キャンセル",
+                      style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    okButton: const Text(
+                      "決定",
+                      style: TextStyle(
+                          color: AppColors.primaryColor,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  dialogSize: const Size(325, 400),
+                  value: [date],
+                  borderRadius: BorderRadius.circular(15),
+                );
+                if (results != null && results.isNotEmpty) {
+                  onChanged(results.first!);
+                }
+              },
+              child: Text(
+                DateFormat('yyyy年MM月dd日').format(date),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              )),
         ),
       ],
     );
@@ -398,20 +433,21 @@ class _CommentSection extends StatelessWidget {
             minLines: 3,
             initialValue: initialComment,
             decoration: InputDecoration(
-              hintText: 'コメント',
+              hintText: 'おいしかった！',
               filled: true,
-              fillColor: AppColors.searchBarColor,
+              fillColor: AppColors.whiteColor,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               enabledBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
-                  color: AppColors.whiteColor,
+                  color: AppColors.blackTextColor,
+                  width: 1,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
               focusedBorder: OutlineInputBorder(
                 borderSide: const BorderSide(
-                  color: AppColors.whiteColor,
+                  color: AppColors.blackTextColor,
                 ),
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -419,6 +455,42 @@ class _CommentSection extends StatelessWidget {
             onChanged: onChanged,
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _PublicSection extends StatelessWidget {
+  const _PublicSection({
+    this.isPublic = false,
+    required this.onChanged,
+  });
+  final bool isPublic;
+  final Function(bool) onChanged;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(bottom: 8),
+          child: _SectionTitle(icon: Icons.lock, title: "公開設定"),
+        ),
+        Row(
+          children: [
+            const Text('画像の公開を許可'),
+            const Spacer(),
+            CupertinoSwitch(
+              value: isPublic,
+              onChanged: onChanged,
+              activeColor: AppColors.primaryColor,
+            ),
+          ],
+        ),
+        const Text(
+          "投稿した画像が他ユーザーに閲覧されることがあります\n※訪問日やコメントは公開されません",
+          style: TextStyle(color: AppColors.greyDarkColor, fontSize: 10),
+        )
       ],
     );
   }
