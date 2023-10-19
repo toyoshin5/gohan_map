@@ -67,6 +67,7 @@ dependencies:
   share_plus: ^7.2.1
   calendar_date_picker2: ^0.5.3
   flutter_svg: ^2.0.7
+  appinio_swiper: ^2.0.3
 
 dev_dependencies:
   flutter_test:
