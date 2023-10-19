@@ -10,13 +10,13 @@ class MapPin {
 }
 
 final mapPins = [
-  MapPin("デフォルト", "default", "images/pins/pin_default.png",
+  MapPin("デフォルト", "default", "images/pins/pin_default.svg",
       const Color(0xFFEF5350)),
-  MapPin("ご飯もの", "rice", "images/pins/pin_rice.png", const Color(0xFF4CAF50)),
-  MapPin("ラーメン", "ramen", "images/pins/pin_ramen.png", const Color(0xFF7E57C2)),
+  MapPin("ご飯もの", "rice", "images/pins/pin_kome.svg", const Color(0xFF4CAF50)),
+  MapPin("ラーメン", "ramen", "images/pins/pin_ramen.svg", const Color(0xFF7E57C2)),
   MapPin(
-      "喫茶店", "coffee", "images/pins/pin_coffee.png", const Color(0xFF29B6F6)),
-  MapPin("ハンバーガー", "hamburger", "images/pins/pin_hamburger.png",
+      "喫茶店", "coffee", "images/pins/pin_cafe.svg", const Color(0xFF29B6F6)),
+  MapPin("ハンバーガー", "hamburger", "images/pins/pin_ham.svg",
       const Color(0xFFFF7043)),
 ];
 

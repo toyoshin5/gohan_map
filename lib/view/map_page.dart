@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_map.dart';
@@ -256,10 +257,9 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   //1つのピンを、地図に描画するための配列pinsに追加する関数
   void _addPinToMap(LatLng latLng, Shop? shop) {
-    const markerSize = 40.0;
-    const imgRatio = 345 / 512;
+    const markerSize = 44.0;
+    const imgRatio = 405 / 512;
     final shopMapPin = findPinByKind(shop?.shopMapIconKind);
-
     pins.add(
       Marker(
         width: markerSize * imgRatio,
@@ -313,15 +313,15 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Image.asset(shopMapPin != null
+                    SvgPicture.asset(shopMapPin != null
                         ? shopMapPin.pinImagePath
-                        : 'images/pins/pin_default.png'),
+                        : 'images/pins/pin_default.svg'),
                     if (shop != null &&
                         shopMapPin != null &&
                         _isShowShopName(shop, shops, textLen ?? 0))
                       Positioned(
-                        left: 33,
-                        top: 7,
+                        left: 38,
+                        top: 10,
                         child: BorderedText(
                           strokeWidth: 2,
                           strokeColor: AppColors.whiteColor,
