@@ -4,7 +4,6 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 
 import 'package:gohan_map/collections/shop.dart';
-import 'package:gohan_map/icon/app_icon_icons.dart';
 
 import 'package:gohan_map/utils/map_pins.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
@@ -110,7 +109,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                     ],
                     onChanged: (value) {
                       if (value == null) return;
-            
                       setState(
                         () {
                           shopMapIconKind = value;
@@ -344,7 +342,6 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
 
 class _ShopNameArea extends StatelessWidget {
   const _ShopNameArea({
-    super.key,
     required this.shopName,
     required this.shopAddress,
   });

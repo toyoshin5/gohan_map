@@ -9,6 +9,7 @@ import 'package:gohan_map/utils/map_pins.dart';
 
 import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/component/app_modal.dart';
+import 'package:gohan_map/view/place_detail_page.dart';
 
 // 飲食店の更新画面
 class PlaceUpdatePage extends StatefulWidget {
@@ -52,40 +53,18 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            //飲食店名
-            Text(
-              widget.shop.shopName,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            //住所
-            const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.place,
-                    color: Colors.blue,
-                  ),
-                  Padding(padding: EdgeInsets.only(right: 5)),
-                  Text(
-                    '住所',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Text(
-              widget.shop.shopAddress,
-              style: const TextStyle(fontSize: 16),
+            ShopNameHeader(
+                title: widget.shop.shopName, address: widget.shop.shopAddress),
+            const Divider(
+              color: AppColors.greyColor,
+              thickness: 1,
+              height: 16,
             ),
             // ピンの種類
             const Padding(
-              padding: EdgeInsets.fromLTRB(0, 16, 0, 4),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 4),
               child: Text(
-                'ピンの種類',
+                'お店のジャンル',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -161,7 +140,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                     borderRadius: BorderRadius.circular(10),
                   ),
                   foregroundColor: AppColors.blackTextColor,
-                  backgroundColor: AppColors.whiteColor,
+                  backgroundColor: AppColors.primaryColor,
                 ),
                 onPressed: (isValidating)
                     ? null
@@ -179,13 +158,13 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                         width: 14,
                         child: const CircularProgressIndicator(
                           valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.primaryColor),
+                              AppColors.whiteColor),
                         ),
                       ),
                     const Text(
                       '決定',
                       style: TextStyle(
-                          color: AppColors.primaryColor,
+                          color: AppColors.whiteColor,
                           fontWeight: FontWeight.bold),
                     ),
                   ],
@@ -209,7 +188,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                   _deleteShop();
                 },
                 child: const Text(
-                  '削除',
+                  'お店を削除',
                   style: TextStyle(
                       color: AppColors.redTextColor,
                       fontWeight: FontWeight.bold),

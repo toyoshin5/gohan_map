@@ -29,7 +29,7 @@ class PostCardWidget extends StatelessWidget {
       children: [
         Container(
           margin: const EdgeInsets.all(16),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
           decoration: BoxDecoration(
             border: Border.all(color: AppColors.primaryColor, width: 1),
             borderRadius: const BorderRadius.all(Radius.circular(16)),
@@ -56,16 +56,25 @@ class PostCardWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         DateFormat('yyyy年MM月dd日').format(timeline.date),
                         style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            height: 1.3),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
                       ),
+                      if (!timeline.isPublic)
+                        const Padding(
+                          padding: EdgeInsets.only(left: 8),
+                          child: Icon(
+                            Icons.lock_rounded,
+                            //color: AppColors.greyDarkColor,
+                            size: 22,
+                          ),
+                        ),
                     ],
                   ),
                   PullDownButton(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:gohan_map/bottom_navigation.dart';
+import 'package:gohan_map/colors/app_colors.dart';
 import 'package:gohan_map/tab_navigator.dart';
 import 'package:gohan_map/utils/logger.dart';
 import 'package:gohan_map/utils/safearea_utils.dart';
