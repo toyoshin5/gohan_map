@@ -94,9 +94,6 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
 
   //下の検索バー
   Widget buildDummySearchWidget() {
-    final paddingBottom = (SafeAreaUtil.unSafeAreaBottomHeight == 0)
-        ? 24.0
-        : SafeAreaUtil.unSafeAreaBottomHeight + 4.0;
     return Align(
       alignment: Alignment.bottomCenter,
       child: SizedBox(
@@ -314,7 +311,9 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                   clipBehavior: Clip.none,
                   children: [
                     SvgPicture.asset(shopMapPin != null
-                        ? shopMapPin.pinImagePath
+                        ? (shop?.wantToGoFlg ?? false)
+                            ? 'images/pins/pin_man.svg'
+                            : shopMapPin.pinImagePath
                         : 'images/pins/pin_default.svg'),
                     if (shop != null &&
                         shopMapPin != null &&
@@ -330,7 +329,9 @@ class MapPageState extends State<MapPage> with TickerProviderStateMixin {
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
-                                color: shopMapPin.textColor),
+                                color: (shop.wantToGoFlg)
+                                    ? AppColors.tabBarColor
+                                    : shopMapPin.textColor),
                           ),
                         ),
                       )

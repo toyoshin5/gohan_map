@@ -262,7 +262,7 @@ class _PlaceCreatePageState extends State<PlaceCreatePage> {
                   height: 82,
                   margin: const EdgeInsets.only(top: 20, bottom: 12),
                   child: SvgPicture.asset(
-                    findPinByKind(shopMapIconKind)?.pinImagePath ?? '',
+                    'images/pins/pin_man.svg',
                     fit: BoxFit.contain,
                   ),
                 ),
