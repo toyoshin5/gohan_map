@@ -3,6 +3,7 @@ import 'package:flutter/Cupertino.dart';
 import 'package:flutter/Material.dart';
 import 'package:flutter_haptic/haptic.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gohan_map/collections/shop.dart';
 import 'package:gohan_map/utils/isar_utils.dart';
 import 'package:gohan_map/utils/map_pins.dart';
@@ -83,7 +84,7 @@ class _PlaceUpdatePageState extends State<PlaceUpdatePage>
                           width: 30,
                           height: 40,
                           padding: const EdgeInsets.only(right: 10),
-                          child: Image.asset(
+                          child: SvgPicture.asset(
                             v.pinImagePath,
                             fit: BoxFit.contain,
                           ),
