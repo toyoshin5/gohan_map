@@ -469,12 +469,15 @@ class _PublicSection extends StatelessWidget {
   final Function(bool) onChanged;
   @override
   Widget build(BuildContext context) {
+    final String msg = (isPublic)
+        ? "投稿した画像がおすすめ機能として他ユーザーに公開されることがあります\n※訪問日やコメントは公開されません"
+        : "投稿した画像がおすすめ機能として他ユーザーに公開されることはありません";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
           padding: EdgeInsets.only(bottom: 8),
-          child: _SectionTitle(icon: Icons.lock, title: "公開設定"),
+          child: _SectionTitle(icon: Icons.lock_open_rounded, title: "公開設定"),
         ),
         Row(
           children: [
@@ -487,9 +490,9 @@ class _PublicSection extends StatelessWidget {
             ),
           ],
         ),
-        const Text(
-          "投稿した画像が他ユーザーに閲覧されることがあります\n※訪問日やコメントは公開されません",
-          style: TextStyle(color: AppColors.greyDarkColor, fontSize: 10),
+        Text(
+          msg,
+          style: const TextStyle(color: AppColors.greyDarkColor, fontSize: 10),
         )
       ],
     );
